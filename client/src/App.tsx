@@ -212,9 +212,9 @@ export function App() {
   if (viewMode === 'landing') {
     return (
       <LandingPage
-        onNavigateToAuth={(mode, role) => {
+        onNavigateToAuth={(mode) => {
           setAuthInitialMode(mode);
-          setAuthTargetRole(role || 'organizer');
+          setAuthTargetRole('organizer');
           setViewMode('auth');
         }}
         onLaunchApp={(targetTab) => {
