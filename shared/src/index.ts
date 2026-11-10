@@ -5,17 +5,24 @@
 // ==========================================
 // User & Multi-Tenancy Roles
 // ==========================================
-export enum SystemRole {
+export enum PlatformRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
-  USER = 'USER'
+  SUPPORT_ADMIN = 'SUPPORT_ADMIN'
 }
 
 export enum OrganizationRole {
   OWNER = 'OWNER',
   ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
-  AUDITOR = 'AUDITOR',
+  STAFF = 'STAFF'
+}
+
+export enum ElectionRole {
   VOTER = 'VOTER'
+}
+
+export enum SystemRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  USER = 'USER'
 }
 
 export interface UserProfile {
@@ -24,8 +31,16 @@ export interface UserProfile {
   fullName: string;
   avatarUrl?: string;
   systemRole: SystemRole;
+  platformRoles?: PlatformRole[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface OrganizationSettings {
+  timezone?: string;
+  allowPublicBallots?: boolean;
+  defaultElectionDurationDays?: number;
+  contactEmail?: string;
 }
 
 export interface Organization {
@@ -34,6 +49,7 @@ export interface Organization {
   name: string;
   logoUrl?: string;
   planId?: string;
+  settings?: OrganizationSettings;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,9 +59,52 @@ export interface OrganizationMember {
   organizationId: string;
   userId: string;
   role: OrganizationRole;
-  invitedEmail?: string;
   joinedAt: string;
   user?: UserProfile;
+}
+
+export interface OrganizationInvitation {
+  id: string;
+  organizationId: string;
+  email: string;
+  role: OrganizationRole;
+  token: string;
+  invitedBy: string;
+  expiresAt: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED';
+  createdAt: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserOrganizationMembership {
+  organization: Organization;
+  role: OrganizationRole;
+}
+
+export interface AuthSessionResponse {
+  user: UserProfile;
+  token: string;
+  organizations: UserOrganizationMembership[];
+  activeTenant?: UserOrganizationMembership;
+}
+
+export interface SwitchOrganizationRequest {
+  organizationId: string;
+}
+
+export interface InviteMemberRequest {
+  email: string;
+  role: OrganizationRole;
 }
 
 // ==========================================

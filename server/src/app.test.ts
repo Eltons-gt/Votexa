@@ -70,7 +70,7 @@ describe('Votexa Server Foundation Unit Tests', () => {
   });
 
   describe('TenantContext Middleware', () => {
-    it('should attach tenant to request when X-Organization-Id is present', () => {
+    it('should attach tenant to request when X-Organization-Id is present', async () => {
       const mockReq = {
         headers: {
           'x-organization-id': 'org-uuid-123'
@@ -83,7 +83,7 @@ describe('Votexa Server Foundation Unit Tests', () => {
       const mockRes = {} as Response;
       const middleware = tenantContext();
 
-      middleware(mockReq, mockRes, () => {
+      await middleware(mockReq, mockRes, () => {
         nextCalled = true;
       });
 
@@ -91,7 +91,7 @@ describe('Votexa Server Foundation Unit Tests', () => {
       expect(mockReq.tenant?.organizationId).toBe('org-uuid-123');
     });
 
-    it('should throw AppError when tenant is required but missing', () => {
+    it('should pass AppError to next when tenant is required but missing', async () => {
       const mockReq = {
         headers: {},
         query: {},
@@ -101,9 +101,13 @@ describe('Votexa Server Foundation Unit Tests', () => {
       const mockRes = {} as Response;
       const middleware = tenantContext({ required: true });
 
-      expect(() => {
-        middleware(mockReq, mockRes, () => {});
-      }).toThrow('Tenant context is required');
+      let error: any = null;
+      await middleware(mockReq, mockRes, (err?: any) => {
+        error = err;
+      });
+
+      expect(error).toBeInstanceOf(AppError);
+      expect(error.code).toBe('TENANT_CONTEXT_MISSING');
     });
   });
 });

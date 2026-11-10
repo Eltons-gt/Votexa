@@ -6,7 +6,15 @@ import { Lock, Mail, AlertCircle, CheckCircle2, Shield } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { apiClient } from '../../lib/api';
 
-export function LoginForm({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
+export function LoginForm({
+  onLoginSuccess,
+  onSwitchToRegister,
+  onSwitchToForgot
+}: {
+  onLoginSuccess?: () => void;
+  onSwitchToRegister?: () => void;
+  onSwitchToForgot?: () => void;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -127,6 +135,25 @@ export function LoginForm({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Verifying Session...' : 'Sign In with Supabase Auth'}
           </Button>
+          <div className="flex items-center justify-between text-xs text-muted-foreground w-full pt-1">
+            <button
+              type="button"
+              className="hover:underline text-primary"
+              onClick={onSwitchToForgot}
+            >
+              Forgot password?
+            </button>
+            <div>
+              Need an account?{' '}
+              <button
+                type="button"
+                className="hover:underline text-primary font-medium"
+                onClick={onSwitchToRegister}
+              >
+                Register
+              </button>
+            </div>
+          </div>
           <Button
             type="button"
             variant="ghost"
