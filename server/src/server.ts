@@ -2,9 +2,9 @@ import { createApp } from './app.js';
 import { config } from './config/index.js';
 import { checkDatabaseConnection, pool } from './database/db.js';
 
-const app = createApp();
+export const app = createApp();
 
-const server = app.listen(config.port, async () => {
+export const server = app.listen(config.port, async () => {
   console.log(`[VOTEXA SERVER] Running on port ${config.port} in ${config.env} mode`);
   console.log(`[VOTEXA SERVER] API Base: http://localhost:${config.port}/api/v1`);
   console.log(`[VOTEXA SERVER] Health Check: http://localhost:${config.port}/health`);
@@ -16,6 +16,8 @@ const server = app.listen(config.port, async () => {
     console.log('[VOTEXA SERVER] Running in disconnected database mode (configure DATABASE_URL in .env).');
   }
 });
+
+export default app;
 
 // Graceful Shutdown
 function handleShutdown(signal: string) {

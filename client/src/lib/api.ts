@@ -1,6 +1,6 @@
 import { ApiResponse } from '@votexa/shared';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
 
 class ApiClient {
   private activeTenantId: string | null = null;
