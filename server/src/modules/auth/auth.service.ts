@@ -126,11 +126,30 @@ export class AuthService {
           updatedAt: row.updated_at
         };
 
-        const token = TokenManager.sign(user);
+        let orgs: UserOrganizationMembership[] = [];
+        let activeTenant: UserOrganizationMembership | undefined;
+
+        if (req.organizationName && req.organizationName.trim().length > 0) {
+          try {
+            const { organizationsService } = await import('../organizations/organizations.service.js');
+            const cleanSlug = req.organizationSlug || req.organizationName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `org-${Date.now().toString(36)}`;
+            const membership = await organizationsService.createOrganization(user.id, req.organizationName.trim(), cleanSlug);
+            orgs = [membership];
+            activeTenant = membership;
+          } catch {
+            // Fallback gracefully
+          }
+        }
+
+        const tenantPayload = activeTenant
+          ? { organizationId: activeTenant.organization.id, role: activeTenant.role }
+          : undefined;
+        const token = TokenManager.sign(user, tenantPayload);
         return {
           user,
           token,
-          organizations: []
+          organizations: orgs,
+          activeTenant
         };
       } finally {
         client.release();
@@ -167,11 +186,30 @@ export class AuthService {
         updatedAt: newUser.updatedAt
       };
 
-      const token = TokenManager.sign(profile);
+      let orgs: UserOrganizationMembership[] = [];
+      let activeTenant: UserOrganizationMembership | undefined;
+
+      if (req.organizationName && req.organizationName.trim().length > 0) {
+        try {
+          const { organizationsService } = await import('../organizations/organizations.service.js');
+          const cleanSlug = req.organizationSlug || req.organizationName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `org-${Date.now().toString(36)}`;
+          const membership = await organizationsService.createOrganization(profile.id, req.organizationName.trim(), cleanSlug);
+          orgs = [membership];
+          activeTenant = membership;
+        } catch {
+          // Fallback gracefully
+        }
+      }
+
+      const tenantPayload = activeTenant
+        ? { organizationId: activeTenant.organization.id, role: activeTenant.role }
+        : undefined;
+      const token = TokenManager.sign(profile, tenantPayload);
       return {
         user: profile,
         token,
-        organizations: []
+        organizations: orgs,
+        activeTenant
       };
     }
   }

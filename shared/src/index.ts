@@ -79,6 +79,10 @@ export interface RegisterRequest {
   email: string;
   password: string;
   fullName: string;
+  phoneNumber?: string;
+  organizationName?: string;
+  organizationSlug?: string;
+  eventCategory?: string;
 }
 
 export interface LoginRequest {

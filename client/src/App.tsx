@@ -37,6 +37,7 @@ export function App() {
   // Top-Level View Router: Landing Page vs. Auth Page vs. Workspace App
   const [viewMode, setViewMode] = useState<'landing' | 'auth' | 'app'>('landing');
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register' | 'forgot'>('login');
+  const [authTargetRole, setAuthTargetRole] = useState<'organizer' | 'voter'>('organizer');
 
   // Workspace Navigation Tab
   const [activeTab, setActiveTab] = useState<
@@ -169,9 +170,16 @@ export function App() {
     setActiveTab('elections');
   };
 
-  const handleAuthSuccess = (simulatedUser?: UserProfile) => {
+  const handleAuthSuccess = (simulatedUser?: UserProfile, newMembership?: UserOrganizationMembership) => {
     if (simulatedUser) {
       setCurrentUser(simulatedUser);
+    }
+    if (newMembership) {
+      setMemberships([newMembership, ...memberships]);
+      setActiveOrgId(newMembership.organization.id);
+      apiClient.setTenant(newMembership.organization.id);
+      setActiveTab('elections');
+      setShowElectionWizard(true);
     }
     setViewMode('app');
   };
@@ -204,8 +212,9 @@ export function App() {
   if (viewMode === 'landing') {
     return (
       <LandingPage
-        onNavigateToAuth={(mode) => {
+        onNavigateToAuth={(mode, role) => {
           setAuthInitialMode(mode);
+          setAuthTargetRole(role || 'organizer');
           setViewMode('auth');
         }}
         onLaunchApp={(targetTab) => {
@@ -227,6 +236,7 @@ export function App() {
     return (
       <AuthPage
         initialMode={authInitialMode}
+        targetRole={authTargetRole}
         onAuthSuccess={handleAuthSuccess}
         onBackToHome={() => setViewMode('landing')}
       />
