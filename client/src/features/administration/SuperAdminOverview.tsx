@@ -75,13 +75,13 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
             Platform Executive Command Center
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Aggregated multi-tenant governance, double-entry financial balances, and system health metrics.
+            Aggregated platform governance, financial balances, and system health metrics.
           </p>
         </div>
         <div className="flex items-center gap-2">
           {metrics?.isLedgerBalanced ? (
             <Badge variant="success" className="gap-1 text-xs">
-              <Scale className="h-3.5 w-3.5" /> Double-Entry Balanced
+              <Scale className="h-3.5 w-3.5" /> Ledger Balanced
             </Badge>
           ) : (
             <Badge variant="destructive" className="gap-1 text-xs">
@@ -127,7 +127,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
         <Card className="border-l-4 border-l-emerald-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Platform Revenue (40%)
+              Platform Revenue
             </CardTitle>
             <DollarSign className="h-4 w-4 text-emerald-500" />
           </CardHeader>
@@ -142,7 +142,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
         <Card className="border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Organiser Earnings (60%)
+              Total Organiser Earnings
             </CardTitle>
             <Landmark className="h-4 w-4 text-blue-500" />
           </CardHeader>

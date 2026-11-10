@@ -47,48 +47,48 @@ export function AppLayout({
   // Tab Titles and Subtitles
   const tabTitles: Record<string, { title: string; subtitle: string }> = {
     overview: {
-      title: 'Workspace Dashboard Overview',
-      subtitle: 'Real-time overview of active elections, voter participation, and financial treasury.'
+      title: 'Workspace Dashboard',
+      subtitle: 'Real-time overview of active elections, voter participation, and financial balance.'
     },
     voting: {
-      title: 'Cryptographic Ballot Interface',
-      subtitle: 'Cast confidential ballots with double-voting prevention and tamper-evident receipt tokens.'
+      title: 'Official Ballot',
+      subtitle: 'Cast your secret ballot securely with an instant digital confirmation receipt.'
     },
     elections: {
-      title: 'Election Lifecycle & Positions',
-      subtitle: 'Manage institutional ballots, paid competitions, scheduling, and results visibility.'
+      title: 'Elections & Contests',
+      subtitle: 'Manage institutional elections, paid competitions, scheduling, and live results.'
     },
     candidates: {
-      title: 'Candidate Directory & Ballots',
-      subtitle: 'Review nominations, candidate statements, and position ballot assignments.'
+      title: 'Candidates & Nominations',
+      subtitle: 'Review nominations, candidate profiles, and ballot listings.'
     },
     voters: {
       title: 'Voter Register & Eligibility',
-      subtitle: 'Audit enrolled voters, bulk import CSV rosters, and manage institutional domains.'
+      subtitle: 'Manage eligible voters, import rosters, and configure verification rules.'
     },
     members: {
       title: 'Organization Members & Roles',
-      subtitle: 'Manage workspace access, invite colleagues, and configure Owner, Admin, or Staff permissions.'
+      subtitle: 'Manage workspace access, invite team members, and configure permissions.'
     },
     settings: {
-      title: 'Workspace Settings & Policies',
-      subtitle: 'Configure timezone, organization contact details, and tenant preferences.'
+      title: 'Workspace Settings',
+      subtitle: 'Configure timezone, organization contact information, and platform preferences.'
     },
     finance: {
-      title: 'Treasury, 40/60 Split & Payouts',
-      subtitle: 'Monitor 60% organiser earnings, M-Pesa B2C disbursements, and double-entry ledger balance.'
+      title: 'Treasury & Payouts',
+      subtitle: 'View ticket sales, available earnings, and request instant M-Pesa disbursements.'
     },
     admin: {
-      title: 'Platform Super Administration',
-      subtitle: 'Platform-wide oversight, 9 RFC 4180 audit reports, commission controls, and security log viewer.'
+      title: 'Platform Administration',
+      subtitle: 'Platform-wide oversight, audit reports, commission settings, and security logs.'
     },
     profile: {
-      title: 'User Profile & Identity',
-      subtitle: 'Manage your authenticated session credentials, platform roles, and organization memberships.'
+      title: 'My Profile & Account',
+      subtitle: 'Manage your personal account details, security credentials, and organization access.'
     },
     onboarding: {
-      title: 'Create New Organization Workspace',
-      subtitle: 'Establish an independent tenant workspace with PostgreSQL Row-Level Security isolation.'
+      title: 'Create Organization Workspace',
+      subtitle: 'Set up a private, secure workspace for your institution or contest.'
     }
   };
 
@@ -193,12 +193,12 @@ export function AppLayout({
         {/* Workspace Footer */}
         <footer className="border-t border-border bg-card/50 px-4 lg:px-8 py-4 text-[11px] text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            © 2026 Votexa Multi-Tenant Platform • Scoped to <code className="font-mono text-foreground font-semibold">{activeOrg?.id}</code>
+            © 2026 Votexa • Workspace: <span className="font-semibold text-foreground">{activeOrg?.name || 'My Organization'}</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium">● PostgreSQL RLS Active</span>
-            <span>Daraja B2C Live</span>
-            <span>40/60 Ledger Balanced</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">● Workspace Protected</span>
+            <span>M-Pesa Verified</span>
+            <span>Automated Payouts Ready</span>
           </div>
         </footer>
       </div>

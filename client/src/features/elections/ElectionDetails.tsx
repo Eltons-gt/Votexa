@@ -320,10 +320,10 @@ export function ElectionDetails({ electionId, userRole = OrganizationRole.OWNER,
         <div className="space-y-4">
           <div>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <History className="h-5 w-5 text-primary" /> Immutable Election Audit Ledger
+              <History className="h-5 w-5 text-primary" /> Official Election Audit Log
             </h3>
             <p className="text-xs text-muted-foreground">
-              Cryptographically timestamped log of all lifecycle state transitions, rule modifications, and administrative overrides.
+              Official log of all status changes, rule modifications, and administrative actions.
             </p>
           </div>
 

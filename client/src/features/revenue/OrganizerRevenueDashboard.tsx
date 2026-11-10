@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Percent,
   Wallet,
-  ShieldCheck,
   RefreshCw,
   Receipt,
   RotateCcw
@@ -74,13 +73,13 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">Revenue & Financial Accounting</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground">Organizer Treasury & Earnings</h2>
             <Badge variant="outline" className="text-[10px] font-bold border-emerald-500/30 text-emerald-600">
-              Commercial Split: 60% Organiser / 40% Platform
+              Verified Account
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Real-time distributable calculations, processing fee deductions, and double-entry ledger earnings.
+            Track ticket sales, payment processing fees, and your available payout balance in real-time.
           </p>
         </div>
         <Button
@@ -107,24 +106,24 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           </CardContent>
         </Card>
 
-        {/* Distributable Amount */}
+        {/* Processing Fees */}
         <Card className="bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-1">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Distributable</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Processing Fees</CardTitle>
+            <TrendingUp className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-blue-600">{formatCents(metrics?.distributableAmount)}</div>
+            <div className="text-2xl font-black text-foreground">{formatCents(metrics?.processingFees)}</div>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              Less {formatCents(metrics?.processingFees)} fees & {formatCents(metrics?.approvedDeductions)} deductions
+              Payment gateway processing fees
             </p>
           </CardContent>
         </Card>
 
-        {/* Organiser Net Share (60%) */}
+        {/* Organiser Net Earnings */}
         <Card className="bg-emerald-500/5 border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between pb-1">
-            <CardTitle className="text-xs font-semibold text-emerald-600 uppercase">Organiser Share (60%)</CardTitle>
+            <CardTitle className="text-xs font-semibold text-emerald-600 uppercase">Your Net Earnings</CardTitle>
             <Percent className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
@@ -133,15 +132,15 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           </CardContent>
         </Card>
 
-        {/* Platform Share (40%) */}
+        {/* Available for Payout */}
         <Card className="bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-1">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Platform Fee (40%)</CardTitle>
-            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs font-semibold text-primary uppercase">Available for Payout</CardTitle>
+            <Wallet className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-muted-foreground">{formatCents(metrics?.platformCommission)}</div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Votexa SaaS commission</p>
+            <div className="text-2xl font-black text-primary">{formatCents(metrics?.availableBalance)}</div>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Ready for instant M-Pesa transfer</p>
           </CardContent>
         </Card>
       </div>
@@ -174,7 +173,7 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
             </div>
           </div>
           <Badge variant="outline" className="text-xs font-bold border-amber-500/30 text-amber-500">
-            Dispute & Payout Reserve
+            Pending Settlement Reserve
           </Badge>
         </Card>
       </div>
@@ -184,7 +183,7 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">Revenue Allocation Ledger (40/60 Split)</h3>
+            <h3 className="text-sm font-bold text-foreground">Earnings & Payout Ledger</h3>
           </div>
           <span className="text-xs text-muted-foreground">
             {allocations.length} Verified Allocations
@@ -224,10 +223,10 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
 
                 <div className="text-left sm:text-right space-y-0.5">
                   <div className="font-bold text-emerald-600 text-sm">
-                    +{formatCents(a.organiserFeeCents)} (60%)
+                    +{formatCents(a.organiserFeeCents)} Net
                   </div>
                   <div className="text-[10px] text-muted-foreground">
-                    Platform Fee: {formatCents(a.platformFeeCents)} (40%)
+                    Verified Payment
                   </div>
                 </div>
               </div>

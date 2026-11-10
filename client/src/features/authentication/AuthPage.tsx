@@ -111,16 +111,16 @@ export function AuthPage({
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold">
                 <Lock className="h-3.5 w-3.5 text-blue-400" />
-                Zero-Trust Authentication
+                Secure Authentication
               </div>
 
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                  Secure Access to Your Electoral Workspace
+                  Sign In to Your Voting Workspace
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-                  PostgreSQL Row-Level Security ensures that tenant data, ballots, and financial records
-                  remain strictly isolated to your authorized organization.
+                  Enterprise-grade privacy ensures that your organization's ballots, voter rosters, and financial records
+                  remain strictly protected.
                 </p>
               </div>
 
@@ -130,7 +130,7 @@ export function AuthPage({
                     <CheckCircle2 className="h-3.5 w-3.5" />
                   </div>
                   <span>
-                    <strong>Supabase Auth & JWT</strong> with automatic session validation and role mapping.
+                    <strong>Bank-Grade Encryption:</strong> Secure session validation and protected credential storage.
                   </span>
                 </div>
                 <div className="flex items-start gap-3 text-xs text-slate-200">
@@ -138,7 +138,7 @@ export function AuthPage({
                     <CheckCircle2 className="h-3.5 w-3.5" />
                   </div>
                   <span>
-                    <strong>Multi-Tenant Switching:</strong> Manage multiple institutions with one master login.
+                    <strong>Multi-Workspace Access:</strong> Manage multiple institutions or events with a single login.
                   </span>
                 </div>
                 <div className="flex items-start gap-3 text-xs text-slate-200">
@@ -146,7 +146,7 @@ export function AuthPage({
                     <CheckCircle2 className="h-3.5 w-3.5" />
                   </div>
                   <span>
-                    <strong>Safaricom Daraja Linked:</strong> Instant automated wallet funding and withdrawals.
+                    <strong>M-Pesa Integration:</strong> Seamless mobile payments and instant automated payouts.
                   </span>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export function AuthPage({
 
       {/* Footer Notice */}
       <footer className="h-12 border-t border-border px-4 text-center text-[11px] text-muted-foreground flex items-center justify-center bg-card/40">
-        © 2026 Votexa Multi-Tenant Platform • Protected by TLS 1.3 & Cryptographic Nonces
+        © 2026 Votexa • Protected by 256-bit Encryption & Secure Authentication
       </footer>
     </div>
   );

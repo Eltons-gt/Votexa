@@ -59,8 +59,8 @@ export function LandingPage({
           {/* Center Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="#categories" className="hover:text-foreground transition-colors">Election Types</a>
-            <a href="#features" className="hover:text-foreground transition-colors">Core Engine</a>
-            <a href="#security" className="hover:text-foreground transition-colors">Security & RLS</a>
+            <a href="#features" className="hover:text-foreground transition-colors">Key Features</a>
+            <a href="#security" className="hover:text-foreground transition-colors">Security & Privacy</a>
             <a href="#mpesa" className="hover:text-foreground transition-colors">M-Pesa Finance</a>
             <a href="#reports" className="hover:text-foreground transition-colors">Audit & Reports</a>
           </nav>
@@ -108,7 +108,7 @@ export function LandingPage({
             {/* Live Trust Pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold tracking-wide backdrop-blur-sm animate-pulse">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Safaricom Daraja B2C & Supabase Auth Live • Strict 40/60 Split
+              Safaricom M-Pesa Integrated • Automated Instant Payouts
             </div>
 
             {/* Main Headline */}
@@ -121,8 +121,8 @@ export function LandingPage({
 
             {/* Sub-headline */}
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-normal leading-relaxed">
-              Empowering universities, corporate SACCOs, and national talent competitions with
-              verifiable cryptographic ballots, isolated tenant workspaces, and instant M-Pesa automated payouts.
+              Empowering universities, professional associations, and national talent competitions with
+              tamper-proof secret ballots, private organization workspaces, and instant M-Pesa payouts.
             </p>
 
             {/* Hero Action Buttons */}
@@ -148,7 +148,7 @@ export function LandingPage({
                 onClick={() => onLaunchApp('admin')}
                 className="w-full sm:w-auto h-12 px-5 text-muted-foreground hover:text-foreground hover:bg-muted text-sm font-semibold gap-1.5"
               >
-                <BarChart3 className="h-4 w-4" /> View Super Admin
+                <BarChart3 className="h-4 w-4" /> Platform Admin
               </Button>
             </div>
 
@@ -156,19 +156,19 @@ export function LandingPage({
             <div className="pt-8 border-t border-border flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>PostgreSQL Row-Level Security</span>
+                <span>Private & Isolated Workspaces</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Double-Entry Minor Currency Ledger</span>
+                <span>Instant M-Pesa Withdrawals</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Anti-Self-Approval Payout Rule</span>
+                <span>Dual-Approval Payout Protection</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Sub-200ms Authorization Latency</span>
+                <span>Instant Ballot Processing</span>
               </div>
             </div>
           </div>
@@ -251,31 +251,31 @@ export function LandingPage({
                 </div>
               </div>
 
-              {/* Card 3: 40/60 Revenue Treasury */}
+              {/* Card 3: Organizer Treasury & Payouts */}
               <div className="rounded-xl border border-border bg-card p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px]">
-                    FINANCIAL LEDGER
+                    ORGANIZER TREASURY
                   </Badge>
-                  <span className="text-[11px] text-muted-foreground font-mono">Double-Entry</span>
+                  <span className="text-[11px] text-muted-foreground font-mono">Live Balance</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-foreground">Commercial Split</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Immutable Minor Currency (Cents)</p>
+                  <h4 className="font-bold text-sm text-foreground">Verified Ticket Earnings</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">Instant M-Pesa Disbursements</p>
                 </div>
                 <div className="space-y-2 pt-1 text-xs">
                   <div className="flex justify-between items-center p-2 rounded bg-muted/50 border border-border">
-                    <span className="text-muted-foreground">Platform Share (40%)</span>
-                    <span className="font-mono font-bold text-primary">KES 40,000</span>
+                    <span className="text-muted-foreground">Total Ticket Sales</span>
+                    <span className="font-mono font-bold text-foreground">KES 100,000</span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-muted/50 border border-border">
-                    <span className="text-muted-foreground">Organiser Earnings (60%)</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Available for Payout</span>
                     <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">KES 60,000</span>
                   </div>
                 </div>
                 <div className="pt-1 text-[10px] text-muted-foreground flex items-center justify-between font-mono">
-                  <span>Balance: KES 0 discrepancy</span>
-                  <span className="text-primary font-medium">B2C Automated</span>
+                  <span>Status: Ready for Withdrawal</span>
+                  <span className="text-primary font-medium">Instant M-Pesa</span>
                 </div>
               </div>
             </div>
@@ -360,7 +360,7 @@ export function LandingPage({
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                      <span>Detached cryptographic receipts guarantee total ballot secrecy.</span>
+                      <span>Official digital receipts guarantee complete ballot secrecy.</span>
                     </li>
                   </ul>
                   <Button
@@ -406,7 +406,7 @@ export function LandingPage({
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                      <span>Automatic 40% platform / 60% organiser split recorded instantly in ledger.</span>
+                      <span>Automatic organizer earnings recorded immediately upon payment.</span>
                     </li>
                   </ul>
                   <Button
@@ -424,7 +424,7 @@ export function LandingPage({
                   <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Credit Issuance: Exactly-Once per CheckoutRequestID</div>
                   <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Cross-Election Token Transfer: BLOCKED (403)</div>
                   <div className="text-muted-foreground pt-2 text-[11px]">
-                    "Automated B2C disbursement delivers 60% organiser share upon admin approval."
+                    "Automated M-Pesa disbursement delivers organizer earnings upon approval."
                   </div>
                 </div>
               </div>
@@ -502,10 +502,10 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center">
                 <Layers className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">PostgreSQL Row-Level Security</h3>
+              <h3 className="font-bold text-lg text-foreground">Private Organization Workspaces</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Transactions automatically execute with <code>SET LOCAL app.current_organization_id</code>.
-                Cross-tenant data leakage is physically barred by database kernel policies.
+                Every organization's data, elections, voters, and financials are strictly separated.
+                Your data is private and accessible only to your authorized team members.
               </p>
             </div>
 
@@ -514,10 +514,10 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
                 <Smartphone className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">Safaricom Daraja STK & B2C</h3>
+              <h3 className="font-bold text-lg text-foreground">Direct M-Pesa Integration</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Seamless C2B STK push for voters to buy credits, paired with automated B2C disbursement
-                straight to organiser M-Pesa mobile wallets upon admin approval.
+                Seamless STK push for voters purchasing packages, paired with fast automated withdrawals
+                straight to organizer M-Pesa numbers upon administrative approval.
               </p>
             </div>
 
@@ -526,10 +526,10 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center">
                 <DollarSign className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">40/60 Double-Entry Ledger</h3>
+              <h3 className="font-bold text-lg text-foreground">Transparent Financial Records</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Platform commission is fixed at 40%, organiser share at 60%. Integer minor-currency
-                accounting eliminates floating-point rounding bugs and maintains zero ledger variance.
+                Every transaction and fee is recorded with penny-accurate precision. Organizers have
+                full visibility into gross sales, processing fees, and net available earnings.
               </p>
             </div>
 
@@ -538,10 +538,10 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
                 <Lock className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">Cryptographic Ballot Privacy</h3>
+              <h3 className="font-bold text-lg text-foreground">Guaranteed Secret Ballot</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Voters receive tamper-evident cryptographic receipt hashes. Identities are decoupled
-                from ballots, preventing voter coercion while providing inclusion proofs.
+                Voters receive an official digital receipt. Voter identity is strictly separated from choices
+                to guarantee complete ballot confidentiality without coercion.
               </p>
             </div>
 
@@ -550,10 +550,10 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center justify-center">
                 <Shield className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">Anti-Self-Approval Defense</h3>
+              <h3 className="font-bold text-lg text-foreground">Secure Dual-Approval Payouts</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Strict segregation of duties prevents platform administrators from approving their own
-                payout requests. Permanent deductions only occur upon verified settlement.
+                Built-in financial safeguards prevent unauthorized payouts. Funds are safely reserved
+                before settlement, protecting both organizers and platform security.
               </p>
             </div>
 
@@ -562,7 +562,7 @@ export function LandingPage({
               <div className="h-10 w-10 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 flex items-center justify-center">
                 <BarChart3 className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-lg text-foreground">9 Enterprise Reports & Audits</h3>
+              <h3 className="font-bold text-lg text-foreground">Comprehensive Audit & Reporting</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Instant generation of participation, turnout, commission, and financial reconciliation
                 reports in RFC 4180 CSV and JSON with automatic credential scrubbing.
@@ -643,32 +643,32 @@ export function LandingPage({
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-bold text-foreground">Financial Ledger</h4>
+              <h4 className="font-bold text-foreground">Treasury & Payouts</h4>
               <ul className="space-y-1.5 text-muted-foreground text-[11px]">
-                <li>40/60 Revenue Split</li>
-                <li>Daraja STK Push</li>
-                <li>Automated B2C Payouts</li>
-                <li>Anti-Self-Approval Rule</li>
+                <li>Instant Organizer Earnings</li>
+                <li>Direct M-Pesa Checkout</li>
+                <li>Automated Mobile Disbursements</li>
+                <li>Protected Payout Authorization</li>
               </ul>
             </div>
 
             <div className="space-y-2">
               <h4 className="font-bold text-foreground">Compliance & Security</h4>
               <ul className="space-y-1.5 text-muted-foreground text-[11px]">
-                <li>PostgreSQL RLS Policies</li>
-                <li>Double-Entry Ledger</li>
-                <li>Immutable Audit Logs</li>
+                <li>Private Isolated Workspaces</li>
+                <li>Secret Anonymous Ballots</li>
+                <li>Comprehensive Audit History</li>
                 <li>KDPA & GDPR Data Privacy</li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted-foreground">
-            <p>© 2026 Votexa Inc. All rights reserved. Registered SaaS Platform.</p>
+            <p>© 2026 Votexa Inc. All rights reserved. Secure Voting Platform.</p>
             <div className="flex gap-4">
               <button onClick={() => onNavigateToAuth('login')} className="hover:text-foreground transition-colors">Sign In</button>
               <button onClick={() => onNavigateToAuth('register')} className="hover:text-foreground transition-colors">Register</button>
-              <button onClick={() => onLaunchApp('voting')} className="hover:text-foreground transition-colors">Voting Engine</button>
+              <button onClick={() => onLaunchApp('voting')} className="hover:text-foreground transition-colors">Cast Vote</button>
             </div>
           </div>
         </div>

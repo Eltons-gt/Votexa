@@ -90,7 +90,7 @@ export function SuperAdminAuditLogViewer() {
             Platform Immutable Audit Trail & Change Ledger
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Cryptographically tracked administrative events, state transformations, and role mutations. Protected by database trigger immutability.
+            Official log of all administrative actions, permission changes, and security events. Protected by tamper-proof database policies.
           </p>
         </div>
         <div className="flex items-center gap-2">

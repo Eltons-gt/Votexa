@@ -206,7 +206,7 @@ export function ElectionSettingsView({ election, onUpdated, isReadOnly = false }
                   className="rounded border text-primary focus:ring-primary h-4 w-4"
                 />
                 <span className="text-xs">
-                  <b>Enable Real-Time Tally Processing:</b> Update cryptographic counters on ballot cast
+                  <b>Enable Real-Time Tally Processing:</b> Update vote counts immediately as ballots are cast
                 </span>
               </label>
 

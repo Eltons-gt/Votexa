@@ -106,7 +106,7 @@ export function Sidebar({
             items: [
               {
                 id: 'admin',
-                label: 'Platform Governance',
+                label: 'Platform Admin',
                 icon: ShieldAlert,
                 badge: 'Super Admin',
                 badgeVariant: 'destructive' as const
@@ -152,8 +152,8 @@ export function Sidebar({
             {!isCollapsed && (
               <div className="leading-none">
                 <span className="font-extrabold text-lg text-foreground tracking-tight">VOTEXA</span>
-                <span className="block text-[10px] text-primary font-mono font-medium mt-0.5">
-                  Multi-Tenant Engine
+                <span className="block text-[10px] text-primary font-semibold tracking-wide uppercase mt-0.5">
+                  Voting Platform
                 </span>
               </div>
             )}

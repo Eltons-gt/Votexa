@@ -80,7 +80,7 @@ export function EligibilityManagement({ election }: EligibilityManagementProps) 
             <div className="space-y-1.5 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                <span><b>Strictly One Voter, One Vote:</b> Double voting blocked at cryptographic ledger level.</span>
+                <span><b>Strictly One Voter, One Vote:</b> Double voting is strictly prevented.</span>
               </div>
               <div className="flex items-center gap-2">
                 <Lock className="h-4 w-4 text-primary shrink-0" />

@@ -20,7 +20,7 @@ export function PricingPackages({ onPaymentCompleted }: { onPaymentCompleted?: (
         'Up to 2,500 verified voters',
         'Single & multiple choice ballots',
         'Real-time turnout analytics',
-        'Cryptographic receipt generation'
+        'Official digital receipt generation'
       ]
     },
     {
@@ -28,12 +28,12 @@ export function PricingPackages({ onPaymentCompleted }: { onPaymentCompleted?: (
       name: 'Enterprise Tier',
       price: '$199',
       period: 'per month',
-      description: 'Full institutional multi-tenancy with dedicated audit trail',
+      description: 'Full institutional workspaces with dedicated audit trails',
       features: [
         'Unlimited elections',
         'Up to 50,000 voters',
-        'Cryptographic ballot verification',
-        'Automated Double-Entry Ledger',
+        'Official ballot verification',
+        'Automated Financial Accounting',
         'Priority SLA & Instant Payouts'
       ]
     }

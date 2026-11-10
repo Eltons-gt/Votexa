@@ -176,7 +176,7 @@ export function ElectionDashboard({
             <span className="text-foreground">{organizationName} Elections</span>
           </h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Manage institutional elections, paid competitions, and public polls with tamper-evident cryptographic tallying.
+            Manage institutional elections, paid competitions, and public polls with verified real-time results.
           </p>
         </div>
 

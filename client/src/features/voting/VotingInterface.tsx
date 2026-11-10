@@ -274,10 +274,10 @@ export function VotingInterface({
               <CheckCircle2 className="h-8 w-8" />
             </div>
             <h3 className="text-2xl font-black tracking-tight text-foreground">
-              Ballot Successfully Cast & Encrypted!
+              Vote Successfully Cast!
             </h3>
             <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              Your secret ballot choices have been securely anonymized and committed to the cryptographic ledger.
+              Your vote has been securely recorded and your choices remain completely private.
             </p>
           </div>
 
@@ -297,7 +297,7 @@ export function VotingInterface({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-muted-foreground pt-1">
               <div>
-                <span className="block font-medium text-foreground">Voter Anonymized Hash:</span>
+                <span className="block font-medium text-foreground">Voter Verification Code:</span>
                 <span className="font-mono text-[10px] break-all">{receipt.voterHash}</span>
               </div>
               <div>
@@ -333,14 +333,14 @@ export function VotingInterface({
                 {activeCategory}
               </Badge>
               <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                <Lock className="h-3.5 w-3.5 text-primary" /> Tamper-Evident Secret Ballot
+                <Lock className="h-3.5 w-3.5 text-primary" /> Secret & Anonymous Ballot
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
               {election?.title || electionTitle}
             </h2>
             <p className="text-xs text-muted-foreground">
-              {election?.description || 'Select candidates for each contested position. One-time cryptographic authorization ensures zero link between your identity and secret choices.'}
+              {election?.description || 'Select your preferred candidate for each position. Your choices are completely secret and anonymous.'}
             </p>
           </div>
 
@@ -348,7 +348,7 @@ export function VotingInterface({
           <div className="space-y-3">
             <div className="p-4 rounded-xl bg-card border space-y-2">
               <label className="font-bold text-xs text-foreground flex items-center gap-1.5">
-                <UserCheck className="h-4 w-4 text-primary" /> Voter Credential Authorization Code *
+                <UserCheck className="h-4 w-4 text-primary" /> Voter ID / Access Code *
               </label>
               <div className="flex items-center gap-2">
                 <Input
@@ -359,7 +359,7 @@ export function VotingInterface({
                 />
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Your credential code will be cryptographically hashed to authorize your ballot.
+                Your voter code confirms your eligibility without linking your identity to your choices.
               </p>
             </div>
 
@@ -503,7 +503,7 @@ export function VotingInterface({
                 </h4>
 
                 <p className="text-xs text-muted-foreground">
-                  Please review your selections. Once confirmed, a one-time cryptographic authorization will be minted and permanently consumed.
+                  Please review your selections carefully. Once submitted, your vote is recorded and cannot be changed or submitted again.
                 </p>
 
                 <div className="p-3 rounded-xl bg-muted/40 border space-y-2 text-xs">
@@ -537,7 +537,7 @@ export function VotingInterface({
                       disabled={isSubmitting}
                       className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
                     >
-                      {isSubmitting ? 'Encrypting & Casting...' : 'Confirm & Commit Ballot'}
+                      {isSubmitting ? 'Submitting Ballot...' : 'Confirm & Submit Vote'}
                     </Button>
                   </div>
                 </div>
@@ -550,10 +550,10 @@ export function VotingInterface({
             <Card className="bg-muted/20 border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold flex items-center gap-2">
-                  <Search className="h-4 w-4 text-primary" /> Independent Receipt Verification
+                  <Search className="h-4 w-4 text-primary" /> Verify a Ballot Receipt
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  Verify any previously cast ballot receipt code to check its digital cryptographic signature.
+                  Enter a receipt code to verify that a ballot was officially received and counted in this election.
                 </p>
               </CardHeader>
               <CardContent className="space-y-3 text-xs">

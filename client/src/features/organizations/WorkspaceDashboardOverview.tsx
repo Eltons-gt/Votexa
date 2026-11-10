@@ -86,7 +86,7 @@ export function WorkspaceDashboardOverview({
   const recentEvents = [
     {
       id: 'ev-1',
-      title: 'Cryptographic Ballot Submitted',
+      title: 'Official Ballot Submitted',
       description: 'Voter FAC-001-MATH verified and cast official ballot for Dean of Faculty.',
       timestamp: '2 minutes ago',
       icon: Receipt,
@@ -102,8 +102,8 @@ export function WorkspaceDashboardOverview({
     },
     {
       id: 'ev-3',
-      title: '60% Organiser Share Credited',
-      description: 'KES 3,000 added to available treasury balance; KES 2,000 platform share.',
+      title: 'Earnings Credited',
+      description: 'KES 3,000 added to your available earnings balance.',
       timestamp: '14 minutes ago',
       icon: Wallet,
       iconColor: 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20'
@@ -141,8 +141,8 @@ export function WorkspaceDashboardOverview({
               Welcome back, {currentUser.fullName || 'Elections Admin'}
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              Your electoral operations are running smoothly. All ballots are backed by cryptographic receipts,
-              and tenant data is isolated under PostgreSQL Row-Level Security.
+              Your elections and voting activities are running smoothly. All ballots are verified in real time,
+              and your organization's workspace is private and secure.
             </p>
           </div>
 
@@ -202,7 +202,7 @@ export function WorkspaceDashboardOverview({
           <div>
             <div className="text-3xl font-black text-foreground">8,310</div>
             <p className="text-xs text-muted-foreground font-medium mt-1 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3 text-emerald-500" /> 100% Cryptographic Receipts
+              <CheckCircle2 className="h-3 w-3 text-emerald-500" /> 100% Verified Submissions
             </p>
           </div>
         </div>
@@ -226,13 +226,13 @@ export function WorkspaceDashboardOverview({
           </div>
         </div>
 
-        {/* Metric 4: Organiser Treasury (60% Share) */}
+        {/* Metric 4: Available Earnings */}
         <div
           onClick={() => onNavigateTab('finance')}
           className="rounded-2xl border border-border bg-card p-5 space-y-3 hover:border-amber-500/50 transition-all cursor-pointer group shadow-sm"
         >
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Organiser Treasury</span>
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Available Earnings</span>
             <div className="h-8 w-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Wallet className="h-4 w-4" />
             </div>
@@ -242,7 +242,7 @@ export function WorkspaceDashboardOverview({
               {formatKes(walletBalanceCents)}
             </div>
             <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-1 flex items-center gap-1">
-              <Smartphone className="h-3 w-3" /> M-Pesa B2C Payout Ready
+              <Smartphone className="h-3 w-3" /> Ready for M-Pesa Withdrawal
             </p>
           </div>
         </div>
@@ -404,7 +404,7 @@ export function WorkspaceDashboardOverview({
                   <div className="text-xs font-bold text-foreground group-hover:text-amber-500 transition-colors">
                     Request M-Pesa Withdrawal
                   </div>
-                  <div className="text-[10px] text-muted-foreground">Disburse 60% organiser balance</div>
+                  <div className="text-[10px] text-muted-foreground">Withdraw available earnings to M-Pesa</div>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" />
               </button>

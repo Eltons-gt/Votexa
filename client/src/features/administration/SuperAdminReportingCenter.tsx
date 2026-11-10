@@ -47,12 +47,12 @@ export function SuperAdminReportingCenter() {
     {
       value: ReportType.PLATFORM_COMMISSIONS,
       label: 'Platform Commission Report',
-      description: 'Platform 40% vs Organiser 60% revenue split reconciliation'
+      description: 'Platform revenue and organizer earnings reconciliation'
     },
     {
       value: ReportType.ORGANISER_EARNINGS,
       label: 'Organiser Earnings Report',
-      description: 'Gross sales, 60% organiser net earnings, and available treasury balances'
+      description: 'Gross sales, organizer net earnings, and available treasury balances'
     },
     {
       value: ReportType.PAYOUTS,

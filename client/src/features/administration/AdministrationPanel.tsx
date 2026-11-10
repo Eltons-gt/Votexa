@@ -70,7 +70,7 @@ export function AdministrationPanel({ currentAdminUserId = 'usr-super-admin' }: 
             Votexa Super Administrator Suite
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Enterprise governance, multi-tenant moderation, 40/60 double-entry ledger, reporting & immutable audit infrastructure.
+            Enterprise governance, platform oversight, automated financial accounting, reporting, and audit logs.
           </p>
         </div>
         <div className="flex items-center gap-2">

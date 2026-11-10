@@ -169,10 +169,10 @@ export function SuperAdminCommissionSettings() {
             <strong>1. Distributable Pool</strong> = Gross Payment - Processing Fees - Deductions
           </div>
           <div className="p-2 bg-background rounded border">
-            <strong>2. Platform Share</strong> = 40% × Distributable Pool (Integer Cents)
+            <strong>2. Platform Share</strong> = Rate % × Distributable Pool (Integer Cents)
           </div>
           <div className="p-2 bg-background rounded border">
-            <strong>3. Organiser Share</strong> = Distributable Pool - Platform Share (60%)
+            <strong>3. Organiser Share</strong> = Distributable Pool - Platform Share
           </div>
         </div>
       </div>
