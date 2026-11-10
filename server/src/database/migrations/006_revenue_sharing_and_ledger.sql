@@ -69,6 +69,20 @@ CREATE INDEX IF NOT EXISTS idx_rev_alloc_org ON revenue_allocations(organization
 CREATE INDEX IF NOT EXISTS idx_rev_alloc_election ON revenue_allocations(election_id);
 
 -- 4. Refunds (Immutable Reversals)
+-- Safely drop legacy 001 placeholder refunds table if it exists without payment_transaction_id column
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_name = 'refunds'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'refunds' AND column_name = 'payment_transaction_id'
+    ) THEN
+        DROP TABLE refunds CASCADE;
+    END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS refunds (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     payment_transaction_id UUID NOT NULL REFERENCES payment_transactions(id) ON DELETE CASCADE,

@@ -52,19 +52,34 @@ CREATE TABLE IF NOT EXISTS platform_commission_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     platform_rate_basis_points INTEGER NOT NULL CHECK (platform_rate_basis_points >= 0 AND platform_rate_basis_points <= 10000),
     organiser_rate_basis_points INTEGER NOT NULL CHECK (organiser_rate_basis_points >= 0 AND organiser_rate_basis_points <= 10000),
-    updated_by UUID NOT NULL REFERENCES users(id),
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed Initial 40/60 Commission Rate (4000 / 6000 basis points)
+-- Ensure updated_by is nullable for system/seed updates if table already existed
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'platform_commission_history' AND column_name = 'updated_by' AND is_nullable = 'NO'
+    ) THEN
+        ALTER TABLE platform_commission_history ALTER COLUMN updated_by DROP NOT NULL;
+    END IF;
+END $$;
+
+-- Seed Initial Commission Rate (4000 / 6000 basis points)
 INSERT INTO platform_commission_history (
     platform_rate_basis_points,
     organiser_rate_basis_points,
     updated_by,
     reason
 )
-SELECT 4000, 6000, '00000000-0000-0000-0000-000000000001', 'Initial 40/60 commercial split policy configuration'
+SELECT 
+    4000, 
+    6000, 
+    (SELECT id FROM users WHERE system_role = 'SUPER_ADMIN' LIMIT 1), 
+    'Initial platform commission policy configuration'
 WHERE NOT EXISTS (SELECT 1 FROM platform_commission_history);
 
 -- 4. Audit Log Immutability Protection Rules

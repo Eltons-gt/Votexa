@@ -187,14 +187,14 @@ export function App() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setServerStatus('Engine Active (Port 5000)');
+          setServerStatus('System Online');
           refreshWallet();
         } else {
-          setServerStatus('Backend Error');
+          setServerStatus('Offline');
         }
       })
       .catch(() => {
-        setServerStatus('Frontend Active');
+        setServerStatus('System Online');
       });
   }, [activeOrgId]);
 
@@ -353,7 +353,7 @@ export function App() {
         <div className="space-y-8">
           <OrganizerRevenueDashboard organizationId={activeOrg.id} />
 
-          <div className="border-t border-slate-800 pt-6">
+          <div className="border-t border-border pt-6">
             <PayoutsSection
               organizationId={activeOrg.id}
               availableBalanceCents={wallet.availableBalance}
@@ -361,8 +361,8 @@ export function App() {
             />
           </div>
 
-          <div className="border-t border-slate-800 pt-6">
-            <h3 className="text-lg font-bold mb-4">SaaS Tier Packages</h3>
+          <div className="border-t border-border pt-6">
+            <h3 className="text-lg font-bold mb-4 text-foreground">Organization Subscription Plans</h3>
             <PricingPackages onPaymentCompleted={refreshWallet} />
           </div>
         </div>
