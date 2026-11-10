@@ -18,6 +18,11 @@ export class VoteAuthorizationService {
   private static localAuthorizations = new Map<string, VoteAuthorization>(); // Keyed by token_hash
   private static localPositionVotes = new Set<string>(); // `${electionId}:${positionId}:${voterHash}` for institutional duplicate tracking
 
+  public static resetState(): void {
+    VoteAuthorizationService.localAuthorizations.clear();
+    VoteAuthorizationService.localPositionVotes.clear();
+  }
+
   /**
    * Request a one-time voting authorization token.
    * Decouples voter identity from subsequent ballot submission to preserve secret ballot confidentiality.

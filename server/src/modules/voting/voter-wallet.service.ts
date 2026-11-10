@@ -12,6 +12,11 @@ export class VoterWalletService {
   private static localWallets = new Map<string, VoterWallet>();
   private static localTransactions = new Map<string, WalletTransaction[]>();
 
+  public static resetState(): void {
+    VoterWalletService.localWallets.clear();
+    VoterWalletService.localTransactions.clear();
+  }
+
   constructor() {
     this.seedDefaultWallets();
   }
@@ -244,6 +249,21 @@ export class VoterWalletService {
       wallet: { ...wallet, creditsBalance: newBalance, updatedAt: now },
       transaction
     };
+  }
+
+  /**
+   * Alias for addCredits
+   */
+  async creditWallet(
+    organizationId: string,
+    electionId: string,
+    voterCode: string,
+    credits: number,
+    referenceId: string,
+    description: string,
+    isMock: boolean = false
+  ): Promise<{ wallet: VoterWallet; transaction: WalletTransaction }> {
+    return this.addCredits(organizationId, electionId, voterCode, credits, referenceId, description, isMock);
   }
 
   /**
