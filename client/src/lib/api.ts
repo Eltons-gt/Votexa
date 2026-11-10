@@ -46,6 +46,13 @@ class ApiClient {
     });
   }
 
+  put<T = unknown>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
   patch<T = unknown>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PATCH',

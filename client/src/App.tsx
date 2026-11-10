@@ -23,9 +23,13 @@ import {
   OrganizationSettings as OrgSettingsScreen,
   MemberManagement
 } from './features/organizations';
-import { ElectionCard } from './features/elections';
-import { CandidateCard } from './features/candidates';
-import { VoterDirectory } from './features/voters';
+import {
+  ElectionDashboard,
+  ElectionWizard,
+  ElectionDetails,
+  CandidateManagement,
+  VoterManagement
+} from './features/elections';
 import { VotingInterface } from './features/voting';
 import { PricingPackages } from './features/payments';
 import { WalletCard } from './features/wallets';
@@ -35,6 +39,7 @@ import { AdministrationPanel } from './features/administration';
 import {
   Election,
   ElectionStatus,
+  ElectionCategory,
   Wallet,
   UserProfile,
   UserOrganizationMembership,
@@ -51,6 +56,10 @@ export function App() {
 
   const [authView, setAuthView] = useState<'login' | 'register' | 'forgot'>('login');
   const [serverStatus, setServerStatus] = useState<string>('Connecting...');
+
+  // Election Navigation State
+  const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
+  const [showElectionWizard, setShowElectionWizard] = useState<boolean>(false);
 
   // Active User State
   const [currentUser, setCurrentUser] = useState<UserProfile>({
@@ -115,60 +124,21 @@ export function App() {
 
   // Active Election Sample
   const sampleElection: Election = {
-    id: 'elec-1',
+    id: 'elec-inst-1',
     organizationId: activeOrg.id,
+    category: ElectionCategory.INSTITUTIONAL,
     title: `${activeOrg.name} Executive Board Election`,
     description: 'Official annual election for executive council and president.',
     status: ElectionStatus.ACTIVE,
     startTime: new Date().toISOString(),
     endTime: new Date(Date.now() + 86400000 * 3).toISOString(),
     timezone: activeOrg.settings?.timezone || 'UTC',
-    allowSelfRegistration: true,
+    allowSelfRegistration: false,
     isPaidVoting: false,
     createdById: currentUser.id,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
-
-  const sampleCandidates = [
-    {
-      id: 'cand-1',
-      electionId: sampleElection.id,
-      organizationId: activeOrg.id,
-      name: 'Jordan Hayes',
-      bio: 'Advocating for campus sustainability, open governance and mental health resources.',
-      ballotOrder: 1
-    },
-    {
-      id: 'cand-2',
-      electionId: sampleElection.id,
-      organizationId: activeOrg.id,
-      name: 'Morgan Chen',
-      bio: 'Campaigning for academic resource equality and streamlined university services.',
-      ballotOrder: 2
-    }
-  ];
-
-  const sampleVoters = [
-    {
-      id: 'vtr-1',
-      organizationId: activeOrg.id,
-      electionId: sampleElection.id,
-      voterCode: 'VTR-9981-METRO',
-      email: 'student.hayes@metro.edu',
-      hasVoted: false,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 'vtr-2',
-      organizationId: activeOrg.id,
-      electionId: sampleElection.id,
-      voterCode: 'VTR-9982-METRO',
-      email: 'chen.m@metro.edu',
-      hasVoted: false,
-      createdAt: new Date().toISOString()
-    }
-  ];
 
   const [wallet, setWallet] = useState<Wallet>({
     id: 'wal-1',
@@ -349,54 +319,44 @@ export function App() {
 
         {/* Active Elections Tab */}
         {activeTab === 'elections' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">{activeOrg.name} Elections</h2>
-                <p className="text-sm text-muted-foreground">Manage ongoing and scheduled voting processes in this workspace</p>
-              </div>
-              {activeRole !== OrganizationRole.STAFF && (
-                <Button size="sm">+ Create Election</Button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <ElectionCard election={sampleElection} />
-            </div>
-          </div>
+          showElectionWizard ? (
+            <ElectionWizard
+              onCreated={(newElec) => {
+                setShowElectionWizard(false);
+                setSelectedElectionId(newElec.id);
+              }}
+              onCancel={() => setShowElectionWizard(false)}
+            />
+          ) : selectedElectionId ? (
+            <ElectionDetails
+              electionId={selectedElectionId}
+              userRole={activeRole}
+              onBack={() => setSelectedElectionId(null)}
+            />
+          ) : (
+            <ElectionDashboard
+              organizationName={activeOrg.name}
+              userRole={activeRole}
+              onSelectElection={(elec) => setSelectedElectionId(elec.id)}
+              onOpenWizard={() => setShowElectionWizard(true)}
+            />
+          )
         )}
 
         {/* Candidates Tab */}
         {activeTab === 'candidates' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Election Candidates</h2>
-                <p className="text-sm text-muted-foreground">Candidate rosters registered for the active ballot</p>
-              </div>
-              {activeRole !== OrganizationRole.STAFF && (
-                <Button size="sm">+ Register Candidate</Button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sampleCandidates.map((c) => (
-                <CandidateCard key={c.id} candidate={c} />
-              ))}
-            </div>
-          </div>
+          <CandidateManagement
+            electionId={selectedElectionId || 'elec-inst-1'}
+            isReadOnly={activeRole === OrganizationRole.STAFF}
+          />
         )}
 
         {/* Voters Tab */}
         {activeTab === 'voters' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Voter Verification Register</h2>
-                <p className="text-sm text-muted-foreground">Multi-tenant voter credential registry for {activeOrg.name}</p>
-              </div>
-              <Button size="sm">+ Import Voters CSV</Button>
-            </div>
-            <VoterDirectory voters={sampleVoters} />
-          </div>
+          <VoterManagement
+            electionId={selectedElectionId || 'elec-inst-1'}
+            isReadOnly={activeRole === OrganizationRole.STAFF}
+          />
         )}
 
         {/* Members & Roles Tab */}

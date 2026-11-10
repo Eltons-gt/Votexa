@@ -1,21 +1,43 @@
 import { Router } from 'express';
-import { CandidatesController } from './candidates.controller.js';
+import { candidatesController } from './candidates.controller.js';
 import { authenticate } from '../../middleware/auth.js';
 import { tenantContext } from '../../middleware/tenantContext.js';
+import { OrganizationRole } from '@votexa/shared';
 
 const router = Router();
-const controller = new CandidatesController();
 
 router.use(authenticate);
-router.use(tenantContext());
 
-router.get('/', (req, res, next) => {
-  controller.listByElection(req, res).catch(next);
+router.get('/', tenantContext(), (req, res, next) => {
+  candidatesController.listByElection(req, res).catch(next);
 });
 
-router.post('/', (req, res, next) => {
-  controller.create(req, res).catch(next);
+router.get('/election/:electionId', tenantContext(), (req, res, next) => {
+  candidatesController.listByElection(req, res).catch(next);
 });
+
+router.post(
+  '/',
+  tenantContext({ allowedRoles: [OrganizationRole.OWNER, OrganizationRole.ADMIN] }),
+  (req, res, next) => {
+    candidatesController.create(req, res).catch(next);
+  }
+);
+
+router.put(
+  '/:id',
+  tenantContext({ allowedRoles: [OrganizationRole.OWNER, OrganizationRole.ADMIN] }),
+  (req, res, next) => {
+    candidatesController.update(req, res).catch(next);
+  }
+);
+
+router.delete(
+  '/:id',
+  tenantContext({ allowedRoles: [OrganizationRole.OWNER, OrganizationRole.ADMIN] }),
+  (req, res, next) => {
+    candidatesController.delete(req, res).catch(next);
+  }
+);
 
 export default router;
-

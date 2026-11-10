@@ -84,3 +84,4 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
     </Card>
   );
 }
+

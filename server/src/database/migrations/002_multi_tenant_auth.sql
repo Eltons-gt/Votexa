@@ -103,3 +103,4 @@ CREATE POLICY tenant_isolation_ledger ON financial_ledger
         organization_id = current_app_organization_id()
         OR is_platform_super_admin()
     );
+

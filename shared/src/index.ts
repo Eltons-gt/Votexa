@@ -110,14 +110,41 @@ export interface InviteMemberRequest {
 // ==========================================
 // Election & Ballot Domain
 // ==========================================
+export enum ElectionCategory {
+  INSTITUTIONAL = 'INSTITUTIONAL',
+  PAID_COMPETITION = 'PAID_COMPETITION',
+  PUBLIC_POLL = 'PUBLIC_POLL'
+}
+
 export enum ElectionStatus {
   DRAFT = 'DRAFT',
   SCHEDULED = 'SCHEDULED',
   ACTIVE = 'ACTIVE',
+  CLOSED = 'CLOSED',
+  CANCELLED = 'CANCELLED',
+  // Backward compatibility aliases
   PAUSED = 'PAUSED',
   CONCLUDED = 'CONCLUDED',
-  AUDITED = 'AUDITED',
-  CANCELLED = 'CANCELLED'
+  AUDITED = 'AUDITED'
+}
+
+export enum ResultsVisibility {
+  LIVE = 'LIVE',
+  AFTER_CLOSE = 'AFTER_CLOSE',
+  HIDDEN = 'HIDDEN',
+  ORGANIZATION_ONLY = 'ORGANIZATION_ONLY'
+}
+
+export enum CandidateStatus {
+  APPROVED = 'APPROVED',
+  PENDING = 'PENDING',
+  REJECTED = 'REJECTED'
+}
+
+export enum VoterEligibilityStatus {
+  ELIGIBLE = 'ELIGIBLE',
+  INELIGIBLE = 'INELIGIBLE',
+  PENDING = 'PENDING'
 }
 
 export enum BallotType {
@@ -126,9 +153,40 @@ export enum BallotType {
   RANKED_CHOICE = 'RANKED_CHOICE'
 }
 
+export interface ElectionSettings {
+  id: string;
+  electionId: string;
+  organizationId: string;
+  resultsVisibility: ResultsVisibility;
+  allowMultipleVotes: boolean;
+  maxVotesPerVoter: number;
+  votePriceCents: number;
+  currency: string;
+  requireVoterVerification: boolean;
+  allowedDomains: string[];
+  shuffleCandidateOrder: boolean;
+  enableRealTimeTally: boolean;
+  customRules?: Record<string, unknown>;
+  updatedAt: string;
+}
+
+export interface ElectionPosition {
+  id: string;
+  electionId: string;
+  organizationId: string;
+  title: string;
+  description?: string;
+  minSelections: number;
+  maxSelections: number;
+  orderIndex: number;
+  createdAt: string;
+  candidatesCount?: number;
+}
+
 export interface Election {
   id: string;
   organizationId: string;
+  category: ElectionCategory;
   title: string;
   description?: string;
   status: ElectionStatus;
@@ -138,7 +196,11 @@ export interface Election {
   allowSelfRegistration: boolean;
   isPaidVoting: boolean;
   packageId?: string;
-  createdById: string;
+  createdById?: string;
+  certifiedAt?: string;
+  certifiedBy?: string;
+  settings?: ElectionSettings;
+  positions?: ElectionPosition[];
   createdAt: string;
   updatedAt: string;
 }
@@ -147,11 +209,16 @@ export interface Candidate {
   id: string;
   electionId: string;
   organizationId: string;
+  positionId?: string;
   name: string;
   bio?: string;
   avatarUrl?: string;
+  manifesto?: string;
   ballotOrder: number;
+  status: CandidateStatus;
   voteCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Voter {
@@ -162,9 +229,155 @@ export interface Voter {
   voterCode: string;
   email?: string;
   phone?: string;
+  firstName?: string;
+  lastName?: string;
+  eligibilityStatus?: VoterEligibilityStatus;
+  eligibilityTag?: string;
   hasVoted: boolean;
+  votesCastCount?: number;
   verifiedAt?: string;
   createdAt: string;
+}
+
+export interface ElectionInvitation {
+  id: string;
+  electionId: string;
+  organizationId: string;
+  email: string;
+  voterId?: string;
+  token: string;
+  status: 'PENDING' | 'SENT' | 'ACCEPTED' | 'EXPIRED';
+  sentAt?: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface ElectionAuditLog {
+  id: string;
+  electionId: string;
+  organizationId: string;
+  userId: string;
+  action: string;
+  previousState?: Record<string, unknown>;
+  newState?: Record<string, unknown>;
+  reason?: string;
+  createdAt: string;
+}
+
+export interface CreateElectionRequest {
+  category: ElectionCategory;
+  title: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  timezone?: string;
+  allowSelfRegistration?: boolean;
+  isPaidVoting?: boolean;
+  settings?: Partial<ElectionSettings>;
+}
+
+export interface UpdateElectionRequest {
+  title?: string;
+  description?: string;
+  startTime?: string;
+  endTime?: string;
+  timezone?: string;
+  allowSelfRegistration?: boolean;
+  isPaidVoting?: boolean;
+  category?: ElectionCategory;
+  auditReason?: string;
+}
+
+export interface UpdateElectionSettingsRequest {
+  resultsVisibility?: ResultsVisibility;
+  allowMultipleVotes?: boolean;
+  maxVotesPerVoter?: number;
+  votePriceCents?: number;
+  currency?: string;
+  requireVoterVerification?: boolean;
+  allowedDomains?: string[];
+  shuffleCandidateOrder?: boolean;
+  enableRealTimeTally?: boolean;
+  auditReason?: string;
+}
+
+export interface UpdateElectionStatusRequest {
+  status: ElectionStatus;
+  reason?: string;
+}
+
+export interface CreatePositionRequest {
+  title: string;
+  description?: string;
+  minSelections?: number;
+  maxSelections?: number;
+  orderIndex?: number;
+}
+
+export interface UpdatePositionRequest {
+  title?: string;
+  description?: string;
+  minSelections?: number;
+  maxSelections?: number;
+  orderIndex?: number;
+}
+
+export interface CreateCandidateRequest {
+  positionId: string;
+  name: string;
+  bio?: string;
+  avatarUrl?: string;
+  manifesto?: string;
+  ballotOrder?: number;
+}
+
+export interface UpdateCandidateRequest {
+  positionId?: string;
+  name?: string;
+  bio?: string;
+  avatarUrl?: string;
+  manifesto?: string;
+  ballotOrder?: number;
+  status?: CandidateStatus;
+}
+
+export interface RegisterVoterRequest {
+  email?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+  eligibilityTag?: string;
+  voterCode?: string;
+}
+
+export interface BulkImportVotersRequest {
+  voters: Array<{
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+    eligibilityTag?: string;
+    voterCode?: string;
+  }>;
+}
+
+export interface BulkImportVotersResponse {
+  importedCount: number;
+  skippedCount: number;
+  voters: Voter[];
+  errors?: string[];
+}
+
+export interface VerifyVoterEligibilityRequest {
+  voterCode?: string;
+  email?: string;
+}
+
+export interface VerifyVoterEligibilityResponse {
+  isEligible: boolean;
+  voter?: Voter;
+  reason?: string;
+  remainingVotesAllowed: number;
 }
 
 export interface BallotOption {
