@@ -72,3 +72,4 @@ test.describe('Votexa End-to-End Voting Workflows', () => {
     }
   });
 });
+

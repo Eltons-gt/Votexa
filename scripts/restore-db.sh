@@ -51,3 +51,4 @@ fi
 
 echo "[+] Database restore completed successfully."
 exit 0
+

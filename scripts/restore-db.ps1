@@ -45,3 +45,4 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "[+] Database restoration successfully completed." -ForegroundColor Green
+

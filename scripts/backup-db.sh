@@ -50,3 +50,4 @@ find "${BACKUP_DIR}" -name "votexa_backup_*.dump.gz*" -type f -mtime +"${RETENTI
 
 echo "[+] Done."
 exit 0
+

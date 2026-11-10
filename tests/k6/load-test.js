@@ -82,3 +82,4 @@ export default function () {
 
   sleep(0.5); // 500ms pacing between voter interactions
 }
+

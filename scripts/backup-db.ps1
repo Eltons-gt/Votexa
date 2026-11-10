@@ -56,3 +56,4 @@ $threshold = (Get-Date).AddDays(-$RetentionDays)
 Get-ChildItem -Path $BackupDir -Filter "votexa_backup_*" | Where-Object { $_.CreationTime -lt $threshold } | Remove-Item -Force
 
 Write-Host "[+] Database backup procedure finished successfully." -ForegroundColor Green
+
