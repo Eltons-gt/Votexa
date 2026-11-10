@@ -25,6 +25,14 @@ export interface ServerConfig {
   jwt: {
     secret: string;
   };
+  mpesa: {
+    environment: 'sandbox' | 'production';
+    consumerKey: string;
+    consumerSecret: string;
+    passkey: string;
+    shortcode: string;
+    callbackUrl: string;
+  };
   security: {
     rateLimitMax: number;
     rateLimitWindowMs: number;
@@ -52,6 +60,16 @@ export const config: ServerConfig = {
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'votexa-default-jwt-secret-minimum-32-characters'
+  },
+  mpesa: {
+    environment: (process.env.MPESA_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+    consumerKey: process.env.MPESA_CONSUMER_KEY || 'sandbox_consumer_key',
+    consumerSecret: process.env.MPESA_CONSUMER_SECRET || 'sandbox_consumer_secret',
+    passkey:
+      process.env.MPESA_PASSKEY ||
+      'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    shortcode: process.env.MPESA_SHORTCODE || '174379',
+    callbackUrl: process.env.MPESA_CALLBACK_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa'
   },
   security: {
     rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),

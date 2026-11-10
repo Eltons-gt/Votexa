@@ -436,6 +436,16 @@ export interface CandidateTally {
   candidateName: string;
   count: number;
   percentage: number;
+  isLeading?: boolean;
+}
+
+export interface PositionTally {
+  positionId: string;
+  positionTitle: string;
+  totalVotesCast: number;
+  candidates: CandidateTally[];
+  winnerCandidateId?: string;
+  winnerCandidateName?: string;
 }
 
 export interface ElectionTally {
@@ -444,6 +454,23 @@ export interface ElectionTally {
   candidates: CandidateTally[];
   status: ElectionStatus;
   auditedAt?: string;
+}
+
+export interface CertifiedResultsReport {
+  electionId: string;
+  electionTitle: string;
+  category: ElectionCategory;
+  status: ElectionStatus;
+  isEmbargoed: boolean;
+  embargoReason?: string;
+  resultsVisibility: ResultsVisibility;
+  totalRegisteredVoters: number;
+  totalBallotsCast: number;
+  turnoutPercentage: number;
+  positions: PositionTally[];
+  certifiedAt?: string;
+  certifiedBy?: string;
+  generatedAt: string;
 }
 
 // ==========================================
@@ -572,6 +599,127 @@ export enum PaymentStatus {
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   REFUNDED = 'REFUNDED'
+}
+
+export enum PaymentProvider {
+  MPESA = 'MPESA',
+  STRIPE = 'STRIPE',
+  MOCK = 'MOCK'
+}
+
+export enum PaymentTransactionStatus {
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  EXPIRED = 'EXPIRED',
+  RECONCILED = 'RECONCILED'
+}
+
+export interface PaymentTransactionRecord {
+  id: string;
+  organizationId: string;
+  electionId: string;
+  packageId: string;
+  voterCode: string;
+  provider: PaymentProvider;
+  amountCents: number;
+  currency: string;
+  phoneNumber?: string;
+  merchantRequestId: string;
+  checkoutRequestId: string;
+  mpesaReceiptNumber?: string;
+  status: PaymentTransactionStatus;
+  resultCode?: number;
+  resultDesc?: string;
+  creditsIssued: boolean;
+  creditsIssuedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentProviderEvent {
+  id: string;
+  paymentId?: string;
+  provider: PaymentProvider;
+  eventType: string;
+  rawPayload: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface PaymentReconciliation {
+  id: string;
+  paymentId: string;
+  reconciledBy: string;
+  status: 'RESOLVED' | 'DISCREPANCY_FLAGGED' | 'MANUAL_REVIEW';
+  discrepancyReason?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface IdempotencyRecord {
+  id: string;
+  key: string;
+  provider: PaymentProvider;
+  resourceId: string;
+  createdAt: string;
+}
+
+export interface MpesaInitiatePaymentRequest {
+  electionId: string;
+  packageId: string;
+  voterCode: string;
+  phoneNumber: string;
+}
+
+export interface MpesaInitiatePaymentResponse {
+  paymentId: string;
+  merchantRequestId: string;
+  checkoutRequestId: string;
+  status: PaymentTransactionStatus;
+  customerMessage: string;
+}
+
+export interface MpesaCallbackMetadataItem {
+  Name: string;
+  Value?: string | number;
+}
+
+export interface MpesaStkCallback {
+  MerchantRequestID: string;
+  CheckoutRequestID: string;
+  ResultCode: number;
+  ResultDesc: string;
+  CallbackMetadata?: {
+    Item: MpesaCallbackMetadataItem[];
+  };
+}
+
+export interface MpesaCallbackPayload {
+  Body: {
+    stkCallback: MpesaStkCallback;
+  };
+}
+
+export interface MpesaPaymentStatusResponse {
+  paymentId: string;
+  organizationId: string;
+  electionId: string;
+  packageId: string;
+  voterCode: string;
+  amountCents: number;
+  currency: string;
+  phoneNumber?: string;
+  merchantRequestId: string;
+  checkoutRequestId: string;
+  mpesaReceiptNumber?: string;
+  status: PaymentTransactionStatus;
+  resultCode?: number;
+  resultDesc?: string;
+  credits: number;
+  creditsIssued: boolean;
+  creditsIssuedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export enum LedgerEntryType {

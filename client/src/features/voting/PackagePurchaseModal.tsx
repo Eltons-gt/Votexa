@@ -7,10 +7,12 @@ import {
   AlertCircle,
   CreditCard,
   Lock,
+  Smartphone,
   X
 } from 'lucide-react';
 import { VotingPackage, PurchasePackageResponse } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import { MpesaCheckoutModal } from '../payments/MpesaCheckoutModal';
 
 interface PackagePurchaseModalProps {
   electionId: string;
@@ -32,6 +34,7 @@ export function PackagePurchaseModal({
   const [selectedPkgId, setSelectedPkgId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showMpesaModal, setShowMpesaModal] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -213,26 +216,81 @@ export function PackagePurchaseModal({
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center justify-between pt-3 border-t">
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Lock className="h-3.5 w-3.5" />
-            <span>Target Wallet: <b>{voterCode}</b></span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onClose} disabled={isProcessing} className="text-xs">
+        <div className="space-y-3 pt-3 border-t">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5" />
+              Target Wallet: <b>{voterCode}</b>
+            </span>
+            <Button variant="ghost" size="sm" onClick={onClose} disabled={isProcessing} className="h-7 text-xs">
               Cancel
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button
+              size="sm"
+              onClick={() => setShowMpesaModal(true)}
+              disabled={isProcessing || !selectedPkgId}
+              className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9"
+            >
+              <Smartphone className="h-4 w-4" />
+              Pay with M-Pesa
             </Button>
             <Button
               size="sm"
+              variant="outline"
               onClick={handleSimulatePurchase}
               disabled={isProcessing || !selectedPkgId}
-              className="gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+              className="gap-1.5 text-xs border-amber-500/40 text-amber-600 hover:bg-amber-500/10 h-9"
             >
               <DollarSign className="h-3.5 w-3.5" />
-              {isProcessing ? 'Processing...' : 'Simulate Purchase'}
+              {isProcessing ? 'Processing...' : 'Simulate Sandbox'}
             </Button>
           </div>
         </div>
+
+        {/* M-Pesa STK Push Modal */}
+        {showMpesaModal && (
+          <MpesaCheckoutModal
+            electionId={electionId}
+            voterCode={voterCode}
+            selectedPackage={packages.find((p) => p.id === selectedPkgId) || null}
+            isOpen={showMpesaModal}
+            onClose={() => setShowMpesaModal(false)}
+            onPaymentSuccess={(_creditsAdded, receipt) => {
+              setShowMpesaModal(false);
+              onClose();
+              // Trigger onPurchased callback so parent voter wallet updates
+              onPurchased({
+                success: true,
+                wallet: {
+                  id: `wlt-${voterCode}`,
+                  organizationId: 'current',
+                  electionId,
+                  voterCode,
+                  creditsBalance: 0, // Parent refreshes actual wallet
+                  currency: 'USD',
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                },
+                transaction: {
+                  id: `tx-mpesa-${receipt}`,
+                  walletId: `wlt-${voterCode}`,
+                  electionId,
+                  type: 'PURCHASE' as unknown as any,
+                  creditsAmount: packages.find((p) => p.id === selectedPkgId)?.credits || 0,
+                  balanceAfter: 0,
+                  referenceId: receipt,
+                  description: `M-Pesa payment ${receipt}`,
+                  isMockPayment: false,
+                  createdAt: new Date().toISOString()
+                },
+                message: `M-Pesa payment verified! Credits added.`
+              });
+            }}
+          />
+        )}
       </div>
     </div>
   );

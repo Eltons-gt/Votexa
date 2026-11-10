@@ -291,3 +291,4 @@ export class VoteAuthorizationService {
 }
 
 export const voteAuthorizationService = new VoteAuthorizationService();
+

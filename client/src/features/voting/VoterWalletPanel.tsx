@@ -9,7 +9,8 @@ import {
   Lock,
   ArrowDownRight,
   ArrowUpRight,
-  Shield
+  Shield,
+  Smartphone
 } from 'lucide-react';
 import {
   VoterWallet,
@@ -19,6 +20,7 @@ import {
   PurchasePackageResponse
 } from '@votexa/shared';
 import { PackagePurchaseModal } from './PackagePurchaseModal';
+import { MpesaCheckoutModal } from '../payments/MpesaCheckoutModal';
 import { apiClient } from '../../lib/api';
 
 interface VoterWalletPanelProps {
@@ -38,6 +40,7 @@ export function VoterWalletPanel({
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showMpesaDirect, setShowMpesaDirect] = useState(false);
 
   const fetchWallet = async () => {
     if (category === ElectionCategory.INSTITUTIONAL) {
@@ -153,7 +156,7 @@ export function VoterWalletPanel({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
             <Button
               size="sm"
               variant="outline"
@@ -165,10 +168,18 @@ export function VoterWalletPanel({
             </Button>
             <Button
               size="sm"
-              onClick={() => setShowPurchaseModal(true)}
-              className="text-xs h-8 gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={() => setShowMpesaDirect(true)}
+              className="text-xs h-8 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
             >
-              <Plus className="h-3.5 w-3.5" /> Top-Up Credits
+              <Smartphone className="h-3.5 w-3.5" /> M-Pesa Top-Up
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowPurchaseModal(true)}
+              className="text-xs h-8 gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" /> Packages
             </Button>
           </div>
         </div>
@@ -243,6 +254,18 @@ export function VoterWalletPanel({
         isOpen={showPurchaseModal}
         onClose={() => setShowPurchaseModal(false)}
         onPurchased={handlePurchased}
+      />
+
+      {/* Direct M-Pesa Modal */}
+      <MpesaCheckoutModal
+        electionId={electionId}
+        voterCode={voterCode}
+        isOpen={showMpesaDirect}
+        onClose={() => setShowMpesaDirect(false)}
+        onPaymentSuccess={(_creditsAdded, _receipt) => {
+          setShowMpesaDirect(false);
+          fetchWallet();
+        }}
       />
     </div>
   );

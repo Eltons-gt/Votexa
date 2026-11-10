@@ -109,3 +109,4 @@ DROP POLICY IF EXISTS tenant_isolation_vote_auth ON vote_authorizations;
 CREATE POLICY tenant_isolation_vote_auth ON vote_authorizations
     FOR ALL
     USING (organization_id = NULLIF(current_setting('app.current_organization_id', true), '')::uuid);
+
