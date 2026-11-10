@@ -1,17 +1,29 @@
 import { Router } from 'express';
-import { RevenueController } from './revenue.controller.js';
-import { authenticate } from '../../middleware/auth.js';
+import { revenueController } from './revenue.controller.js';
 import { tenantContext } from '../../middleware/tenantContext.js';
 
 const router = Router();
-const controller = new RevenueController();
 
-router.use(authenticate);
-router.use(tenantContext());
+router.use(tenantContext({ required: false }));
 
-router.get('/metrics', (req, res, next) => {
-  controller.getMetrics(req, res).catch(next);
+// GET /api/v1/revenue/organizer - Organizer financial dashboard metrics
+router.get('/organizer', (req, res, next) => {
+  revenueController.getOrganizerMetrics(req, res).catch(next);
+});
+
+// GET /api/v1/revenue/platform - Super admin global platform metrics
+router.get('/platform', (req, res, next) => {
+  revenueController.getPlatformMetrics(req, res).catch(next);
+});
+
+// GET /api/v1/revenue/allocations - List 25/75 revenue allocations
+router.get('/allocations', (req, res, next) => {
+  revenueController.listAllocations(req, res).catch(next);
+});
+
+// Backward-compatibility alias for root GET /api/v1/revenue
+router.get('/', (req, res, next) => {
+  revenueController.getOrganizerMetrics(req, res).catch(next);
 });
 
 export default router;
-

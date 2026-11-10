@@ -17,6 +17,7 @@ import { votingPackagesService } from '../voting/voting-packages.service.js';
 import { voterWalletService } from '../voting/voter-wallet.service.js';
 import { electionsService } from '../elections/elections.service.js';
 import { walletsService } from '../wallets/wallets.service.js';
+import { revenueService } from '../revenue/revenue.service.js';
 
 export class MpesaService {
   // In-memory fallbacks for test & offline modes
@@ -431,6 +432,12 @@ export class MpesaService {
       `M-Pesa Revenue: ${pkg.name} (Receipt: ${mpesaReceiptNumber})`,
       tx.id
     );
+
+    // Perform commercial 25/75 split and double-entry ledger allocation
+    await revenueService.allocateRevenue(tx, {
+      processingFeeCents: Math.round(tx.amountCents * 0.015), // Standard gateway fee
+      approvedDeductionCents: 0
+    });
 
     return {
       success: true,

@@ -92,3 +92,4 @@ CREATE POLICY tenant_isolation_payment_provider_events ON payment_provider_event
 DROP POLICY IF EXISTS tenant_isolation_idempotency_records ON idempotency_records;
 CREATE POLICY tenant_isolation_idempotency_records ON idempotency_records
     USING (TRUE); -- System-level deduplication table
+

@@ -1,21 +1,24 @@
 import { Router } from 'express';
-import { RefundsController } from './refunds.controller.js';
-import { authenticate } from '../../middleware/auth.js';
+import { refundsController } from './refunds.controller.js';
 import { tenantContext } from '../../middleware/tenantContext.js';
 
 const router = Router();
-const controller = new RefundsController();
 
-router.use(authenticate);
-router.use(tenantContext());
+router.use(tenantContext({ required: false }));
 
+// GET /api/v1/refunds - List refunds
 router.get('/', (req, res, next) => {
-  controller.list(req, res).catch(next);
+  refundsController.list(req, res).catch(next);
 });
 
+// POST /api/v1/refunds - Process full or partial refund
 router.post('/', (req, res, next) => {
-  controller.requestRefund(req, res).catch(next);
+  refundsController.requestRefund(req, res).catch(next);
+});
+
+// POST /api/v1/refunds/chargeback - Process chargeback/dispute
+router.post('/chargeback', (req, res, next) => {
+  refundsController.processChargeback(req, res).catch(next);
 });
 
 export default router;
-

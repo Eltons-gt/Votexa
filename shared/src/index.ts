@@ -752,6 +752,138 @@ export interface FinancialLedgerEntry {
   createdAt: string;
 }
 
+// ==========================================
+// Financial Engine: Accounts, Double-Entry & Revenue Sharing
+// ==========================================
+export enum FinancialAccountType {
+  PLATFORM_TREASURY = 'PLATFORM_TREASURY',
+  ORGANIZER_TREASURY = 'ORGANIZER_TREASURY',
+  PROCESSING_FEES_ESCROW = 'PROCESSING_FEES_ESCROW',
+  RESERVE_ESCROW = 'RESERVE_ESCROW',
+  VOTER_REFUND_POOL = 'VOTER_REFUND_POOL'
+}
+
+export enum LedgerDirection {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT'
+}
+
+export interface FinancialAccount {
+  id: string;
+  organizationId?: string;
+  type: FinancialAccountType;
+  currency: string;
+  availableBalance: number; // In cents
+  reservedBalance: number; // In cents
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DoubleEntryLedgerRecord {
+  id: string;
+  entryGroupId: string;
+  accountId: string;
+  organizationId?: string;
+  direction: LedgerDirection;
+  amountCents: number; // Always positive integer
+  currency: string;
+  balanceAfter: number;
+  description: string;
+  referenceType: string;
+  referenceId?: string;
+  createdAt: string;
+}
+
+export interface RevenueAllocation {
+  id: string;
+  paymentTransactionId: string;
+  organizationId: string;
+  electionId: string;
+  grossAmountCents: number;
+  processingFeeCents: number;
+  approvedDeductionCents: number;
+  distributableAmountCents: number;
+  platformRateBasisPoints: number; // 2500 = 25.00%
+  platformFeeCents: number;
+  organiserRateBasisPoints: number; // 7500 = 75.00%
+  organiserFeeCents: number;
+  currency: string;
+  status: 'ALLOCATED' | 'PARTIALLY_REFUNDED' | 'FULLY_REFUNDED' | 'DISPUTED';
+  allocatedAt: string;
+}
+
+export interface RefundRecord {
+  id: string;
+  paymentTransactionId: string;
+  revenueAllocationId: string;
+  organizationId: string;
+  electionId: string;
+  voterCode?: string;
+  type: 'PARTIAL' | 'FULL';
+  refundAmountCents: number;
+  reversalDistributableCents: number;
+  reversalPlatformCents: number;
+  reversalOrganiserCents: number;
+  reason: string;
+  status: 'REQUESTED' | 'APPROVED' | 'PROCESSED' | 'REJECTED';
+  processedBy?: string;
+  ledgerEntryGroupId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChargebackRecord {
+  id: string;
+  paymentTransactionId: string;
+  revenueAllocationId: string;
+  organizationId: string;
+  disputeAmountCents: number;
+  reason: string;
+  status: 'UNDER_REVIEW' | 'LOST' | 'WON';
+  ledgerEntryGroupId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateRefundRequest {
+  paymentTransactionId: string;
+  amountCents?: number; // If omitted or equal to gross, full refund
+  reason: string;
+  voterCode?: string;
+}
+
+export interface CreateChargebackRequest {
+  paymentTransactionId: string;
+  amountCents: number;
+  reason: string;
+}
+
+export interface OrganizerRevenueMetrics {
+  organizationId: string;
+  currency: string;
+  grossSales: number;
+  processingFees: number;
+  approvedDeductions: number;
+  distributableAmount: number;
+  platformCommission: number;
+  organiserEarnings: number;
+  availableBalance: number;
+  reservedBalance: number;
+  allocationsCount: number;
+}
+
+export interface SuperAdminFinancialMetrics {
+  currency: string;
+  totalPaymentVolume: number;
+  platformRevenue: number;
+  organiserLiabilities: number;
+  processingFees: number;
+  refundsTotal: number;
+  chargebacksTotal: number;
+  reconciliationDiscrepancies: number;
+  isLedgerBalanced: boolean;
+}
+
 export interface CheckoutSessionRequest {
   packageId: string;
   organizationId: string;
