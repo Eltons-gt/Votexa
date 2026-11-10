@@ -358,6 +358,11 @@ export class FinancialLedgerService {
   /**
    * Ledger Integrity Audit: Verify that every entry group is balanced (Sum Debits === Sum Credits)
    */
+  async verifyLedgerBalance(): Promise<boolean> {
+    const integrity = await this.verifyLedgerIntegrity();
+    return integrity.isBalanced;
+  }
+
   async verifyLedgerIntegrity(): Promise<{
     isBalanced: boolean;
     totalGroupsAudited: number;

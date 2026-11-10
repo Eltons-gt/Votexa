@@ -131,25 +131,30 @@ export class ElectionsService {
   }
 
   /**
-   * List all elections belonging to an organization.
-   * Strictly tenant scoped.
+   * List elections for a tenant, or all elections across the platform if organizationId is omitted.
    */
   async listElections(
-    organizationId: string,
+    organizationId?: string,
     filter?: { category?: ElectionCategory; status?: ElectionStatus }
   ): Promise<Election[]> {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        if (organizationId) {
+          await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        }
         let query = `
           SELECT e.*, 
             row_to_json(s.*) as settings
           FROM elections e
           LEFT JOIN election_settings s ON s.election_id = e.id
-          WHERE e.organization_id = $1
+          WHERE 1=1
         `;
-        const params: unknown[] = [organizationId];
+        const params: unknown[] = [];
+        if (organizationId) {
+          params.push(organizationId);
+          query += ` AND e.organization_id = $${params.length}`;
+        }
 
         if (filter?.category) {
           params.push(filter.category);
@@ -169,9 +174,10 @@ export class ElectionsService {
       }
     } catch {
       // In-memory fallback
-      let elections = Array.from(ElectionsService.localElections.values()).filter(
-        (e) => e.organizationId === organizationId
-      );
+      let elections = Array.from(ElectionsService.localElections.values());
+      if (organizationId) {
+        elections = elections.filter((e) => e.organizationId === organizationId);
+      }
 
       if (filter?.category) {
         elections = elections.filter((e) => e.category === filter.category);

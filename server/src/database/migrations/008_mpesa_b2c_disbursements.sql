@@ -35,3 +35,4 @@ ALTER TABLE mpesa_b2c_disbursements ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS tenant_isolation_mpesa_b2c_disbursements ON mpesa_b2c_disbursements;
 CREATE POLICY tenant_isolation_mpesa_b2c_disbursements ON mpesa_b2c_disbursements
     USING (organization_id = NULLIF(current_setting('app.current_organization_id', true), '')::UUID);
+

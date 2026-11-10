@@ -1073,6 +1073,122 @@ export interface CheckoutSessionResponse {
 }
 
 // ==========================================
+// Super Administrator, Audit & Reporting Contracts
+// ==========================================
+
+export interface PlatformOverviewMetrics {
+  totalOrganizations: number;
+  activeOrganizations: number;
+  totalUsers: number;
+  totalElections: number;
+  activeElections: number;
+  paidCompetitionsCount: number;
+  totalPaymentVolumeCents: number;
+  platformRevenueCents: number;
+  organiserLiabilitiesCents: number;
+  payoutsSettledCents: number;
+  refundsTotalCents: number;
+  chargebacksTotalCents: number;
+  reconciliationDiscrepancies: number;
+  isLedgerBalanced: boolean;
+  systemHealth: 'OPERATIONAL' | 'DEGRADED' | 'MAINTENANCE';
+  currency?: string;
+}
+
+export interface PlatformAuditLogEntry {
+  id: string;
+  actorId?: string;
+  actorEmail?: string;
+  actorRole?: string;
+  action: string;
+  resourceType: string;
+  resourceId?: string;
+  organizationId?: string;
+  requestReference?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  beforeState?: Record<string, unknown>;
+  afterState?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export enum SecurityEventSeverity {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL'
+}
+
+export interface SecurityEventRecord {
+  id: string;
+  eventType: string;
+  severity: SecurityEventSeverity;
+  actorId?: string;
+  actorEmail?: string;
+  ipAddress?: string;
+  organizationId?: string;
+  details?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface CommissionSettingRecord {
+  id: string;
+  platformRateBasisPoints: number; // e.g. 4000 = 40.00%
+  organiserRateBasisPoints: number; // e.g. 6000 = 60.00%
+  updatedBy: string;
+  notes?: string;
+  reason?: string;
+  effectiveFrom?: string;
+  createdAt: string;
+}
+
+export interface CommissionSettingsResponse {
+  currentPlatformRateBasisPoints: number;
+  currentOrganiserRateBasisPoints: number;
+  history: CommissionSettingRecord[];
+}
+
+export interface UpdateCommissionRateRequest {
+  platformRateBasisPoints: number;
+  reason: string;
+}
+
+export enum ReportType {
+  ELECTION_PARTICIPATION = 'ELECTION_PARTICIPATION',
+  CANDIDATE_VOTE_SUMMARY = 'CANDIDATE_VOTE_SUMMARY',
+  VOTER_TURNOUT = 'VOTER_TURNOUT',
+  PAYMENT_TRANSACTIONS = 'PAYMENT_TRANSACTIONS',
+  PLATFORM_COMMISSIONS = 'PLATFORM_COMMISSIONS',
+  ORGANISER_EARNINGS = 'ORGANISER_EARNINGS',
+  PAYOUTS = 'PAYOUTS',
+  REFUNDS = 'REFUNDS',
+  FINANCIAL_RECONCILIATION = 'FINANCIAL_RECONCILIATION'
+}
+
+export type ReportExportFormat = 'json' | 'csv';
+
+export interface GenerateReportRequest {
+  reportType: ReportType;
+  organizationId?: string;
+  electionId?: string;
+  startDate?: string;
+  endDate?: string;
+  format?: ReportExportFormat;
+}
+
+export interface GeneratedReportResponse {
+  reportType: ReportType;
+  title: string;
+  generatedAt: string;
+  generatedBy: string;
+  organizationScope?: string;
+  rowCount: number;
+  data: any[];
+  csvContent?: string;
+}
+
+// ==========================================
 // Standard API Envelope & Error Contracts
 // ==========================================
 export interface PaginationMeta {

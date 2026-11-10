@@ -41,6 +41,10 @@ export class RevenueService {
     RevenueService.currentPlatformRateBasisPoints = rateBasisPoints;
   }
 
+  public getGlobalPlatformCommissionRate(): number {
+    return RevenueService.currentPlatformRateBasisPoints;
+  }
+
   /**
    * Compute Commercial 25/75 Split with integer minor currency units.
    * Formula:
@@ -412,9 +416,19 @@ export class RevenueService {
   }
 
   /**
-   * List allocations for an organization
+   * Alias for getPlatformMetrics
    */
-  async listAllocations(organizationId: string): Promise<RevenueAllocation[]> {
+  async getSuperAdminMetrics(currency: string = 'USD'): Promise<SuperAdminFinancialMetrics> {
+    return this.getPlatformMetrics(currency);
+  }
+
+  /**
+   * List allocations for an organization, or all allocations if orgId is omitted
+   */
+  async listAllocations(organizationId?: string): Promise<RevenueAllocation[]> {
+    if (!organizationId) {
+      return this.listAllAllocations();
+    }
     try {
       const client = await pool.connect();
       try {
