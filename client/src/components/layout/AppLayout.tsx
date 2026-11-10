@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Menu, ExternalLink } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from '../ui/button';
+import { ThemeToggle } from '../../lib/theme';
 import {
   UserProfile,
   UserOrganizationMembership
@@ -43,8 +44,12 @@ export function AppLayout({
     memberships.find((m) => m.organization.id === activeOrgId) || memberships[0];
   const activeOrg = activeMembership?.organization;
 
-  // Pretty Tab Titles
+  // Tab Titles and Subtitles
   const tabTitles: Record<string, { title: string; subtitle: string }> = {
+    overview: {
+      title: 'Workspace Dashboard Overview',
+      subtitle: 'Real-time overview of active elections, voter participation, and financial treasury.'
+    },
     voting: {
       title: 'Cryptographic Ballot Interface',
       subtitle: 'Cast confidential ballots with double-voting prevention and tamper-evident receipt tokens.'
@@ -93,7 +98,7 @@ export function AppLayout({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-background text-foreground flex flex-col lg:flex-row selection:bg-primary selection:text-white transition-colors duration-200">
       {/* Sidebar Component */}
       <Sidebar
         activeTab={activeTab}
@@ -113,23 +118,23 @@ export function AppLayout({
       {/* Main Content Area (Offset by Sidebar on Desktop) */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-72 transition-all duration-300">
         {/* Top Header Bar */}
-        <header className="h-16 px-4 lg:px-8 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4">
+        <header className="h-16 px-4 lg:px-8 border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4 transition-colors">
           {/* Left: Mobile Toggle & Breadcrumbs */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800"
+              className="lg:hidden p-2 rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
               aria-label="Open sidebar menu"
             >
               <Menu className="h-5 w-5" />
             </button>
 
             <div className="flex items-center gap-2 text-xs truncate">
-              <span className="font-semibold text-slate-400 truncate hidden sm:inline">
+              <span className="font-semibold text-muted-foreground truncate hidden sm:inline">
                 {activeOrg?.name || 'Workspace'}
               </span>
-              <span className="text-slate-600 hidden sm:inline">/</span>
-              <span className="font-bold text-white truncate">
+              <span className="text-muted-foreground/60 hidden sm:inline">/</span>
+              <span className="font-bold text-foreground truncate">
                 {currentTabInfo.title}
               </span>
             </div>
@@ -138,17 +143,20 @@ export function AppLayout({
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Server Status Badge */}
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-950/30 text-emerald-400 text-xs font-mono font-medium">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-medium">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>{serverStatus}</span>
             </div>
+
+            {/* Light / Dark Mode Toggle */}
+            <ThemeToggle />
 
             {/* Public Landing Link */}
             <Button
               variant="ghost"
               size="sm"
               onClick={onNavigateHome}
-              className="text-xs text-slate-400 hover:text-white hover:bg-slate-900 gap-1.5 hidden sm:inline-flex"
+              className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5 hidden sm:inline-flex"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>Landing Page</span>
@@ -168,10 +176,10 @@ export function AppLayout({
         {/* Dynamic Page Header */}
         <div className="px-4 lg:px-8 pt-6 pb-2">
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
               {currentTabInfo.title}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {currentTabInfo.subtitle}
             </p>
           </div>
@@ -183,12 +191,12 @@ export function AppLayout({
         </main>
 
         {/* Workspace Footer */}
-        <footer className="border-t border-slate-800/80 bg-slate-950/60 px-4 lg:px-8 py-4 text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <footer className="border-t border-border bg-card/50 px-4 lg:px-8 py-4 text-[11px] text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            © 2026 Votexa Multi-Tenant Platform • Scoped to <code>{activeOrg?.id}</code>
+            © 2026 Votexa Multi-Tenant Platform • Scoped to <code className="font-mono text-foreground font-semibold">{activeOrg?.id}</code>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-emerald-400">● PostgreSQL RLS Active</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">● PostgreSQL RLS Active</span>
             <span>Daraja B2C Live</span>
             <span>40/60 Ledger Balanced</span>
           </div>

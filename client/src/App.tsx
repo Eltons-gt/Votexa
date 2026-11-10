@@ -5,7 +5,8 @@ import { AppLayout } from './components/layout';
 import {
   OrganizationOnboarding,
   OrganizationSettings as OrgSettingsScreen,
-  MemberManagement
+  MemberManagement,
+  WorkspaceDashboardOverview
 } from './features/organizations';
 import {
   ElectionDashboard,
@@ -39,8 +40,8 @@ export function App() {
 
   // Workspace Navigation Tab
   const [activeTab, setActiveTab] = useState<
-    'voting' | 'elections' | 'candidates' | 'voters' | 'members' | 'settings' | 'finance' | 'admin' | 'profile' | 'onboarding'
-  >('voting');
+    'overview' | 'voting' | 'elections' | 'candidates' | 'voters' | 'members' | 'settings' | 'finance' | 'admin' | 'profile' | 'onboarding'
+  >('overview');
 
   const [serverStatus, setServerStatus] = useState<string>('Connecting...');
 
@@ -249,6 +250,21 @@ export function App() {
       serverStatus={serverStatus}
       walletBalanceCents={wallet.availableBalance}
     >
+      {/* Workspace Dashboard Overview */}
+      {activeTab === 'overview' && (
+        <WorkspaceDashboardOverview
+          organization={activeOrg}
+          userRole={activeRole}
+          currentUser={currentUser}
+          walletBalanceCents={wallet.availableBalance}
+          onNavigateTab={(t) => setActiveTab(t as any)}
+          onOpenCreateElection={() => {
+            setActiveTab('elections');
+            setShowElectionWizard(true);
+          }}
+        />
+      )}
+
       {/* Onboarding Screen */}
       {activeTab === 'onboarding' && (
         <OrganizationOnboarding

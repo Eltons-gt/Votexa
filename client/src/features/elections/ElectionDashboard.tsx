@@ -23,6 +23,57 @@ import {
 } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
 
+const DEFAULT_DEMO_ELECTIONS: Election[] = [
+  {
+    id: 'elec-inst-1',
+    organizationId: 'current',
+    category: ElectionCategory.INSTITUTIONAL,
+    title: 'Student Government Executive Council Election 2026',
+    description: 'Official annual election for executive council and student body representation.',
+    status: ElectionStatus.ACTIVE,
+    startTime: new Date(Date.now() - 86400000).toISOString(),
+    endTime: new Date(Date.now() + 86400000 * 3).toISOString(),
+    timezone: 'America/New_York',
+    allowSelfRegistration: false,
+    isPaidVoting: false,
+    createdById: 'usr-demo-owner',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'elec-paid-1',
+    organizationId: 'current',
+    category: ElectionCategory.PAID_COMPETITION,
+    title: 'National Collegiate Performing Arts & Talent Showcase',
+    description: 'Audience-choice public voting for top collegiate performing ensemble. Multiple votes permitted.',
+    status: ElectionStatus.ACTIVE,
+    startTime: new Date(Date.now() - 3600000 * 12).toISOString(),
+    endTime: new Date(Date.now() + 86400000 * 5).toISOString(),
+    timezone: 'America/New_York',
+    allowSelfRegistration: true,
+    isPaidVoting: true,
+    createdById: 'usr-demo-owner',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'elec-poll-1',
+    organizationId: 'current',
+    category: ElectionCategory.PUBLIC_POLL,
+    title: 'Campus Carbon Neutrality & Light Rail Transit Initiative',
+    description: 'Community survey on campus transport electrification and renewable energy investments.',
+    status: ElectionStatus.DRAFT,
+    startTime: new Date(Date.now() + 86400000).toISOString(),
+    endTime: new Date(Date.now() + 86400000 * 14).toISOString(),
+    timezone: 'America/New_York',
+    allowSelfRegistration: true,
+    isPaidVoting: false,
+    createdById: 'usr-demo-owner',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
 interface ElectionDashboardProps {
   organizationName: string;
   userRole?: OrganizationRole;
@@ -36,11 +87,11 @@ export function ElectionDashboard({
   onSelectElection,
   onOpenWizard
 }: ElectionDashboardProps) {
-  const [elections, setElections] = useState<Election[]>([]);
+  const [elections, setElections] = useState<Election[]>(DEFAULT_DEMO_ELECTIONS);
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchElections = async () => {
     try {
@@ -52,59 +103,13 @@ export function ElectionDashboard({
       if (params.length > 0) query += `?${params.join('&')}`;
 
       const res = await apiClient.get<Election[]>(query);
-      if (res.data) setElections(res.data);
+      if (res.data && res.data.length > 0) {
+        setElections(res.data);
+      } else {
+        setElections(DEFAULT_DEMO_ELECTIONS);
+      }
     } catch {
-      // Fallback seeds
-      setElections([
-        {
-          id: 'elec-inst-1',
-          organizationId: 'current',
-          category: ElectionCategory.INSTITUTIONAL,
-          title: 'Student Government Executive Council Election 2026',
-          description: 'Official annual election for executive council and student body representation.',
-          status: ElectionStatus.ACTIVE,
-          startTime: new Date(Date.now() - 86400000).toISOString(),
-          endTime: new Date(Date.now() + 86400000 * 3).toISOString(),
-          timezone: 'America/New_York',
-          allowSelfRegistration: false,
-          isPaidVoting: false,
-          createdById: 'usr-demo-owner',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'elec-paid-1',
-          organizationId: 'current',
-          category: ElectionCategory.PAID_COMPETITION,
-          title: 'National Collegiate Performing Arts & Talent Showcase',
-          description: 'Audience-choice public voting for top collegiate performing ensemble. Multiple votes permitted.',
-          status: ElectionStatus.ACTIVE,
-          startTime: new Date(Date.now() - 3600000 * 12).toISOString(),
-          endTime: new Date(Date.now() + 86400000 * 5).toISOString(),
-          timezone: 'America/New_York',
-          allowSelfRegistration: true,
-          isPaidVoting: true,
-          createdById: 'usr-demo-owner',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'elec-poll-1',
-          organizationId: 'current',
-          category: ElectionCategory.PUBLIC_POLL,
-          title: 'Campus Carbon Neutrality & Light Rail Transit Initiative',
-          description: 'Community survey on campus transport electrification and renewable energy investments.',
-          status: ElectionStatus.DRAFT,
-          startTime: new Date(Date.now() + 86400000).toISOString(),
-          endTime: new Date(Date.now() + 86400000 * 14).toISOString(),
-          timezone: 'America/New_York',
-          allowSelfRegistration: true,
-          isPaidVoting: false,
-          createdById: 'usr-demo-owner',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ]);
+      setElections(DEFAULT_DEMO_ELECTIONS);
     } finally {
       setLoading(false);
     }
@@ -115,6 +120,8 @@ export function ElectionDashboard({
   }, [categoryFilter, statusFilter]);
 
   const filteredElections = elections.filter((e) => {
+    if (categoryFilter !== 'ALL' && e.category !== categoryFilter) return false;
+    if (statusFilter !== 'ALL' && e.status !== statusFilter) return false;
     if (!search.trim()) return true;
     const q = search.trim().toLowerCase();
     return (
@@ -164,10 +171,11 @@ export function ElectionDashboard({
       {/* Top Header & New Election Action */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-            <Vote className="h-6 w-6 text-primary" /> {organizationName} Elections
+          <h2 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+            <Vote className="h-6 w-6 text-primary" />
+            <span className="text-foreground">{organizationName} Elections</span>
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-1">
             Manage institutional elections, paid competitions, and public polls with tamper-evident cryptographic tallying.
           </p>
         </div>
@@ -181,43 +189,43 @@ export function ElectionDashboard({
 
       {/* KPI Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="p-3.5 flex items-center gap-3">
+        <Card className="p-4 flex items-center gap-3.5 bg-card border-border shadow-sm">
           <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <Vote className="h-5 w-5" />
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground font-medium">Total Elections</p>
-            <p className="text-lg font-black text-foreground">{totalCount}</p>
+            <p className="text-xl font-black text-foreground">{totalCount}</p>
           </div>
         </Card>
 
-        <Card className="p-3.5 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+        <Card className="p-4 flex items-center gap-3.5 bg-card border-border shadow-sm">
+          <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground font-medium">Active Polls Now</p>
-            <p className="text-lg font-black text-foreground">{activeCount}</p>
+            <p className="text-xl font-black text-foreground">{activeCount}</p>
           </div>
         </Card>
 
-        <Card className="p-3.5 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+        <Card className="p-4 flex items-center gap-3.5 bg-card border-border shadow-sm">
+          <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <Shield className="h-5 w-5" />
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground font-medium">Institutional</p>
-            <p className="text-lg font-black text-foreground">{institutionalCount}</p>
+            <p className="text-xl font-black text-foreground">{institutionalCount}</p>
           </div>
         </Card>
 
-        <Card className="p-3.5 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+        <Card className="p-4 flex items-center gap-3.5 bg-card border-border shadow-sm">
+          <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
             <DollarSign className="h-5 w-5" />
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground font-medium">Paid Competitions</p>
-            <p className="text-lg font-black text-foreground">{paidCount}</p>
+            <p className="text-xl font-black text-foreground">{paidCount}</p>
           </div>
         </Card>
       </div>
@@ -234,10 +242,10 @@ export function ElectionDashboard({
             <button
               key={cat.id}
               onClick={() => setCategoryFilter(cat.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs transition-colors shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs transition-colors shrink-0 font-medium ${
                 categoryFilter === cat.id
-                  ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
-                  : 'bg-muted/60 text-muted-foreground hover:bg-muted'
+                  ? 'bg-primary text-primary-foreground font-bold shadow-sm'
+                  : 'border border-border bg-card text-foreground hover:bg-muted'
               }`}
             >
               {cat.label}
@@ -252,12 +260,12 @@ export function ElectionDashboard({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search elections..."
-              className="pl-8 text-xs h-8"
+              className="pl-8 text-xs h-8 bg-card border-border text-foreground"
             />
           </div>
 
           <select
-            className="rounded-md border bg-background px-2.5 py-1.5 text-xs text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary h-8"
+            className="rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-8"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -275,10 +283,10 @@ export function ElectionDashboard({
       {loading ? (
         <div className="py-12 text-center text-xs text-muted-foreground">Loading workspace elections...</div>
       ) : filteredElections.length === 0 ? (
-        <Card className="border-dashed py-12 text-center">
+        <Card className="border-dashed py-12 text-center bg-card border-border">
           <CardContent className="space-y-3">
             <Vote className="h-10 w-10 text-muted-foreground mx-auto" />
-            <p className="text-base font-semibold">No elections match your filter</p>
+            <p className="text-base font-semibold text-foreground">No elections match your filter</p>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
               Create a new institutional election, paid competition, or public poll to get started.
             </p>
@@ -294,7 +302,7 @@ export function ElectionDashboard({
           {filteredElections.map((elec) => (
             <Card
               key={elec.id}
-              className="flex flex-col justify-between hover:border-primary/50 transition-all shadow-sm hover:shadow-md overflow-hidden group"
+              className="flex flex-col justify-between hover:border-primary/50 transition-all shadow-sm hover:shadow-md overflow-hidden group bg-card border-border"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
@@ -304,7 +312,7 @@ export function ElectionDashboard({
                   </div>
                   {getStatusBadge(elec.status)}
                 </div>
-                <CardTitle className="text-base font-bold group-hover:text-primary transition-colors line-clamp-2 mt-2">
+                <CardTitle className="text-base font-bold group-hover:text-primary transition-colors line-clamp-2 mt-2 text-foreground">
                   {elec.title}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
@@ -325,7 +333,7 @@ export function ElectionDashboard({
                 </div>
 
                 {/* Category Rule Badges */}
-                <div className="pt-2 border-t flex flex-wrap gap-1.5">
+                <div className="pt-2 border-t border-border flex flex-wrap gap-1.5">
                   {elec.category === ElectionCategory.INSTITUTIONAL ? (
                     <>
                       <Badge variant="outline" className="text-[10px]">
@@ -357,7 +365,7 @@ export function ElectionDashboard({
                 </div>
               </CardContent>
 
-              <CardFooter className="pt-2 border-t flex items-center justify-between bg-muted/20">
+              <CardFooter className="pt-2 border-t border-border flex items-center justify-between bg-muted/20">
                 <span className="text-[11px] text-muted-foreground font-mono">
                   ID: {elec.id.slice(0, 10)}...
                 </span>
