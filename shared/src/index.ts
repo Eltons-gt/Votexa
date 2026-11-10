@@ -447,6 +447,124 @@ export interface ElectionTally {
 }
 
 // ==========================================
+// Voting Packages & Election-Specific Voter Wallets
+// ==========================================
+export enum WalletTransactionType {
+  PURCHASE = 'PURCHASE',
+  SPEND = 'SPEND',
+  REFUND = 'REFUND',
+  ADJUSTMENT = 'ADJUSTMENT',
+  EXPIRY = 'EXPIRY'
+}
+
+export interface VotingPackage {
+  id: string;
+  organizationId: string;
+  electionId: string;
+  name: string;
+  credits: number;
+  priceCents: number;
+  currency: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VoterWallet {
+  id: string;
+  organizationId: string;
+  electionId: string;
+  voterCode: string;
+  creditsBalance: number;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WalletTransaction {
+  id: string;
+  walletId: string;
+  electionId: string;
+  type: WalletTransactionType;
+  creditsAmount: number;
+  balanceAfter: number;
+  referenceId?: string;
+  description: string;
+  isMockPayment: boolean;
+  createdAt: string;
+}
+
+export interface VoteAuthorization {
+  id: string;
+  electionId: string;
+  organizationId: string;
+  positionId?: string;
+  token: string;
+  voterHash: string;
+  category: ElectionCategory;
+  creditsAllocated: number;
+  isUsed: boolean;
+  usedAt?: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface CreateVotingPackageRequest {
+  electionId: string;
+  name: string;
+  credits: number;
+  priceCents: number;
+  currency?: string;
+  isActive?: boolean;
+}
+
+export interface PurchasePackageRequest {
+  electionId: string;
+  packageId: string;
+  voterCode: string;
+  paymentMethod?: 'MOCK_SANDBOX' | 'CARD';
+  mockCardNumber?: string;
+}
+
+export interface PurchasePackageResponse {
+  success: boolean;
+  wallet: VoterWallet;
+  transaction: WalletTransaction;
+  message: string;
+}
+
+export interface RequestVoteAuthorizationRequest {
+  electionId: string;
+  voterCode: string;
+  positionId?: string;
+  creditsRequested?: number;
+}
+
+export interface RequestVoteAuthorizationResponse {
+  authorized: boolean;
+  authorizationToken: string;
+  expiresAt: string;
+  category: ElectionCategory;
+  positionId?: string;
+  creditsAllocated: number;
+  voterHash: string;
+}
+
+export interface CastAuthorizedVoteRequest {
+  electionId: string;
+  authorizationToken: string;
+  positionId: string;
+  candidateId: string;
+  ballotId?: string;
+}
+
+export interface CastAuthorizedVoteResponse {
+  success: boolean;
+  receipt: VoteReceipt;
+  remainingCredits?: number;
+}
+
+// ==========================================
 // Finance, Ledger & Payments
 // ==========================================
 export enum PaymentStatus {

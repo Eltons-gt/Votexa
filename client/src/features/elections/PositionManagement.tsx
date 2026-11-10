@@ -295,3 +295,4 @@ export function PositionManagement({ electionId, isReadOnly = false }: PositionM
     </div>
   );
 }
+

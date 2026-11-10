@@ -146,3 +146,4 @@ DROP POLICY IF EXISTS tenant_isolation_election_audit_logs ON election_audit_log
 CREATE POLICY tenant_isolation_election_audit_logs ON election_audit_logs
     FOR ALL
     USING (organization_id = NULLIF(current_setting('app.current_organization_id', true), '')::uuid);
+

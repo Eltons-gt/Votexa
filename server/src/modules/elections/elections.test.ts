@@ -445,3 +445,4 @@ describe('Election Management Module', () => {
     });
   });
 });
+

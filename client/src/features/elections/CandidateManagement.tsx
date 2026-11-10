@@ -501,3 +501,4 @@ export function CandidateManagement({ electionId, isReadOnly = false }: Candidat
     </div>
   );
 }
+
