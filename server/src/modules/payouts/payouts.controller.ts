@@ -1,50 +1,80 @@
 import { Request, Response } from 'express';
 import { sendSuccess } from '../../utils/apiResponse.js';
-import { walletsService } from '../wallets/wallets.service.js';
+import { payoutsService } from './payouts.service.js';
+import { PayoutStatus } from '@votexa/shared';
 
 export class PayoutsController {
-  private static localPayouts: any[] = [
-    {
-      id: 'payout-1',
-      organizationId: 'org-demo-1',
-      amount: 50000,
-      currency: 'USD',
-      status: 'COMPLETED',
-      destinationAccountId: 'acct_1234',
-      createdAt: '2026-11-01T12:00:00.000Z'
-    }
-  ];
+  // 1. Submit withdrawal request
+  async requestPayout(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || req.body.organizationId || 'org-metro-uni';
+    const userId = req.user?.id || req.body.userId || 'usr-organizer-1';
 
+    const payout = await payoutsService.requestWithdrawal(orgId, userId, {
+      amountCents: parseInt(req.body.amountCents, 10),
+      method: req.body.method,
+      destinationDetails: req.body.destinationDetails,
+      payoutAccountId: req.body.payoutAccountId,
+      currency: req.body.currency
+    });
+
+    sendSuccess(res, payout, undefined, 201, req.requestId);
+  }
+
+  // 2. List payouts
   async list(req: Request, res: Response): Promise<void> {
-    const orgId = req.tenant?.organizationId || 'org-demo-1';
-    const payouts = PayoutsController.localPayouts.filter((p) => p.organizationId === orgId);
+    const orgId = req.tenant?.organizationId || (req.query.organizationId as string);
+    const status = req.query.status as PayoutStatus | undefined;
+    const payouts = await payoutsService.listPayouts(orgId, { status });
     sendSuccess(res, payouts, undefined, 200, req.requestId);
   }
 
-  async requestPayout(req: Request, res: Response): Promise<void> {
-    const orgId = req.tenant?.organizationId || 'org-demo-1';
-    const amountCents = parseInt(req.body.amount, 10);
+  // 3. Get single payout with audit log
+  async getPayout(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || (req.query.organizationId as string) || 'org-metro-uni';
+    const payoutId = req.params.id as string;
+    const details = await payoutsService.getPayout(orgId, payoutId);
+    sendSuccess(res, details, undefined, 200, req.requestId);
+  }
 
-    // Atomically debit the tenant wallet with double-entry ledger entry
-    const ledgerEntry = await walletsService.debitWallet(
-      orgId,
-      amountCents,
-      `Institutional Payout to ${req.body.destinationAccountId || 'Connected Bank Account'}`,
-      `payout-${Date.now()}`
-    );
+  // 4. Admin Review: Approve or Reject
+  async reviewPayout(req: Request, res: Response): Promise<void> {
+    const payoutId = req.params.id as string;
+    const adminUserId = req.user?.id || req.body.adminUserId || 'usr-super-admin';
+    const action = req.body.action as 'APPROVE' | 'REJECT';
+    const reason = req.body.reason as string | undefined;
 
-    const payout = {
-      id: `payout-${Date.now()}`,
-      organizationId: orgId,
-      amount: amountCents,
-      currency: 'USD',
-      status: 'COMPLETED',
-      destinationAccountId: req.body.destinationAccountId || 'Bank Account ending in 4192',
-      ledgerEntryId: ledgerEntry.id,
-      createdAt: new Date().toISOString()
-    };
+    const payout = await payoutsService.reviewPayout(payoutId, adminUserId, action, reason);
+    sendSuccess(res, payout, undefined, 200, req.requestId);
+  }
 
-    PayoutsController.localPayouts.unshift(payout);
-    sendSuccess(res, payout, undefined, 201, req.requestId);
+  // 5. Admin Settlement: Record settlement evidence and mark PAID
+  async settlePayout(req: Request, res: Response): Promise<void> {
+    const payoutId = req.params.id as string;
+    const adminUserId = req.user?.id || req.body.adminUserId || 'usr-super-admin';
+    const { settlementEvidence, providerReference, notes } = req.body;
+
+    const payout = await payoutsService.recordSettlement(payoutId, adminUserId, {
+      settlementEvidence,
+      providerReference,
+      notes
+    });
+
+    sendSuccess(res, payout, undefined, 200, req.requestId);
+  }
+
+  // 6. Save destination account
+  async saveAccount(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || req.body.organizationId || 'org-metro-uni';
+    const acc = await payoutsService.savePayoutAccount(orgId, req.body);
+    sendSuccess(res, acc, undefined, 201, req.requestId);
+  }
+
+  // 7. List destination accounts
+  async listAccounts(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || (req.query.organizationId as string) || 'org-metro-uni';
+    const accounts = await payoutsService.listPayoutAccounts(orgId);
+    sendSuccess(res, accounts, undefined, 200, req.requestId);
   }
 }
+
+export const payoutsController = new PayoutsController();

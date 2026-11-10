@@ -7,7 +7,8 @@ import {
   Settings,
   Lock,
   User as UserIcon,
-  UserCheck
+  UserCheck,
+  ShieldAlert
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
@@ -32,8 +33,7 @@ import {
 } from './features/elections';
 import { VotingInterface } from './features/voting';
 import { PricingPackages } from './features/payments';
-import { WalletCard } from './features/wallets';
-import { RevenueOverview } from './features/revenue';
+import { OrganizerRevenueDashboard } from './features/revenue';
 import { PayoutsSection } from './features/payouts';
 import { AdministrationPanel } from './features/administration';
 import {
@@ -268,7 +268,8 @@ export function App() {
             { id: 'voters', label: 'Voters Register', icon: UserCheck },
             { id: 'members', label: 'Members & Roles', icon: Users },
             { id: 'settings', label: 'Workspace Settings', icon: Settings },
-            { id: 'finance', label: 'Treasury & Ledger', icon: DollarSign },
+            { id: 'finance', label: 'Treasury & Payouts', icon: DollarSign },
+            { id: 'admin', label: 'Platform Governance', icon: ShieldAlert },
             { id: 'profile', label: 'My Profile', icon: UserIcon }
           ].map((tab) => {
             const Icon = tab.icon;
@@ -384,28 +385,18 @@ export function App() {
 
         {/* Treasury & Finance Tab */}
         {activeTab === 'finance' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">{activeOrg.name} Treasury Vault</h2>
-              <p className="text-sm text-muted-foreground">Double-entry ledger accounting, revenue KPIs, and payout disbursements</p>
+          <div className="space-y-8">
+            <OrganizerRevenueDashboard organizationId={activeOrg.id} />
+
+            <div className="border-t pt-6">
+              <PayoutsSection
+                organizationId={activeOrg.id}
+                availableBalanceCents={wallet.availableBalance}
+                onBalanceUpdated={refreshWallet}
+              />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
-                <WalletCard wallet={wallet} />
-              </div>
-              <div className="lg:col-span-2">
-                <RevenueOverview
-                  totalRevenue={wallet.availableBalance + 109000}
-                  votingFees={wallet.availableBalance}
-                  payouts={109000}
-                />
-              </div>
-            </div>
-
-            <PayoutsSection />
-
-            <div className="pt-6">
+            <div className="border-t pt-6">
               <h3 className="text-lg font-bold mb-4">SaaS Tier Packages (Stripe Integration Active)</h3>
               <PricingPackages onPaymentCompleted={refreshWallet} />
             </div>
@@ -424,7 +415,7 @@ export function App() {
         {/* Administration Tab */}
         {activeTab === 'admin' && (
           <div className="space-y-6">
-            <AdministrationPanel />
+            <AdministrationPanel currentAdminUserId={currentUser.id} />
           </div>
         )}
 

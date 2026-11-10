@@ -884,6 +884,111 @@ export interface SuperAdminFinancialMetrics {
   isLedgerBalanced: boolean;
 }
 
+// ==========================================
+// Organiser Payouts & Withdrawal Management
+// ==========================================
+export enum PayoutStatus {
+  REQUESTED = 'REQUESTED',
+  RESERVED = 'RESERVED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  APPROVED = 'APPROVED',
+  PROCESSING = 'PROCESSING',
+  PAID = 'PAID',
+  REJECTED = 'REJECTED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED'
+}
+
+export enum PayoutMethod {
+  MPESA_B2C = 'MPESA_B2C',
+  BANK_TRANSFER = 'BANK_TRANSFER'
+}
+
+export interface OrganizationPayoutAccount {
+  id: string;
+  organizationId: string;
+  method: PayoutMethod;
+  accountName: string;
+  accountIdentifier: string; // Phone 2547... or Bank Account Number
+  bankName?: string;
+  swiftCode?: string;
+  isDefault: boolean;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizerPayout {
+  id: string;
+  organizationId: string;
+  payoutAccountId?: string;
+  amountCents: number;
+  feeCents: number;
+  netAmountCents: number;
+  currency: string;
+  method: PayoutMethod;
+  destinationDetails: Record<string, unknown>;
+  status: PayoutStatus;
+  requestedBy: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  settlementEvidence?: string;
+  settledAt?: string;
+  rejectionReason?: string;
+  ledgerEntryGroupId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PayoutReservation {
+  id: string;
+  payoutId: string;
+  accountId: string;
+  organizationId: string;
+  amountCents: number;
+  status: 'ACTIVE' | 'RELEASED' | 'SETTLED';
+  reservedAt: string;
+  releasedAt?: string;
+  settledAt?: string;
+}
+
+export interface PayoutAuditLog {
+  id: string;
+  payoutId: string;
+  organizationId: string;
+  performedBy: string;
+  action: string;
+  fromStatus?: PayoutStatus;
+  toStatus: PayoutStatus;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CreateWithdrawalRequest {
+  amountCents: number;
+  method: PayoutMethod;
+  destinationDetails: {
+    phoneNumber?: string;
+    accountName?: string;
+    accountNumber?: string;
+    bankName?: string;
+    swiftCode?: string;
+  };
+  payoutAccountId?: string;
+  currency?: string;
+}
+
+export interface ReviewPayoutActionRequest {
+  action: 'APPROVE' | 'REJECT';
+  reason?: string;
+}
+
+export interface SettlePayoutRequest {
+  settlementEvidence: string;
+  providerReference?: string;
+  notes?: string;
+}
+
 export interface CheckoutSessionRequest {
   packageId: string;
   organizationId: string;

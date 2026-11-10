@@ -5,7 +5,7 @@ import { refundsService, RefundsService } from '../refunds/refunds.service.js';
 import { FinancialAccountType } from '@votexa/shared';
 import { AppError } from '../../utils/apiResponse.js';
 
-describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => {
+describe('Commercial 40/60 Revenue Sharing & Double-Entry Ledger Engine', () => {
   const orgId = 'org-metro-uni';
   const electionId = 'elec-paid-1';
 
@@ -15,24 +15,24 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
     RefundsService.resetState();
   });
 
-  describe('1. Mathematical 25/75 Split & Rounding Precision', () => {
-    it('should split exact 25/75 without floating point drift or single-cent loss', () => {
+  describe('1. Mathematical 40/60 Split & Rounding Precision', () => {
+    it('should split exact 40/60 without floating point drift or single-cent loss', () => {
       // Gross: $100.00 = 10,000 cents
       // Processing fee: $1.50 = 150 cents
       // Approved deduction: $0.50 = 50 cents
       // Distributable: 10,000 - 200 = 9,800 cents
-      // Platform Share (25%): 2,450 cents
-      // Organiser Share (75%): 7,350 cents
+      // Platform Share (40%): 3,920 cents
+      // Organiser Share (60%): 5,880 cents
       const split = revenueService.calculateSplit(10000, 150, 50);
 
       expect(split.distributableAmountCents).toBe(9800);
-      expect(split.platformFeeCents).toBe(2450);
-      expect(split.organiserFeeCents).toBe(7350);
+      expect(split.platformFeeCents).toBe(3920);
+      expect(split.organiserFeeCents).toBe(5880);
       expect(split.platformFeeCents + split.organiserFeeCents).toBe(split.distributableAmountCents);
     });
 
     it('should guarantee Platform Share + Organiser Share === Distributable on uneven odd cent amounts', () => {
-      // Test odd numbers where 25% has fractional cents (e.g. 99 cents, 133 cents, 1999 cents)
+      // Test odd numbers where 40% has fractional cents (e.g. 99 cents, 133 cents, 1999 cents)
       const oddAmounts = [99, 133, 1001, 1999, 7777, 33333];
 
       for (const amount of oddAmounts) {
@@ -40,8 +40,8 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
         // Organiser share must be exact remainder after platform share
         expect(split.platformFeeCents + split.organiserFeeCents).toBe(amount);
         expect(split.distributableAmountCents).toBe(amount);
-        expect(split.platformFeeCents).toBe(Math.floor((amount * 25) / 100));
-        expect(split.organiserFeeCents).toBe(amount - Math.floor((amount * 25) / 100));
+        expect(split.platformFeeCents).toBe(Math.floor((amount * 40) / 100));
+        expect(split.organiserFeeCents).toBe(amount - Math.floor((amount * 40) / 100));
       }
     });
 
@@ -68,13 +68,13 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
       });
 
       // Distributable = 4500 - 100 = 4400 cents
-      // Platform 25% = 1100 cents
-      // Organiser 75% = 3300 cents
+      // Platform 40% = 1760 cents
+      // Organiser 60% = 2640 cents
       expect(allocation.grossAmountCents).toBe(4500);
       expect(allocation.processingFeeCents).toBe(100);
       expect(allocation.distributableAmountCents).toBe(4400);
-      expect(allocation.platformFeeCents).toBe(1100);
-      expect(allocation.organiserFeeCents).toBe(3300);
+      expect(allocation.platformFeeCents).toBe(1760);
+      expect(allocation.organiserFeeCents).toBe(2640);
       expect(allocation.status).toBe('ALLOCATED');
 
       // Verify Account Balances
@@ -82,13 +82,13 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
         orgId,
         FinancialAccountType.ORGANIZER_TREASURY
       );
-      expect(orgTreasury.availableBalance).toBe(3300);
+      expect(orgTreasury.availableBalance).toBe(2640);
 
       const platformTreasury = await financialLedgerService.getOrCreateAccount(
         null,
         FinancialAccountType.PLATFORM_TREASURY
       );
-      expect(platformTreasury.availableBalance).toBe(1100);
+      expect(platformTreasury.availableBalance).toBe(1760);
 
       const processingEscrow = await financialLedgerService.getOrCreateAccount(
         null,
@@ -141,14 +141,14 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
         currency: 'USD'
       };
 
-      // Payment 1 under standard 25% platform rate
+      // Payment 1 under standard 40% platform rate
       const alloc1 = await revenueService.allocateRevenue(payment1, { processingFeeCents: 0 });
-      expect(alloc1.platformRateBasisPoints).toBe(2500);
-      expect(alloc1.platformFeeCents).toBe(2500);
-      expect(alloc1.organiserFeeCents).toBe(7500);
+      expect(alloc1.platformRateBasisPoints).toBe(4000);
+      expect(alloc1.platformFeeCents).toBe(4000);
+      expect(alloc1.organiserFeeCents).toBe(6000);
 
-      // Now change future platform rate to 30% (3000 basis points)
-      revenueService.setGlobalPlatformCommissionRate(3000);
+      // Now change future platform rate to 45% (4500 basis points)
+      revenueService.setGlobalPlatformCommissionRate(4500);
 
       const payment2 = {
         id: 'pay-tx-hist-2',
@@ -158,17 +158,17 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
         currency: 'USD'
       };
 
-      // Payment 2 under new 30% rate
+      // Payment 2 under new 45% rate
       const alloc2 = await revenueService.allocateRevenue(payment2, { processingFeeCents: 0 });
-      expect(alloc2.platformRateBasisPoints).toBe(3000);
-      expect(alloc2.platformFeeCents).toBe(3000);
-      expect(alloc2.organiserFeeCents).toBe(7000);
+      expect(alloc2.platformRateBasisPoints).toBe(4500);
+      expect(alloc2.platformFeeCents).toBe(4500);
+      expect(alloc2.organiserFeeCents).toBe(5500);
 
-      // CRITICAL INVARIANT: Re-query Payment 1, its snapshot MUST remain 25% / 2500 cents!
+      // CRITICAL INVARIANT: Re-query Payment 1, its snapshot MUST remain 40% / 4000 cents!
       const recheckedAlloc1 = await revenueService.getAllocationByPaymentId(payment1.id);
-      expect(recheckedAlloc1?.platformRateBasisPoints).toBe(2500);
-      expect(recheckedAlloc1?.platformFeeCents).toBe(2500);
-      expect(recheckedAlloc1?.organiserFeeCents).toBe(7500);
+      expect(recheckedAlloc1?.platformRateBasisPoints).toBe(4000);
+      expect(recheckedAlloc1?.platformFeeCents).toBe(4000);
+      expect(recheckedAlloc1?.organiserFeeCents).toBe(6000);
     });
   });
 
@@ -184,8 +184,8 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
 
       await revenueService.allocateRevenue(payment, { processingFeeCents: 0 });
 
-      // Organiser had 75% = 6,000 cents
-      // Platform had 25% = 2,000 cents
+      // Organiser had 60% = 4,800 cents
+      // Platform had 40% = 3,200 cents
       const refund = await refundsService.processRefund(orgId, {
         paymentTransactionId: payment.id,
         reason: 'Event rescheduled'
@@ -193,8 +193,8 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
 
       expect(refund.type).toBe('FULL');
       expect(refund.refundAmountCents).toBe(8000);
-      expect(refund.reversalPlatformCents).toBe(2000);
-      expect(refund.reversalOrganiserCents).toBe(6000);
+      expect(refund.reversalPlatformCents).toBe(3200);
+      expect(refund.reversalOrganiserCents).toBe(4800);
 
       // Accounts debited back to zero
       const orgTreasury = await financialLedgerService.getOrCreateAccount(orgId, FinancialAccountType.ORGANIZER_TREASURY);
@@ -228,8 +228,8 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
 
       expect(refund1.type).toBe('PARTIAL');
       expect(refund1.refundAmountCents).toBe(4000);
-      expect(refund1.reversalPlatformCents).toBe(1000); // 25% of 4000
-      expect(refund1.reversalOrganiserCents).toBe(3000); // 75% of 4000
+      expect(refund1.reversalPlatformCents).toBe(1600); // 40% of 4000
+      expect(refund1.reversalOrganiserCents).toBe(2400); // 60% of 4000
 
       // Partial refund 2: $60.00 (remaining 6,000 cents)
       const refund2 = await refundsService.processRefund(orgId, {
@@ -239,8 +239,8 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
       });
 
       expect(refund2.refundAmountCents).toBe(6000);
-      expect(refund2.reversalPlatformCents).toBe(1500); // 25% of 6000
-      expect(refund2.reversalOrganiserCents).toBe(4500); // 75% of 6000
+      expect(refund2.reversalPlatformCents).toBe(2400); // 40% of 6000
+      expect(refund2.reversalOrganiserCents).toBe(3600); // 60% of 6000
 
       // Re-refunding beyond available should fail
       await expect(
@@ -267,18 +267,18 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
 
       const cb = await refundsService.processChargeback(orgId, {
         paymentTransactionId: payment.id,
-        amountCents: 3750, // Organiser share under dispute
+        amountCents: 3000, // Organiser share under dispute (60% of 5000)
         reason: 'Fraudulent card dispute reported by issuer'
       });
 
       expect(cb.status).toBe('UNDER_REVIEW');
-      expect(cb.disputeAmountCents).toBe(3750);
+      expect(cb.disputeAmountCents).toBe(3000);
 
       const orgTreasury = await financialLedgerService.getOrCreateAccount(orgId, FinancialAccountType.ORGANIZER_TREASURY);
-      expect(orgTreasury.availableBalance).toBe(0); // 3750 debited from available balance
+      expect(orgTreasury.availableBalance).toBe(0); // 3000 debited from available balance
 
       const reserveEscrow = await financialLedgerService.getOrCreateAccount(orgId, FinancialAccountType.RESERVE_ESCROW);
-      expect(reserveEscrow.reservedBalance).toBe(3750); // Held in reserve
+      expect(reserveEscrow.reservedBalance).toBe(3000); // Held in reserve
 
       // Ledger must still balance
       const audit = await financialLedgerService.verifyLedgerIntegrity();
@@ -316,15 +316,15 @@ describe('Commercial 25/75 Revenue Sharing & Double-Entry Ledger Engine', () => 
       expect(orgMetrics.grossSales).toBe(15000);
       expect(orgMetrics.processingFees).toBe(300);
       expect(orgMetrics.distributableAmount).toBe(14700);
-      expect(orgMetrics.platformCommission).toBe(3675); // 25% of 14,700
-      expect(orgMetrics.organiserEarnings).toBe(11025); // 75% of 14,700
-      expect(orgMetrics.availableBalance).toBe(11025);
+      expect(orgMetrics.platformCommission).toBe(5880); // 40% of 14,700
+      expect(orgMetrics.organiserEarnings).toBe(8820); // 60% of 14,700
+      expect(orgMetrics.availableBalance).toBe(8820);
 
       // Super Admin Metrics
       const platformMetrics = await revenueService.getPlatformMetrics();
       expect(platformMetrics.totalPaymentVolume).toBe(15000);
-      expect(platformMetrics.platformRevenue).toBe(3675);
-      expect(platformMetrics.organiserLiabilities).toBe(11025);
+      expect(platformMetrics.platformRevenue).toBe(5880);
+      expect(platformMetrics.organiserLiabilities).toBe(8820);
       expect(platformMetrics.processingFees).toBe(300);
       expect(platformMetrics.isLedgerBalanced).toBe(true);
     });

@@ -76,7 +76,7 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold tracking-tight text-foreground">Revenue & Financial Accounting</h2>
             <Badge variant="outline" className="text-[10px] font-bold border-emerald-500/30 text-emerald-600">
-              Commercial Split: 75% Organiser / 25% Platform
+              Commercial Split: 60% Organiser / 40% Platform
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -121,10 +121,10 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           </CardContent>
         </Card>
 
-        {/* Organiser Net Share (75%) */}
+        {/* Organiser Net Share (60%) */}
         <Card className="bg-emerald-500/5 border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between pb-1">
-            <CardTitle className="text-xs font-semibold text-emerald-600 uppercase">Organiser Share (75%)</CardTitle>
+            <CardTitle className="text-xs font-semibold text-emerald-600 uppercase">Organiser Share (60%)</CardTitle>
             <Percent className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
@@ -133,10 +133,10 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           </CardContent>
         </Card>
 
-        {/* Platform Share (25%) */}
+        {/* Platform Share (40%) */}
         <Card className="bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-1">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Platform Fee (25%)</CardTitle>
+            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Platform Fee (40%)</CardTitle>
             <ShieldCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -184,7 +184,7 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">Revenue Allocation Ledger (25/75 Split)</h3>
+            <h3 className="text-sm font-bold text-foreground">Revenue Allocation Ledger (40/60 Split)</h3>
           </div>
           <span className="text-xs text-muted-foreground">
             {allocations.length} Verified Allocations
@@ -224,10 +224,10 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
 
                 <div className="text-left sm:text-right space-y-0.5">
                   <div className="font-bold text-emerald-600 text-sm">
-                    +{formatCents(a.organiserFeeCents)} (75%)
+                    +{formatCents(a.organiserFeeCents)} (60%)
                   </div>
                   <div className="text-[10px] text-muted-foreground">
-                    Platform Fee: {formatCents(a.platformFeeCents)} (25%)
+                    Platform Fee: {formatCents(a.platformFeeCents)} (40%)
                   </div>
                 </div>
               </div>
@@ -238,3 +238,4 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
     </div>
   );
 }
+

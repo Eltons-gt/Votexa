@@ -21,13 +21,13 @@ export class RevenueService {
   private static localAllocations = new Map<string, RevenueAllocation>();
   private static localPaymentToAllocMap = new Map<string, string>();
 
-  // Current default commission settings (can be configured in platform settings)
-  private static currentPlatformRateBasisPoints: number = 2500; // 25.00%
+  // Current default commission settings: 40.00% Platform / 60.00% Organiser
+  private static currentPlatformRateBasisPoints: number = 4000; // 40.00%
 
   public static resetState(): void {
     RevenueService.localAllocations.clear();
     RevenueService.localPaymentToAllocMap.clear();
-    RevenueService.currentPlatformRateBasisPoints = 2500;
+    RevenueService.currentPlatformRateBasisPoints = 4000;
   }
 
   /**

@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS revenue_allocations (
     processing_fee_cents BIGINT NOT NULL DEFAULT 0 CHECK (processing_fee_cents >= 0),
     approved_deduction_cents BIGINT NOT NULL DEFAULT 0 CHECK (approved_deduction_cents >= 0),
     distributable_amount_cents BIGINT NOT NULL CHECK (distributable_amount_cents >= 0),
-    platform_rate_basis_points INT NOT NULL DEFAULT 2500, -- 25.00%
+    platform_rate_basis_points INT NOT NULL DEFAULT 4000, -- 40.00%
     platform_fee_cents BIGINT NOT NULL CHECK (platform_fee_cents >= 0),
-    organiser_rate_basis_points INT NOT NULL DEFAULT 7500, -- 75.00%
+    organiser_rate_basis_points INT NOT NULL DEFAULT 6000, -- 60.00%
     organiser_fee_cents BIGINT NOT NULL CHECK (organiser_fee_cents >= 0),
     currency VARCHAR(10) NOT NULL DEFAULT 'USD',
     status VARCHAR(50) NOT NULL DEFAULT 'ALLOCATED', -- 'ALLOCATED', 'PARTIALLY_REFUNDED', 'FULLY_REFUNDED', 'DISPUTED'
@@ -134,3 +134,4 @@ CREATE POLICY tenant_isolation_refunds ON refunds
 DROP POLICY IF EXISTS tenant_isolation_chargebacks ON chargebacks;
 CREATE POLICY tenant_isolation_chargebacks ON chargebacks
     USING (organization_id = NULLIF(current_setting('app.current_organization_id', true), '')::UUID);
+
