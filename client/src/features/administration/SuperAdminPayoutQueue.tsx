@@ -22,7 +22,9 @@ import {
   AlertTriangle,
   ArrowRight,
   Clock,
-  Layers
+  Layers,
+  Zap,
+  Send
 } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 
@@ -51,6 +53,13 @@ export function SuperAdminPayoutQueue({
   const [settleNotes, setSettleNotes] = useState<string>('');
   const [settleLoading, setSettleLoading] = useState<boolean>(false);
   const [settleError, setSettleError] = useState<string | null>(null);
+
+  // Automated M-Pesa B2C Dialog State
+  const [b2cPayout, setB2cPayout] = useState<OrganizerPayout | null>(null);
+  const [b2cCommandId, setB2cCommandId] = useState<'BusinessPayment' | 'SalaryPayment' | 'PromotionPayment'>('BusinessPayment');
+  const [b2cLoading, setB2cLoading] = useState<boolean>(false);
+  const [b2cError, setB2cError] = useState<string | null>(null);
+  const [b2cSuccess, setB2cSuccess] = useState<any | null>(null);
 
   // Audit Logs Dialog State
   const [auditPayout, setAuditPayout] = useState<OrganizerPayout | null>(null);
@@ -177,6 +186,69 @@ export function SuperAdminPayoutQueue({
       setSettleError(err?.message || 'Error occurred while settling payout.');
     } finally {
       setSettleLoading(false);
+    }
+  };
+
+  // Automated M-Pesa B2C Execution Handler
+  const handleExecuteB2C = async () => {
+    if (!b2cPayout) return;
+    setB2cError(null);
+    try {
+      setB2cLoading(true);
+      const res = await apiClient.post<any>(`/payouts/${b2cPayout.id}/disburse-mpesa`, {
+        commandId: b2cCommandId,
+        adminUserId: currentAdminUserId
+      });
+
+      if (res.success && res.data) {
+        setB2cSuccess(res.data);
+        setPayouts((prev) =>
+          prev.map((p) => (p.id === b2cPayout.id ? { ...p, status: PayoutStatus.PROCESSING } : p))
+        );
+      } else {
+        setB2cError(res.error?.message || 'Failed to dispatch M-Pesa B2C disbursement.');
+      }
+    } catch (err: any) {
+      setB2cError(err?.message || 'Error occurred while communicating with Safaricom Daraja B2C API.');
+    } finally {
+      setB2cLoading(false);
+    }
+  };
+
+  // Simulate B2C Callback in Development / Testing Mode
+  const handleSimulateB2CCallback = async () => {
+    if (!b2cPayout || !b2cSuccess) return;
+    try {
+      setB2cLoading(true);
+      const randReceipt = `NLX${Math.floor(100000 + Math.random() * 900000)}KL`;
+      const callbackPayload = {
+        Result: {
+          ResultType: 0,
+          ResultCode: 0,
+          ResultDesc: 'The service request is processed successfully.',
+          OriginatorConversationID: b2cSuccess.originatorConversationId,
+          ConversationID: b2cSuccess.conversationId,
+          TransactionID: randReceipt,
+          ResultParameters: {
+            ResultParameter: [
+              { Key: 'TransactionAmount', Value: b2cSuccess.amountKes },
+              { Key: 'TransactionReceipt', Value: randReceipt },
+              { Key: 'ReceiverPartyPublicName', Value: `${b2cSuccess.recipientPhone} - Organizer Recipient` },
+              { Key: 'TransactionCompletedDateTime', Value: new Date().toISOString() }
+            ]
+          }
+        }
+      };
+
+      await apiClient.post('/webhooks/mpesa/b2c-result', callbackPayload);
+
+      await fetchPayouts();
+      setB2cPayout(null);
+      setB2cSuccess(null);
+    } catch (err: any) {
+      setB2cError(err?.message || 'Error occurred while simulating B2C callback.');
+    } finally {
+      setB2cLoading(false);
     }
   };
 
@@ -456,10 +528,27 @@ export function SuperAdminPayoutQueue({
                       </Button>
                     )}
 
-                    {/* Settle Button (for APPROVED or PROCESSING) */}
+                    {/* Automated M-Pesa B2C Direct Transfer */}
+                    {payout.method === PayoutMethod.MPESA_B2C &&
+                      [PayoutStatus.APPROVED, PayoutStatus.PROCESSING].includes(payout.status) && (
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setB2cPayout(payout);
+                            setB2cSuccess(null);
+                            setB2cError(null);
+                          }}
+                          className="h-8 text-xs gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-sm"
+                        >
+                          <Zap className="h-3.5 w-3.5" /> Disburse B2C
+                        </Button>
+                      )}
+
+                    {/* Manual Settlement Record Button (for APPROVED or PROCESSING) */}
                     {[PayoutStatus.APPROVED, PayoutStatus.PROCESSING].includes(payout.status) && (
                       <Button
                         size="sm"
+                        variant="outline"
                         onClick={() => {
                           setSettlePayout(payout);
                           setSettlementEvidence('');
@@ -467,9 +556,9 @@ export function SuperAdminPayoutQueue({
                           setSettleNotes('');
                           setSettleError(null);
                         }}
-                        className="h-8 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                        className="h-8 text-xs gap-1 text-muted-foreground hover:text-foreground font-semibold"
                       >
-                        <FileCheck className="h-3.5 w-3.5" /> Record Settlement
+                        <FileCheck className="h-3.5 w-3.5" /> Record Proof
                       </Button>
                     )}
                   </div>
@@ -720,6 +809,166 @@ export function SuperAdminPayoutQueue({
                   </Button>
                 </div>
               </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Automated M-Pesa B2C Execution Modal */}
+      {b2cPayout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-150">
+          <Card className="w-full max-w-lg bg-card border shadow-2xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
+              <div>
+                <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
+                  <Zap className="h-5 w-5 text-emerald-600" /> Safaricom Daraja M-Pesa B2C Direct Disbursement
+                </CardTitle>
+                <p className="text-xs text-muted-foreground font-mono">{b2cPayout.id}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setB2cPayout(null);
+                  setB2cSuccess(null);
+                  setB2cError(null);
+                }}
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </CardHeader>
+
+            <CardContent className="pt-4 space-y-4 text-xs">
+              {b2cError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{b2cError}</span>
+                </div>
+              )}
+
+              {/* Separation of Duties Warning */}
+              {b2cPayout.requestedBy === currentAdminUserId && (
+                <div className="p-3 bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200 rounded-lg flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-600" />
+                  <div>
+                    <strong className="block font-bold">Separation of Duties Policy Enforced</strong>
+                    <span>
+                      You requested this withdrawal. Platform policy strictly prohibits an administrator from executing their own disbursement. Another administrator must dispatch this payment.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Success Result / Simulation Box */}
+              {b2cSuccess && (
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-200 rounded-xl space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-emerald-700 dark:text-emerald-300">
+                    <CheckCircle2 className="h-4 w-4" /> B2C Disbursement Request Dispatched Successfully
+                  </div>
+                  <div className="space-y-1 font-mono text-[11px]">
+                    <div>ConversationID: <span className="font-bold">{b2cSuccess.conversationId}</span></div>
+                    <div>OriginatorConvID: <span className="font-bold">{b2cSuccess.originatorConversationId}</span></div>
+                    <div>Recipient MSISDN: <span className="font-bold">{b2cSuccess.recipientPhone}</span></div>
+                    <div>Amount Dispatched: <span className="font-bold text-emerald-600">KES {b2cSuccess.amountKes.toLocaleString()}</span></div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground pt-1 border-t border-emerald-500/20">
+                    Status moved to <strong>PROCESSING</strong>. Awaiting asynchronous result callback from Safaricom Daraja to finalize settlement.
+                  </p>
+
+                  <div className="pt-2 flex justify-end">
+                    <Button
+                      size="sm"
+                      onClick={handleSimulateB2CCallback}
+                      disabled={b2cLoading}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs gap-1.5 shadow"
+                    >
+                      <Zap className="h-3.5 w-3.5" /> Simulate Successful Callback & Settle
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Disbursement Parameters Breakdown */}
+              <div className="p-3 rounded-xl bg-muted/30 border space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Recipient Mobile Number:</span>
+                  <span className="font-mono font-bold text-foreground">
+                    {(b2cPayout.destinationDetails as any).phoneNumber || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Registered Recipient Name:</span>
+                  <span className="font-semibold text-foreground">
+                    {(b2cPayout.destinationDetails as any).accountName || 'Customer'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t pt-1.5">
+                  <span className="text-muted-foreground">Net Payout (USD):</span>
+                  <span className="font-mono font-bold text-foreground">
+                    ${(b2cPayout.netAmountCents / 100).toFixed(2)} {b2cPayout.currency}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t pt-1.5 bg-emerald-500/5 p-2 rounded-lg">
+                  <span className="font-bold text-foreground">Estimated KES Mobile Disbursement:</span>
+                  <span className="font-mono font-black text-emerald-600 text-sm">
+                    KES {Math.round((b2cPayout.netAmountCents / 100) * 130).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* CommandID Selector */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-foreground">Safaricom Daraja CommandID:</label>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {[
+                    { id: 'BusinessPayment', label: 'BusinessPayment (Default Earnings)' },
+                    { id: 'SalaryPayment', label: 'SalaryPayment' }
+                  ].map((cmd) => (
+                    <button
+                      key={cmd.id}
+                      type="button"
+                      onClick={() => setB2cCommandId(cmd.id as any)}
+                      className={`p-2 rounded-lg border text-left font-medium transition-colors ${
+                        b2cCommandId === cmd.id
+                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold'
+                          : 'border-border hover:bg-muted/30 text-muted-foreground'
+                      }`}
+                    >
+                      {cmd.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300 text-[11px]">
+                <strong>Automated Two-Phase Protocol:</strong> Dispatching sends funds directly from your Safaricom Utility float. Once Safaricom confirms delivery, the payout will be automatically verified and marked PAID. If the network or subscriber rejects the transfer, the reservation will be automatically released back to the organizer's available balance.
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setB2cPayout(null);
+                    setB2cSuccess(null);
+                    setB2cError(null);
+                  }}
+                >
+                  Close
+                </Button>
+                {!b2cSuccess && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={b2cLoading || b2cPayout.requestedBy === currentAdminUserId}
+                    onClick={handleExecuteB2C}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-1.5"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    {b2cLoading ? 'Dispatching to Safaricom...' : 'Dispatch B2C Mobile Transfer'}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

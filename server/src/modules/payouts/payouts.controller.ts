@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { sendSuccess } from '../../utils/apiResponse.js';
 import { payoutsService } from './payouts.service.js';
+import { mpesaB2CService } from '../payments/mpesa-b2c.service.js';
 import { PayoutStatus } from '@votexa/shared';
 
 export class PayoutsController {
@@ -74,6 +75,28 @@ export class PayoutsController {
     const orgId = req.tenant?.organizationId || (req.query.organizationId as string) || 'org-metro-uni';
     const accounts = await payoutsService.listPayoutAccounts(orgId);
     sendSuccess(res, accounts, undefined, 200, req.requestId);
+  }
+
+  // 8. Admin automated M-Pesa B2C disbursement
+  async disburseMpesaB2C(req: Request, res: Response): Promise<void> {
+    const payoutId = req.params.id as string;
+    const adminUserId = req.user?.id || req.body.adminUserId || 'usr-super-admin';
+    const { commandId, remarks } = req.body;
+
+    const result = await mpesaB2CService.dispatchDisbursement(payoutId, adminUserId, {
+      commandId,
+      remarks
+    });
+
+    sendSuccess(res, result, undefined, 200, req.requestId);
+  }
+
+  // 9. List B2C disbursement records for a payout
+  async listDisbursements(req: Request, res: Response): Promise<void> {
+    const payoutId = req.params.id as string;
+    const orgId = req.tenant?.organizationId || (req.query.organizationId as string);
+    const records = await mpesaB2CService.listDisbursements(orgId, payoutId);
+    sendSuccess(res, records, undefined, 200, req.requestId);
   }
 }
 

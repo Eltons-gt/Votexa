@@ -40,4 +40,14 @@ router.post('/:id/settle', (req, res, next) => {
   payoutsController.settlePayout(req, res).catch(next);
 });
 
+// Admin automated M-Pesa B2C direct disbursement execution
+router.post('/:id/disburse-mpesa', (req, res, next) => {
+  payoutsController.disburseMpesaB2C(req, res).catch(next);
+});
+
+// List B2C disbursement logs for a payout
+router.get('/:id/disbursements', (req, res, next) => {
+  payoutsController.listDisbursements(req, res).catch(next);
+});
+
 export default router;

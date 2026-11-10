@@ -746,7 +746,7 @@ export class PayoutsService {
     }
   }
 
-  private async recordAudit(
+  public async recordAudit(
     payoutId: string,
     organizationId: string,
     performedBy: string,
@@ -786,7 +786,7 @@ export class PayoutsService {
     }
   }
 
-  private async getPayoutRecord(payoutId: string): Promise<OrganizerPayout | null> {
+  public async getPayoutRecord(payoutId: string): Promise<OrganizerPayout | null> {
     try {
       const client = await pool.connect();
       try {
@@ -801,7 +801,7 @@ export class PayoutsService {
     }
   }
 
-  private async savePayoutRecord(payout: OrganizerPayout): Promise<void> {
+  public async savePayoutRecord(payout: OrganizerPayout): Promise<void> {
     try {
       const client = await pool.connect();
       try {
@@ -914,3 +914,4 @@ export class PayoutsService {
 }
 
 export const payoutsService = new PayoutsService();
+

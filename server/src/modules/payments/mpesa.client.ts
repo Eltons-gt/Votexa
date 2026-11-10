@@ -17,6 +17,23 @@ export interface StkPushResult {
   customerMessage: string;
 }
 
+export interface B2CDisbursementParams {
+  phoneNumber: string;
+  amount: number;
+  remarks?: string;
+  occasion?: string;
+  commandId?: 'BusinessPayment' | 'SalaryPayment' | 'PromotionPayment';
+  resultUrl?: string;
+  timeoutUrl?: string;
+}
+
+export interface B2CDisbursementResult {
+  conversationId: string;
+  originatorConversationId: string;
+  responseCode: string;
+  responseDescription: string;
+}
+
 export class MpesaClient {
   private tokenCache: { token: string; expiresAt: number } | null = null;
   private isSimulatedMode: boolean = false;
@@ -241,6 +258,103 @@ export class MpesaClient {
         };
       }
       throw new AppError(`Daraja STK push failed: ${(err as Error).message}`, 502, 'STK_PUSH_FAILED');
+    }
+  }
+
+  /**
+   * Initiate M-Pesa B2C (Business to Customer) Automated Disbursement
+   * Disburses funds directly to recipient's mobile phone wallet.
+   */
+  public async initiateB2CDisbursement(params: B2CDisbursementParams): Promise<B2CDisbursementResult> {
+    const normalizedPhone = this.normalizePhoneNumber(params.phoneNumber);
+    const shortcode = config.mpesa.b2cShortcode;
+    const initiatorName = config.mpesa.b2cInitiatorName;
+    const securityCredential = config.mpesa.b2cSecurityCredential;
+    const resultUrl = params.resultUrl || config.mpesa.b2cResultUrl;
+    const timeoutUrl = params.timeoutUrl || config.mpesa.b2cTimeoutUrl;
+    const commandId = params.commandId || 'BusinessPayment';
+    const amountKes = Math.max(1, Math.round(params.amount));
+
+    if (this.isSimulatedMode) {
+      const randSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+      return {
+        conversationId: `AG_${Date.now()}_${randSuffix}`,
+        originatorConversationId: `ORIG_${Date.now()}_${randSuffix}`,
+        responseCode: '0',
+        responseDescription: 'Accept the service request successfully.'
+      };
+    }
+
+    const token = await this.getAccessToken();
+    const baseUrl =
+      config.mpesa.environment === 'production'
+        ? 'https://api.safaricom.co.ke'
+        : 'https://sandbox.safaricom.co.ke';
+
+    const payload = {
+      InitiatorName: initiatorName,
+      SecurityCredential: securityCredential,
+      CommandID: commandId,
+      Amount: amountKes,
+      PartyA: shortcode,
+      PartyB: normalizedPhone,
+      Remarks: (params.remarks || 'Votexa Organiser Earnings Payout').substring(0, 100),
+      QueueTimeOutURL: timeoutUrl,
+      ResultURL: resultUrl,
+      Occasion: (params.occasion || 'Organiser Payout').substring(0, 100)
+    };
+
+    try {
+      const response = await fetch(`${baseUrl}/mpesa/b2c/v1/paymentrequest`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const responseBody = (await response.json()) as {
+        ConversationID?: string;
+        OriginatorConversationID?: string;
+        ResponseCode?: string;
+        ResponseDescription?: string;
+        errorMessage?: string;
+      };
+
+      if (!response.ok || responseBody.ResponseCode !== '0') {
+        const errorDesc =
+          responseBody.ResponseDescription ||
+          responseBody.errorMessage ||
+          'B2C disbursement request rejected by Safaricom Daraja';
+        throw new Error(errorDesc);
+      }
+
+      return {
+        conversationId: responseBody.ConversationID || `AG_${Date.now()}`,
+        originatorConversationId: responseBody.OriginatorConversationID || `ORIG_${Date.now()}`,
+        responseCode: responseBody.ResponseCode || '0',
+        responseDescription: responseBody.ResponseDescription || 'Accept the service request successfully.'
+      };
+    } catch (err) {
+      if (config.env !== 'production') {
+        console.warn(
+          '[DARAJA_B2C_CLIENT] Network B2C call unreachable, returning simulated B2C response:',
+          (err as Error).message
+        );
+        const randSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+        return {
+          conversationId: `AG_${Date.now()}_${randSuffix}`,
+          originatorConversationId: `ORIG_${Date.now()}_${randSuffix}`,
+          responseCode: '0',
+          responseDescription: 'Accept the service request successfully.'
+        };
+      }
+      throw new AppError(
+        `Daraja B2C disbursement failed: ${(err as Error).message}`,
+        502,
+        'B2C_DISBURSEMENT_FAILED'
+      );
     }
   }
 }

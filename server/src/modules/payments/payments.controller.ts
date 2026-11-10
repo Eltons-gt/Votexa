@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { sendSuccess } from '../../utils/apiResponse.js';
 import { paymentsService } from './payments.service.js';
 import { mpesaService } from './mpesa.service.js';
-import { MpesaCallbackPayload } from '@votexa/shared';
+import { mpesaB2CService } from './mpesa-b2c.service.js';
+import { MpesaCallbackPayload, MpesaB2CCallbackPayload } from '@votexa/shared';
 
 export class PaymentsController {
   // Existing SaaS package listing
@@ -58,6 +59,27 @@ export class PaymentsController {
       ResultCode: 0,
       ResultDesc: 'Callback processed successfully',
       ...result
+    });
+  }
+
+  // 4. POST /api/v1/webhooks/mpesa/b2c-result
+  async handleMpesaB2CResult(req: Request, res: Response): Promise<void> {
+    const payload = req.body as MpesaB2CCallbackPayload;
+    const result = await mpesaB2CService.processB2CResult(payload);
+
+    res.status(200).json({
+      ResultCode: 0,
+      ResultDesc: 'B2C Callback processed successfully',
+      ...result
+    });
+  }
+
+  // 5. POST /api/v1/webhooks/mpesa/b2c-timeout
+  async handleMpesaB2CTimeout(req: Request, res: Response): Promise<void> {
+    await mpesaB2CService.processB2CTimeout(req.body);
+    res.status(200).json({
+      ResultCode: 0,
+      ResultDesc: 'B2C Timeout acknowledged'
     });
   }
 

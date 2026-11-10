@@ -106,3 +106,4 @@ CREATE POLICY tenant_isolation_payout_reservations ON payout_reservations
 DROP POLICY IF EXISTS tenant_isolation_payout_audit_logs ON payout_audit_logs;
 CREATE POLICY tenant_isolation_payout_audit_logs ON payout_audit_logs
     USING (organization_id = NULLIF(current_setting('app.current_organization_id', true), '')::UUID);
+

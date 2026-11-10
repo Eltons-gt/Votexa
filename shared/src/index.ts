@@ -989,6 +989,74 @@ export interface SettlePayoutRequest {
   notes?: string;
 }
 
+// ==========================================
+// Safaricom Daraja M-Pesa B2C Disbursements
+// ==========================================
+export enum MpesaB2CDisbursementStatus {
+  INITIATED = 'INITIATED',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  TIMEOUT = 'TIMEOUT'
+}
+
+export interface MpesaB2CInitiateRequest {
+  payoutId: string;
+  commandId?: 'BusinessPayment' | 'SalaryPayment' | 'PromotionPayment';
+  remarks?: string;
+}
+
+export interface MpesaB2CInitiateResponse {
+  payoutId: string;
+  disbursementId: string;
+  conversationId: string;
+  originatorConversationId: string;
+  responseCode: string;
+  responseDescription: string;
+  amountKes: number;
+  recipientPhone: string;
+}
+
+export interface MpesaB2CDisbursementRecord {
+  id: string;
+  payoutId: string;
+  organizationId: string;
+  conversationId: string;
+  originatorConversationId: string;
+  phoneNumber: string;
+  amountKes: number;
+  commandId: string;
+  status: MpesaB2CDisbursementStatus;
+  transactionId?: string;
+  resultCode?: number;
+  resultDesc?: string;
+  rawResult?: Record<string, unknown>;
+  dispatchedBy: string;
+  dispatchedAt: string;
+  completedAt?: string;
+}
+
+export interface MpesaB2CCallbackParameter {
+  Key: string;
+  Value?: string | number;
+}
+
+export interface MpesaB2CCallbackPayload {
+  Result: {
+    ResultType: number;
+    ResultCode: number;
+    ResultDesc: string;
+    OriginatorConversationID: string;
+    ConversationID: string;
+    TransactionID?: string;
+    ResultParameters?: {
+      ResultParameter: MpesaB2CCallbackParameter[];
+    };
+    ReferenceData?: {
+      ReferenceItem?: Array<{ Key: string; Value: string }>;
+    };
+  };
+}
+
 export interface CheckoutSessionRequest {
   packageId: string;
   organizationId: string;

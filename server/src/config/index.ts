@@ -32,6 +32,11 @@ export interface ServerConfig {
     passkey: string;
     shortcode: string;
     callbackUrl: string;
+    b2cShortcode: string;
+    b2cInitiatorName: string;
+    b2cSecurityCredential: string;
+    b2cResultUrl: string;
+    b2cTimeoutUrl: string;
   };
   security: {
     rateLimitMax: number;
@@ -69,7 +74,12 @@ export const config: ServerConfig = {
       process.env.MPESA_PASSKEY ||
       'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
     shortcode: process.env.MPESA_SHORTCODE || '174379',
-    callbackUrl: process.env.MPESA_CALLBACK_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa'
+    callbackUrl: process.env.MPESA_CALLBACK_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa',
+    b2cShortcode: process.env.MPESA_B2C_SHORTCODE || '600999',
+    b2cInitiatorName: process.env.MPESA_B2C_INITIATOR_NAME || 'testapi',
+    b2cSecurityCredential: process.env.MPESA_B2C_SECURITY_CREDENTIAL || 'sandbox_security_credential',
+    b2cResultUrl: process.env.MPESA_B2C_RESULT_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa/b2c-result',
+    b2cTimeoutUrl: process.env.MPESA_B2C_TIMEOUT_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa/b2c-timeout'
   },
   security: {
     rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
