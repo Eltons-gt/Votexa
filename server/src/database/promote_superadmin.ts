@@ -53,3 +53,4 @@ promoteUserToSuperAdmin(targetEmail).catch(err => {
   console.error('[PROMOTION_ERROR]', err);
   process.exit(1);
 });
+

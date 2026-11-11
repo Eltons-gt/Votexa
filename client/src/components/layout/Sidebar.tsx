@@ -6,7 +6,6 @@ import {
   Users,
   UserCheck,
   Settings,
-  ShieldAlert,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -15,7 +14,8 @@ import {
   PlusCircle,
   Check,
   Layers,
-  Wallet
+  Wallet,
+  Crown
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { ThemeToggle } from '../../lib/theme';
@@ -38,6 +38,7 @@ export interface SidebarProps {
   onOpenOnboarding: () => void;
   onNavigateHome: () => void;
   onSignOut: () => void;
+  onOpenSuperAdmin?: () => void;
   walletBalanceCents?: number;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -53,6 +54,7 @@ export function Sidebar({
   onOpenOnboarding,
   onNavigateHome,
   onSignOut,
+  onOpenSuperAdmin,
   walletBalanceCents = 145000,
   isMobileOpen = false,
   onCloseMobile
@@ -100,23 +102,7 @@ export function Sidebar({
         },
         { id: 'settings', label: 'Workspace Settings', icon: Settings }
       ]
-    },
-    ...(isSuperAdmin
-      ? [
-          {
-            group: 'SUPERVISION',
-            items: [
-              {
-                id: 'admin',
-                label: 'Platform Admin',
-                icon: ShieldAlert,
-                badge: 'Super Admin',
-                badgeVariant: 'destructive' as const
-              }
-            ]
-          }
-        ]
-      : [])
+    }
   ];
 
   const handleNavClick = (tabId: string) => {
@@ -324,6 +310,30 @@ export function Sidebar({
               {!isCollapsed && <span className="text-xs font-semibold ml-1.5 hidden sm:inline">Log Out</span>}
             </button>
           </div>
+
+          {/* Dedicated Super Admin Switcher for Platform Admins */}
+          {isSuperAdmin && onOpenSuperAdmin && (
+            <button
+              onClick={() => {
+                onOpenSuperAdmin();
+                if (onCloseMobile) onCloseMobile();
+              }}
+              className={`w-full flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-transparent border border-amber-500/30 text-amber-500 dark:text-amber-400 hover:bg-amber-500/20 transition-all text-xs font-semibold shadow-sm group ${
+                isCollapsed ? 'justify-center' : 'justify-between'
+              }`}
+              title="Open Super Admin Portal"
+            >
+              <div className="flex items-center gap-2">
+                <Crown className="h-4 w-4 text-amber-500 shrink-0 group-hover:scale-110 transition-transform" />
+                {!isCollapsed && <span>Super Admin Portal</span>}
+              </div>
+              {!isCollapsed && (
+                <span className="text-[10px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  Root
+                </span>
+              )}
+            </button>
+          )}
 
           {/* User Profile Pill */}
           <div

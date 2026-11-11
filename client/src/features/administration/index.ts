@@ -1,4 +1,5 @@
 export * from './AdministrationPanel';
+export * from './SuperAdminPortal';
 export * from './SuperAdminFinancialDashboard';
 export * from './SuperAdminPayoutQueue';
 export * from './SuperAdminOverview';

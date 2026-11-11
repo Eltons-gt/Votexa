@@ -19,7 +19,7 @@ import { VotingInterface } from './features/voting';
 import { PricingPackages } from './features/payments';
 import { OrganizerRevenueDashboard } from './features/revenue';
 import { PayoutsSection } from './features/payouts';
-import { AdministrationPanel } from './features/administration';
+import { SuperAdminPortal } from './features/administration';
 import {
   Election,
   ElectionStatus,
@@ -35,8 +35,26 @@ import { apiClient } from './lib/api';
 import { supabase } from './lib/supabase';
 
 export function App() {
-  // Top-Level View Router: Landing Page vs. Auth Page vs. Workspace App
-  const [viewMode, setViewMode] = useState<'landing' | 'auth' | 'app'>('landing');
+  // Top-Level View Router: Landing Page vs. Auth Page vs. Workspace App vs. Super Admin Portal
+  const [viewMode, setViewMode] = useState<'landing' | 'auth' | 'app' | 'superadmin'>(() => {
+    try {
+      const savedMode = localStorage.getItem('votexa_view_mode');
+      if (savedMode === 'superadmin' || savedMode === 'app') return savedMode;
+      const savedUser = localStorage.getItem('votexa_user');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (
+          u.email === 'chunegeorge112@gmail.com' ||
+          u.systemRole === SystemRole.SUPER_ADMIN ||
+          u.platformRoles?.includes(PlatformRole.SUPER_ADMIN)
+        ) {
+          return 'superadmin';
+        }
+        return 'app';
+      }
+    } catch {}
+    return 'landing';
+  });
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [authTargetRole, setAuthTargetRole] = useState<'organizer' | 'voter'>('organizer');
 
@@ -249,8 +267,21 @@ export function App() {
       } catch {}
     }
 
-    setActiveTab('overview');
-    setViewMode('app');
+    const isSuperAdmin =
+      authenticatedUser?.email === 'chunegeorge112@gmail.com' ||
+      authenticatedUser?.email === 'admin@votexa.io' ||
+      authenticatedUser?.systemRole === SystemRole.SUPER_ADMIN ||
+      authenticatedUser?.platformRoles?.includes(PlatformRole.SUPER_ADMIN);
+
+    if (isSuperAdmin) {
+      try {
+        localStorage.setItem('votexa_view_mode', 'superadmin');
+      } catch {}
+      setViewMode('superadmin');
+    } else {
+      setActiveTab('overview');
+      setViewMode('app');
+    }
   };
 
   const handleSignOut = () => {
@@ -261,6 +292,7 @@ export function App() {
       localStorage.removeItem('votexa_auth_token');
       localStorage.removeItem('votexa_memberships');
       localStorage.removeItem('votexa_active_org_id');
+      localStorage.removeItem('votexa_view_mode');
     } catch {}
     setViewMode('landing');
   };
@@ -330,7 +362,26 @@ export function App() {
   }
 
   // =========================================================================
-  // VIEW MODE 3: WORKSPACE APPLICATION WITH RESPONSIVE SIDEBAR
+  // VIEW MODE 3: DEDICATED SUPER ADMIN COMMAND PORTAL
+  // =========================================================================
+  if (viewMode === 'superadmin') {
+    return (
+      <SuperAdminPortal
+        currentUser={currentUser}
+        onSwitchToOrganizer={() => {
+          try {
+            localStorage.setItem('votexa_view_mode', 'app');
+          } catch {}
+          setViewMode('app');
+        }}
+        onSignOut={handleSignOut}
+        serverStatus={serverStatus}
+      />
+    );
+  }
+
+  // =========================================================================
+  // VIEW MODE 4: WORKSPACE APPLICATION WITH RESPONSIVE SIDEBAR
   // =========================================================================
   return (
     <AppLayout
@@ -343,6 +394,12 @@ export function App() {
       onOpenOnboarding={() => setActiveTab('onboarding')}
       onNavigateHome={() => setViewMode('landing')}
       onSignOut={handleSignOut}
+      onOpenSuperAdmin={() => {
+        try {
+          localStorage.setItem('votexa_view_mode', 'superadmin');
+        } catch {}
+        setViewMode('superadmin');
+      }}
       serverStatus={serverStatus}
       walletBalanceCents={wallet.availableBalance}
     >
@@ -471,13 +528,6 @@ export function App() {
           memberships={memberships}
           onProfileUpdated={(updated) => setCurrentUser(updated)}
         />
-      )}
-
-      {/* Super Administration */}
-      {activeTab === 'admin' && (
-        <div className="space-y-6">
-          <AdministrationPanel currentAdminUserId={currentUser.id} />
-        </div>
       )}
     </AppLayout>
   );
