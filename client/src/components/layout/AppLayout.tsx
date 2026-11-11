@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Menu, LogOut, Crown } from 'lucide-react';
+import { Menu, LogOut } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from '../ui/button';
 import { ThemeToggle } from '../../lib/theme';
 import {
   UserProfile,
-  UserOrganizationMembership,
-  SystemRole,
-  PlatformRole
+  UserOrganizationMembership
 } from '@votexa/shared';
 
 export interface AppLayoutProps {
@@ -22,7 +20,6 @@ export interface AppLayoutProps {
   onOpenOnboarding: () => void;
   onNavigateHome: () => void;
   onSignOut: () => void;
-  onOpenSuperAdmin?: () => void;
   serverStatus: string;
   walletBalanceCents?: number;
 }
@@ -38,7 +35,6 @@ export function AppLayout({
   onOpenOnboarding,
   onNavigateHome,
   onSignOut,
-  onOpenSuperAdmin,
   serverStatus,
   walletBalanceCents
 }: AppLayoutProps) {
@@ -47,13 +43,6 @@ export function AppLayout({
   const activeMembership =
     memberships.find((m) => m.organization.id === activeOrgId) || memberships[0];
   const activeOrg = activeMembership?.organization;
-
-  const isSuperAdmin =
-    currentUser.systemRole === SystemRole.SUPER_ADMIN ||
-    currentUser.platformRoles?.includes(PlatformRole.SUPER_ADMIN) ||
-    currentUser.platformRoles?.includes(PlatformRole.SUPPORT_ADMIN) ||
-    currentUser.email === 'chunegeorge112@gmail.com' ||
-    currentUser.email === 'admin@votexa.io';
 
   // Tab Titles and Subtitles
   const tabTitles: Record<string, { title: string; subtitle: string }> = {
@@ -121,7 +110,6 @@ export function AppLayout({
         onOpenOnboarding={onOpenOnboarding}
         onNavigateHome={onNavigateHome}
         onSignOut={onSignOut}
-        onOpenSuperAdmin={onOpenSuperAdmin}
         walletBalanceCents={walletBalanceCents}
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
@@ -160,20 +148,6 @@ export function AppLayout({
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>{serverStatus}</span>
             </div>
-
-            {/* Super Admin Portal Launcher */}
-            {isSuperAdmin && onOpenSuperAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenSuperAdmin}
-                className="text-xs h-8 gap-1.5 border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 hover:text-amber-500 font-bold shadow-sm"
-              >
-                <Crown className="h-3.5 w-3.5 text-amber-500" />
-                <span className="hidden sm:inline">Super Admin Portal</span>
-                <span className="sm:hidden">Admin</span>
-              </Button>
-            )}
 
             {/* Light / Dark Mode Toggle */}
             <ThemeToggle />

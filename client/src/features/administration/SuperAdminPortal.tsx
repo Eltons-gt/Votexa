@@ -11,11 +11,9 @@ import {
   FileText,
   Lock,
   Radio,
-  ArrowLeftRight,
   LogOut,
   Menu,
   X,
-  Layers,
   Crown
 } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
@@ -50,14 +48,12 @@ export type SuperAdminNavTab =
 
 export interface SuperAdminPortalProps {
   currentUser: UserProfile;
-  onSwitchToOrganizer: () => void;
   onSignOut: () => void;
   serverStatus?: string;
 }
 
 export function SuperAdminPortal({
   currentUser,
-  onSwitchToOrganizer,
   onSignOut,
   serverStatus = 'Online'
 }: SuperAdminPortalProps) {
@@ -255,22 +251,13 @@ export function SuperAdminPortal({
             </div>
           </div>
 
-          {/* Quick Action: Switch to Organiser Workspace */}
-          <button
-            onClick={onSwitchToOrganizer}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors border border-slate-700/60 shadow-sm"
-          >
-            <ArrowLeftRight className="h-3.5 w-3.5 text-blue-400" />
-            <span>Switch to Organiser Workspace</span>
-          </button>
-
           {/* Log Out */}
           <button
             onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium text-red-400 hover:bg-red-950/30 hover:text-red-300 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-semibold text-red-400 bg-red-950/20 border border-red-900/40 hover:bg-red-950/40 hover:text-red-300 transition-colors shadow-sm"
           >
             <LogOut className="h-3.5 w-3.5" />
-            <span>Log Out</span>
+            <span>Sign Out Admin</span>
           </button>
         </div>
       </aside>
@@ -301,23 +288,12 @@ export function SuperAdminPortal({
             </div>
           </div>
 
-          {/* Right: Quick Controls & Return to Workspace */}
+          {/* Right: Quick Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-[11px] text-slate-300">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
               <span>PostgreSQL Pool: {serverStatus}</span>
             </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onSwitchToOrganizer}
-              className="text-xs h-8 gap-1.5 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white"
-            >
-              <Layers className="h-3.5 w-3.5 text-blue-400" />
-              <span className="hidden sm:inline">Organiser Workspace</span>
-              <span className="sm:hidden">Workspace</span>
-            </Button>
 
             <ThemeToggle />
 

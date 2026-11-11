@@ -100,6 +100,14 @@ export function LoginForm({
           updatedAt: new Date().toISOString()
         };
 
+        if (isSuperAdmin) {
+          setSuccessMessage('Welcome Super Admin! Opening platform command center...');
+          setTimeout(() => {
+            if (onLoginSuccess) onLoginSuccess(userObj, undefined, []);
+          }, 300);
+          return;
+        }
+
         const orgTitle = `${cleanName}'s Organization`;
         const tenantObj: UserOrganizationMembership = {
           organization: {

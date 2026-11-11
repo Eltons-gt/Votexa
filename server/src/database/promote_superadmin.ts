@@ -35,9 +35,18 @@ export async function promoteUserToSuperAdmin(email: string) {
     );
     console.log(`[PROMOTION] Granted SUPER_ADMIN platform role to user ${userId}`);
 
+    // 3. Remove any organization memberships (Super Admin does not belong to any single tenant)
+    const deleteOrgMembers = await client.query('DELETE FROM organization_members WHERE user_id = $1 RETURNING id', [userId]);
+    console.log(`[PROMOTION] Cleared ${deleteOrgMembers.rowCount} organization membership(s) for super admin user ${userId}`);
+
     // Verify
     const verifyUser = await client.query('SELECT id, email, full_name, system_role FROM users WHERE id = $1', [userId]);
     const verifyRoles = await client.query('SELECT role FROM platform_roles WHERE user_id = $1', [userId]);
+    const verifyOrgs = await client.query('SELECT * FROM organization_members WHERE user_id = $1', [userId]);
+    
+    console.log('[PROMOTION] Success! Current record:', verifyUser.rows[0]);
+    console.log('[PROMOTION] Platform roles:', verifyRoles.rows.map(r => r.role));
+    console.log('[PROMOTION] Organization memberships count:', verifyOrgs.rows.length);
     
     console.log('[PROMOTION] Success! Current record:', verifyUser.rows[0]);
     console.log('[PROMOTION] Platform roles:', verifyRoles.rows.map(r => r.role));

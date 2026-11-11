@@ -103,6 +103,18 @@ export function App() {
   // User's Authorized Organization Workspaces (Restored from session or default)
   const [memberships, setMemberships] = useState<UserOrganizationMembership[]>(() => {
     try {
+      const savedUser = localStorage.getItem('votexa_user');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (
+          u.email === 'chunegeorge112@gmail.com' ||
+          u.email === 'admin@votexa.io' ||
+          u.systemRole === SystemRole.SUPER_ADMIN ||
+          u.platformRoles?.includes(PlatformRole.SUPER_ADMIN)
+        ) {
+          return [];
+        }
+      }
       const saved = localStorage.getItem('votexa_memberships');
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -237,6 +249,23 @@ export function App() {
       } catch {}
     }
 
+    const isSuperAdmin =
+      authenticatedUser?.email === 'chunegeorge112@gmail.com' ||
+      authenticatedUser?.email === 'admin@votexa.io' ||
+      authenticatedUser?.systemRole === SystemRole.SUPER_ADMIN ||
+      authenticatedUser?.platformRoles?.includes(PlatformRole.SUPER_ADMIN);
+
+    if (isSuperAdmin) {
+      setMemberships([]);
+      try {
+        localStorage.removeItem('votexa_memberships');
+        localStorage.removeItem('votexa_active_org_id');
+        localStorage.setItem('votexa_view_mode', 'superadmin');
+      } catch {}
+      setViewMode('superadmin');
+      return;
+    }
+
     const orgsToSet =
       organizations && organizations.length > 0
         ? organizations
@@ -267,21 +296,8 @@ export function App() {
       } catch {}
     }
 
-    const isSuperAdmin =
-      authenticatedUser?.email === 'chunegeorge112@gmail.com' ||
-      authenticatedUser?.email === 'admin@votexa.io' ||
-      authenticatedUser?.systemRole === SystemRole.SUPER_ADMIN ||
-      authenticatedUser?.platformRoles?.includes(PlatformRole.SUPER_ADMIN);
-
-    if (isSuperAdmin) {
-      try {
-        localStorage.setItem('votexa_view_mode', 'superadmin');
-      } catch {}
-      setViewMode('superadmin');
-    } else {
-      setActiveTab('overview');
-      setViewMode('app');
-    }
+    setActiveTab('overview');
+    setViewMode('app');
   };
 
   const handleSignOut = () => {
@@ -364,16 +380,16 @@ export function App() {
   // =========================================================================
   // VIEW MODE 3: DEDICATED SUPER ADMIN COMMAND PORTAL
   // =========================================================================
-  if (viewMode === 'superadmin') {
+  const isSuperAdminUser =
+    currentUser.email === 'chunegeorge112@gmail.com' ||
+    currentUser.email === 'admin@votexa.io' ||
+    currentUser.systemRole === SystemRole.SUPER_ADMIN ||
+    currentUser.platformRoles?.includes(PlatformRole.SUPER_ADMIN);
+
+  if (viewMode === 'superadmin' || isSuperAdminUser) {
     return (
       <SuperAdminPortal
         currentUser={currentUser}
-        onSwitchToOrganizer={() => {
-          try {
-            localStorage.setItem('votexa_view_mode', 'app');
-          } catch {}
-          setViewMode('app');
-        }}
         onSignOut={handleSignOut}
         serverStatus={serverStatus}
       />
@@ -394,12 +410,6 @@ export function App() {
       onOpenOnboarding={() => setActiveTab('onboarding')}
       onNavigateHome={() => setViewMode('landing')}
       onSignOut={handleSignOut}
-      onOpenSuperAdmin={() => {
-        try {
-          localStorage.setItem('votexa_view_mode', 'superadmin');
-        } catch {}
-        setViewMode('superadmin');
-      }}
       serverStatus={serverStatus}
       walletBalanceCents={wallet.availableBalance}
     >
