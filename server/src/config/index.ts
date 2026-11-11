@@ -64,7 +64,10 @@ export const config: ServerConfig = {
     name: process.env.DB_NAME || 'votexa',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    ssl: process.env.DB_SSL === 'true',
+    ssl:
+      process.env.DB_SSL === 'true' ||
+      (process.env.DATABASE_URL?.includes('supabase') ?? false) ||
+      (process.env.DATABASE_URL?.includes('sslmode=require') ?? false),
     poolMax: parseInt(process.env.DB_POOL_MAX || '20', 10)
   },
   supabase: {
