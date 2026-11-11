@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { VotingPackage, PurchasePackageResponse } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
-import { MpesaCheckoutModal } from '../payments/MpesaCheckoutModal';
+import { MpesaCheckoutModal, PaystackCheckoutModal } from '../payments';
 
 interface PackagePurchaseModalProps {
   electionId: string;
@@ -35,6 +35,7 @@ export function PackagePurchaseModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showMpesaModal, setShowMpesaModal] = useState(false);
+  const [showPaystackModal, setShowPaystackModal] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -227,15 +228,24 @@ export function PackagePurchaseModal({
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <Button
+              size="sm"
+              onClick={() => setShowPaystackModal(true)}
+              disabled={isProcessing || !selectedPkgId}
+              className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 shadow-sm"
+            >
+              <CreditCard className="h-3.5 w-3.5" />
+              Paystack
+            </Button>
             <Button
               size="sm"
               onClick={() => setShowMpesaModal(true)}
               disabled={isProcessing || !selectedPkgId}
-              className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9"
+              className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9 shadow-sm"
             >
-              <Smartphone className="h-4 w-4" />
-              Pay with M-Pesa
+              <Smartphone className="h-3.5 w-3.5" />
+              M-Pesa STK
             </Button>
             <Button
               size="sm"
@@ -245,10 +255,51 @@ export function PackagePurchaseModal({
               className="gap-1.5 text-xs border-amber-500/40 text-amber-600 hover:bg-amber-500/10 h-9"
             >
               <DollarSign className="h-3.5 w-3.5" />
-              {isProcessing ? 'Processing...' : 'Simulate Sandbox'}
+              {isProcessing ? 'Processing...' : 'Sandbox Demo'}
             </Button>
           </div>
         </div>
+
+        {/* Paystack Checkout Modal */}
+        {showPaystackModal && (
+          <PaystackCheckoutModal
+            electionId={electionId}
+            voterCode={voterCode}
+            selectedPackage={packages.find((p) => p.id === selectedPkgId) || null}
+            isOpen={showPaystackModal}
+            onClose={() => setShowPaystackModal(false)}
+            onPaymentSuccess={(creditsAdded, receipt) => {
+              setShowPaystackModal(false);
+              onClose();
+              onPurchased({
+                success: true,
+                wallet: {
+                  id: `wlt-${voterCode}`,
+                  organizationId: 'current',
+                  electionId,
+                  voterCode,
+                  creditsBalance: 0,
+                  currency: 'KES',
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                },
+                transaction: {
+                  id: `tx-pstk-${receipt}`,
+                  walletId: `wlt-${voterCode}`,
+                  electionId,
+                  type: 'PURCHASE' as unknown as any,
+                  creditsAmount: creditsAdded || packages.find((p) => p.id === selectedPkgId)?.credits || 0,
+                  balanceAfter: 0,
+                  referenceId: receipt,
+                  description: `Paystack payment ${receipt}`,
+                  isMockPayment: false,
+                  createdAt: new Date().toISOString()
+                },
+                message: `Paystack payment verified! ${creditsAdded} voting credits added.`
+              });
+            }}
+          />
+        )}
 
         {/* M-Pesa STK Push Modal */}
         {showMpesaModal && (

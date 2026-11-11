@@ -10,7 +10,8 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Shield,
-  Smartphone
+  Smartphone,
+  CreditCard
 } from 'lucide-react';
 import {
   VoterWallet,
@@ -20,7 +21,7 @@ import {
   PurchasePackageResponse
 } from '@votexa/shared';
 import { PackagePurchaseModal } from './PackagePurchaseModal';
-import { MpesaCheckoutModal } from '../payments/MpesaCheckoutModal';
+import { MpesaCheckoutModal, PaystackCheckoutModal } from '../payments';
 import { apiClient } from '../../lib/api';
 
 interface VoterWalletPanelProps {
@@ -41,6 +42,7 @@ export function VoterWalletPanel({
   const [showHistory, setShowHistory] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showMpesaDirect, setShowMpesaDirect] = useState(false);
+  const [showPaystackDirect, setShowPaystackDirect] = useState(false);
 
   const fetchWallet = async () => {
     if (category === ElectionCategory.INSTITUTIONAL) {
@@ -168,6 +170,13 @@ export function VoterWalletPanel({
             </Button>
             <Button
               size="sm"
+              onClick={() => setShowPaystackDirect(true)}
+              className="text-xs h-8 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold"
+            >
+              <CreditCard className="h-3.5 w-3.5" /> Paystack
+            </Button>
+            <Button
+              size="sm"
               onClick={() => setShowMpesaDirect(true)}
               className="text-xs h-8 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
             >
@@ -254,6 +263,18 @@ export function VoterWalletPanel({
         isOpen={showPurchaseModal}
         onClose={() => setShowPurchaseModal(false)}
         onPurchased={handlePurchased}
+      />
+
+      {/* Direct Paystack Modal */}
+      <PaystackCheckoutModal
+        electionId={electionId}
+        voterCode={voterCode}
+        isOpen={showPaystackDirect}
+        onClose={() => setShowPaystackDirect(false)}
+        onPaymentSuccess={(_creditsAdded, _receipt) => {
+          setShowPaystackDirect(false);
+          fetchWallet();
+        }}
       />
 
       {/* Direct M-Pesa Modal */}

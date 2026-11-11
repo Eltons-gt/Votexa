@@ -3,7 +3,8 @@ import { sendSuccess } from '../../utils/apiResponse.js';
 import { paymentsService } from './payments.service.js';
 import { mpesaService } from './mpesa.service.js';
 import { mpesaB2CService } from './mpesa-b2c.service.js';
-import { MpesaCallbackPayload, MpesaB2CCallbackPayload } from '@votexa/shared';
+import { paystackService } from './paystack.service.js';
+import { MpesaCallbackPayload, MpesaB2CCallbackPayload, PaystackWebhookPayload } from '@votexa/shared';
 
 export class PaymentsController {
   // Existing SaaS package listing
@@ -80,6 +81,46 @@ export class PaymentsController {
     res.status(200).json({
       ResultCode: 0,
       ResultDesc: 'B2C Timeout acknowledged'
+    });
+  }
+
+  // 6. POST /api/v1/payments/paystack/initiate
+  async initiatePaystackPayment(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || req.body.organizationId || 'org-metro-uni';
+    const result = await paystackService.initiatePayment(orgId, {
+      electionId: req.body.electionId,
+      packageId: req.body.packageId,
+      voterCode: req.body.voterCode,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      currency: req.body.currency,
+      callbackUrl: req.body.callbackUrl
+    });
+
+    sendSuccess(res, result, undefined, 201, req.requestId);
+  }
+
+  // 7. GET /api/v1/payments/paystack/verify/:reference
+  async verifyPaystackPayment(req: Request, res: Response): Promise<void> {
+    const orgId = req.tenant?.organizationId || (req.query.organizationId as string) || 'org-metro-uni';
+    const reference = (req.params.reference || req.query.reference) as string;
+    const result = await paystackService.verifyPayment(orgId, reference);
+
+    sendSuccess(res, result, undefined, 200, req.requestId);
+  }
+
+  // 8. POST /api/v1/webhooks/paystack
+  async handlePaystackWebhook(req: Request, res: Response): Promise<void> {
+    const signature = (req.headers['x-paystack-signature'] as string) || '';
+    const rawBody = (req as unknown as { rawBody?: Buffer }).rawBody || JSON.stringify(req.body);
+    const payload = req.body as PaystackWebhookPayload;
+
+    const result = await paystackService.handleWebhook(signature, rawBody, payload);
+
+    res.status(200).json({
+      status: true,
+      message: 'Paystack webhook received and processed',
+      ...result
     });
   }
 

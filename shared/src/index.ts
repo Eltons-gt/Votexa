@@ -607,6 +607,7 @@ export enum PaymentStatus {
 
 export enum PaymentProvider {
   MPESA = 'MPESA',
+  PAYSTACK = 'PAYSTACK',
   STRIPE = 'STRIPE',
   MOCK = 'MOCK'
 }
@@ -724,6 +725,76 @@ export interface MpesaPaymentStatusResponse {
   creditsIssuedAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PaystackInitiatePaymentRequest {
+  electionId: string;
+  packageId: string;
+  voterCode: string;
+  email?: string;
+  phoneNumber?: string;
+  currency?: string;
+  callbackUrl?: string;
+}
+
+export interface PaystackInitiatePaymentResponse {
+  paymentId: string;
+  reference: string;
+  authorizationUrl: string;
+  accessCode: string;
+  amountCents: number;
+  currency: string;
+  status: PaymentTransactionStatus;
+  message: string;
+}
+
+export interface PaystackVerifyPaymentResponse {
+  paymentId: string;
+  reference: string;
+  status: PaymentTransactionStatus;
+  amountCents: number;
+  currency: string;
+  gatewayResponse?: string;
+  paidAt?: string;
+  channel?: string;
+  creditsIssued: boolean;
+  creditsAdded?: number;
+  message: string;
+}
+
+export interface PaystackWebhookPayload {
+  event: string;
+  data: {
+    id: number;
+    domain: string;
+    status: string;
+    reference: string;
+    amount: number;
+    message?: string | null;
+    gateway_response?: string;
+    paid_at?: string;
+    created_at?: string;
+    channel?: string;
+    currency: string;
+    ip_address?: string;
+    metadata?: {
+      organizationId?: string;
+      electionId?: string;
+      packageId?: string;
+      voterCode?: string;
+      credits?: number;
+      phoneNumber?: string;
+      [key: string]: unknown;
+    };
+    customer?: {
+      id?: number;
+      email?: string;
+      customer_code?: string;
+      phone?: string;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
 }
 
 export enum LedgerEntryType {

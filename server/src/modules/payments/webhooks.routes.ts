@@ -18,4 +18,9 @@ router.post('/mpesa/b2c-timeout', (req, res, next) => {
   paymentsController.handleMpesaB2CTimeout(req, res).catch(next);
 });
 
+// 4. POST /api/v1/webhooks/paystack - Paystack Webhook Receiver Endpoint
+router.post('/paystack', (req, res, next) => {
+  paymentsController.handlePaystackWebhook(req, res).catch(next);
+});
+
 export default router;

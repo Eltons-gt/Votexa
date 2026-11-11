@@ -22,8 +22,15 @@ export function createApp(): Express {
     })
   );
 
-  // Body Parsing
-  app.use(express.json({ limit: '2mb' }));
+  // Body Parsing (with rawBody retention for webhook signature verification)
+  app.use(
+    express.json({
+      limit: '2mb',
+      verify: (req: Request, _res: Response, buf: Buffer) => {
+        (req as unknown as { rawBody?: Buffer }).rawBody = buf;
+      }
+    })
+  );
   app.use(express.urlencoded({ extended: true }));
 
   // Request ID & Context

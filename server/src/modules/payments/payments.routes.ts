@@ -11,6 +11,16 @@ router.get('/', (req, res, next) => {
   paymentsController.list(req, res).catch(next);
 });
 
+// POST /api/v1/payments/paystack/initiate - Initiate Paystack Checkout Session
+router.post('/paystack/initiate', (req, res, next) => {
+  paymentsController.initiatePaystackPayment(req, res).catch(next);
+});
+
+// GET /api/v1/payments/paystack/verify/:reference - Verify Paystack Payment
+router.get('/paystack/verify/:reference', (req, res, next) => {
+  paymentsController.verifyPaystackPayment(req, res).catch(next);
+});
+
 // POST /api/v1/payments/initiate - Initiate M-Pesa STK Push
 router.post('/initiate', (req, res, next) => {
   paymentsController.initiateMpesaPayment(req, res).catch(next);
