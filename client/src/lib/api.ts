@@ -23,6 +23,10 @@ class ApiClient {
     this.authToken = token;
   }
 
+  getAuthToken(): string | null {
+    return this.authToken;
+  }
+
   async request<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const headers = new Headers(options.headers || {});
     headers.set('Content-Type', 'application/json');

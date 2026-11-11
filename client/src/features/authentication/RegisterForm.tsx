@@ -6,8 +6,19 @@ import { User, Mail, Lock, Building2, AlertCircle, CheckCircle2, ArrowRight } fr
 import { apiClient } from '../../lib/api';
 import { supabase } from '../../lib/supabase';
 
+import {
+  UserProfile,
+  UserOrganizationMembership,
+  SystemRole,
+  OrganizationRole
+} from '@votexa/shared';
+
 interface RegisterFormProps {
-  onRegisterSuccess?: (user?: any, membership?: any) => void;
+  onRegisterSuccess?: (
+    user?: UserProfile,
+    activeTenant?: UserOrganizationMembership,
+    organizations?: UserOrganizationMembership[]
+  ) => void;
   onSwitchToLogin?: () => void;
 }
 
@@ -65,12 +76,13 @@ export function RegisterForm({
         }
 
         const newMembership = res.data.activeTenant || res.data.organizations?.[0];
+        const allOrgs = res.data.organizations || (newMembership ? [newMembership] : []);
 
         setSuccessMessage('Account created! Opening your dashboard...');
 
         setTimeout(() => {
           if (onRegisterSuccess) {
-            onRegisterSuccess(res.data.user, newMembership);
+            onRegisterSuccess(res.data.user, newMembership, allOrgs);
           }
         }, 500);
       } else {
@@ -78,17 +90,17 @@ export function RegisterForm({
       }
     } catch (err: any) {
       // Offline fallback
-      const fallbackUser = {
+      const fallbackUser: UserProfile = {
         id: `usr-${Date.now()}`,
         email: cleanEmail || 'organizer@votexa.io',
         fullName: cleanName || 'Event Organiser',
-        systemRole: 'USER',
+        systemRole: SystemRole.USER,
         platformRoles: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
 
-      const fallbackMembership = {
+      const fallbackMembership: UserOrganizationMembership = {
         organization: {
           id: `org-${Date.now()}`,
           name: orgTitle,
@@ -98,13 +110,13 @@ export function RegisterForm({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         },
-        role: 'OWNER'
+        role: OrganizationRole.OWNER
       };
 
       setSuccessMessage('Account established! Opening dashboard...');
       setTimeout(() => {
         if (onRegisterSuccess) {
-          onRegisterSuccess(fallbackUser, fallbackMembership);
+          onRegisterSuccess(fallbackUser, fallbackMembership, [fallbackMembership]);
         }
       }, 500);
     } finally {

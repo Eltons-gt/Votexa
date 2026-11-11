@@ -5,9 +5,19 @@ import { Card, CardContent } from '../../components/ui/card';
 import { Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { supabase } from '../../lib/supabase';
+import {
+  UserProfile,
+  UserOrganizationMembership,
+  SystemRole,
+  OrganizationRole
+} from '@votexa/shared';
 
 interface LoginFormProps {
-  onLoginSuccess?: () => void;
+  onLoginSuccess?: (
+    user?: UserProfile,
+    activeTenant?: UserOrganizationMembership,
+    organizations?: UserOrganizationMembership[]
+  ) => void;
   onSwitchToRegister?: () => void;
   onSwitchToForgot?: () => void;
 }
@@ -41,9 +51,16 @@ export function LoginForm({
       if (res.success && res.data?.token) {
         apiClient.setAuthToken(res.data.token);
         setSuccessMessage('Welcome back! Opening dashboard...');
+
+        const userObj: UserProfile = res.data.user;
+        const tenantObj: UserOrganizationMembership | undefined =
+          res.data.activeTenant || res.data.organizations?.[0];
+        const orgsList: UserOrganizationMembership[] =
+          res.data.organizations || (tenantObj ? [tenantObj] : []);
+
         setTimeout(() => {
-          if (onLoginSuccess) onLoginSuccess();
-        }, 400);
+          if (onLoginSuccess) onLoginSuccess(userObj, tenantObj, orgsList);
+        }, 300);
         return;
       }
     } catch {
@@ -57,12 +74,42 @@ export function LoginForm({
         password
       });
 
-      if (data?.session) {
+      if (data?.session && data.user) {
         apiClient.setAuthToken(data.session.access_token);
         setSuccessMessage('Welcome back! Opening dashboard...');
+
+        const cleanName =
+          data.user.user_metadata?.full_name ||
+          normalizedEmail.split('@')[0] ||
+          'Organiser';
+
+        const userObj: UserProfile = {
+          id: data.user.id,
+          email: data.user.email || normalizedEmail,
+          fullName: cleanName,
+          systemRole: SystemRole.USER,
+          platformRoles: [],
+          createdAt: data.user.created_at || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        const orgTitle = `${cleanName}'s Organization`;
+        const tenantObj: UserOrganizationMembership = {
+          organization: {
+            id: `org-${data.user.id.substring(0, 8)}`,
+            name: orgTitle,
+            slug: orgTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            planId: 'STANDARD',
+            settings: { timezone: 'Africa/Nairobi', contactEmail: normalizedEmail },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          role: OrganizationRole.OWNER
+        };
+
         setTimeout(() => {
-          if (onLoginSuccess) onLoginSuccess();
-        }, 400);
+          if (onLoginSuccess) onLoginSuccess(userObj, tenantObj, [tenantObj]);
+        }, 300);
         return;
       }
 
@@ -73,11 +120,7 @@ export function LoginForm({
           normalizedEmail.includes('test') ||
           normalizedEmail.includes('user@university.edu')
         ) {
-          apiClient.setAuthToken('mock-test-token');
-          setSuccessMessage('Welcome back! Opening dashboard...');
-          setTimeout(() => {
-            if (onLoginSuccess) onLoginSuccess();
-          }, 400);
+          handleQuickDemo();
           return;
         }
         setErrorMessage(error.message || 'Invalid email or password.');
@@ -91,9 +134,31 @@ export function LoginForm({
 
   const handleQuickDemo = () => {
     apiClient.setAuthToken('mock-test-token');
+    const demoUser: UserProfile = {
+      id: 'usr-demo-owner',
+      email: 'demo@votexa.io',
+      fullName: 'Demo Organiser',
+      systemRole: SystemRole.USER,
+      platformRoles: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    const demoOrg: UserOrganizationMembership = {
+      organization: {
+        id: 'org-demo',
+        name: 'Demo Awards 2026',
+        slug: 'demo-awards-2026',
+        planId: 'ENTERPRISE',
+        settings: { timezone: 'Africa/Nairobi', contactEmail: 'demo@votexa.io' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      role: OrganizationRole.OWNER
+    };
+
     setSuccessMessage('Loading demo workspace...');
     setTimeout(() => {
-      if (onLoginSuccess) onLoginSuccess();
+      if (onLoginSuccess) onLoginSuccess(demoUser, demoOrg, [demoOrg]);
     }, 300);
   };
 

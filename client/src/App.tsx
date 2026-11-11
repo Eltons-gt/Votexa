@@ -28,8 +28,7 @@ import {
   UserProfile,
   UserOrganizationMembership,
   SystemRole,
-  OrganizationRole,
-  PlatformRole
+  OrganizationRole
 } from '@votexa/shared';
 import { apiClient } from './lib/api';
 import { supabase } from './lib/supabase';
@@ -51,56 +50,65 @@ export function App() {
   const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
   const [showElectionWizard, setShowElectionWizard] = useState<boolean>(false);
 
-  // Active Authenticated User Profile
-  const [currentUser, setCurrentUser] = useState<UserProfile>({
-    id: 'usr-demo-owner',
-    email: 'user@university.edu',
-    fullName: 'Dean Alexander Vance',
-    systemRole: SystemRole.USER,
-    platformRoles: [PlatformRole.SUPPORT_ADMIN],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+  // Active Authenticated User Profile (Restored from session or initialized)
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
+    try {
+      const saved = localStorage.getItem('votexa_user');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      id: 'usr-organizer',
+      email: 'organizer@votexa.io',
+      fullName: 'Event Organiser',
+      systemRole: SystemRole.USER,
+      platformRoles: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
   });
 
-  // User's Authorized Organization Workspaces
-  const [memberships, setMemberships] = useState<UserOrganizationMembership[]>([
-    {
-      organization: {
-        id: 'org-metro-uni',
-        name: 'Metropolitan University',
-        slug: 'metropolitan-uni',
-        planId: 'ENTERPRISE',
-        settings: { timezone: 'America/New_York', contactEmail: 'elections@metro.edu' },
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z'
-      },
-      role: OrganizationRole.OWNER
-    },
-    {
-      organization: {
-        id: 'org-starlight-col',
-        name: 'Starlight Medical College',
-        slug: 'starlight-college',
-        planId: 'STANDARD',
-        settings: { timezone: 'America/Chicago', contactEmail: 'admin@starlight.edu' },
-        createdAt: '2026-02-01T00:00:00Z',
-        updatedAt: '2026-02-01T00:00:00Z'
-      },
-      role: OrganizationRole.ADMIN
-    }
-  ]);
+  // User's Authorized Organization Workspaces (Restored from session or default)
+  const [memberships, setMemberships] = useState<UserOrganizationMembership[]>(() => {
+    try {
+      const saved = localStorage.getItem('votexa_memberships');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [
+      {
+        organization: {
+          id: 'org-main',
+          name: 'My Voting Organization',
+          slug: 'my-voting-organization',
+          planId: 'STANDARD',
+          settings: { timezone: 'Africa/Nairobi', contactEmail: 'organizer@votexa.io' },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        role: OrganizationRole.OWNER
+      }
+    ];
+  });
 
-  const [activeOrgId, setActiveOrgId] = useState<string>('org-metro-uni');
+  const [activeOrgId, setActiveOrgId] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('votexa_active_org_id');
+      if (saved) return saved;
+    } catch {}
+    return 'org-main';
+  });
 
   const defaultFallback: UserOrganizationMembership = {
     organization: {
-      id: 'org-metro-uni',
-      name: 'Metropolitan University',
-      slug: 'metropolitan-uni',
-      planId: 'ENTERPRISE',
-      settings: { timezone: 'America/New_York', contactEmail: 'elections@metro.edu' },
-      createdAt: '2026-01-01T00:00:00Z',
-      updatedAt: '2026-01-01T00:00:00Z'
+      id: 'org-main',
+      name: 'My Voting Organization',
+      slug: 'my-voting-organization',
+      planId: 'STANDARD',
+      settings: { timezone: 'Africa/Nairobi', contactEmail: 'organizer@votexa.io' },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     role: OrganizationRole.OWNER
   };
@@ -171,25 +179,73 @@ export function App() {
     setActiveTab('elections');
   };
 
-  const handleAuthSuccess = (simulatedUser?: UserProfile, newMembership?: UserOrganizationMembership) => {
-    if (simulatedUser) {
-      setCurrentUser(simulatedUser);
+  const handleAuthSuccess = (
+    authenticatedUser?: UserProfile,
+    newMembership?: UserOrganizationMembership,
+    organizations?: UserOrganizationMembership[]
+  ) => {
+    if (authenticatedUser) {
+      setCurrentUser(authenticatedUser);
+      try {
+        localStorage.setItem('votexa_user', JSON.stringify(authenticatedUser));
+      } catch {}
     }
-    if (newMembership) {
-      setMemberships([newMembership, ...memberships]);
-      setActiveOrgId(newMembership.organization.id);
-      apiClient.setTenant(newMembership.organization.id);
-      setActiveTab('elections');
-      setShowElectionWizard(true);
+
+    const orgsToSet =
+      organizations && organizations.length > 0
+        ? organizations
+        : newMembership
+        ? [newMembership]
+        : [];
+
+    if (orgsToSet.length > 0) {
+      setMemberships(orgsToSet);
+      try {
+        localStorage.setItem('votexa_memberships', JSON.stringify(orgsToSet));
+      } catch {}
+
+      const activeOrg = newMembership || orgsToSet[0];
+      if (activeOrg && activeOrg.organization) {
+        setActiveOrgId(activeOrg.organization.id);
+        apiClient.setTenant(activeOrg.organization.id);
+        try {
+          localStorage.setItem('votexa_active_org_id', activeOrg.organization.id);
+        } catch {}
+      }
     }
+
+    const activeToken = apiClient.getAuthToken();
+    if (activeToken) {
+      try {
+        localStorage.setItem('votexa_auth_token', activeToken);
+      } catch {}
+    }
+
+    setActiveTab('overview');
     setViewMode('app');
   };
 
   const handleSignOut = () => {
     supabase.auth.signOut().catch(() => {});
     apiClient.setAuthToken('');
+    try {
+      localStorage.removeItem('votexa_user');
+      localStorage.removeItem('votexa_auth_token');
+      localStorage.removeItem('votexa_memberships');
+      localStorage.removeItem('votexa_active_org_id');
+    } catch {}
     setViewMode('landing');
   };
+
+  // Restore stored session token on mount
+  useEffect(() => {
+    try {
+      const storedToken = localStorage.getItem('votexa_auth_token');
+      if (storedToken) {
+        apiClient.setAuthToken(storedToken);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     apiClient.setTenant(activeOrgId);

@@ -4,13 +4,20 @@ import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
 import { ThemeToggle } from '../../lib/theme';
-import { UserProfile } from '@votexa/shared';
+import {
+  UserProfile,
+  UserOrganizationMembership
+} from '@votexa/shared';
 import { VotexaLogo } from '../../components/brand/VotexaLogo';
 
 interface AuthPageProps {
   initialMode?: 'login' | 'register' | 'forgot';
   targetRole?: 'organizer' | 'voter';
-  onAuthSuccess: (userProfile?: UserProfile, membership?: any) => void;
+  onAuthSuccess: (
+    userProfile?: UserProfile,
+    membership?: UserOrganizationMembership,
+    organizations?: UserOrganizationMembership[]
+  ) => void;
   onBackToHome: () => void;
 }
 
@@ -78,7 +85,7 @@ export function AuthPage({
           {/* Active Auth Card */}
           {mode === 'login' && (
             <LoginForm
-              onLoginSuccess={() => onAuthSuccess()}
+              onLoginSuccess={(user, tenant, orgs) => onAuthSuccess(user, tenant, orgs)}
               onSwitchToRegister={() => setMode('register')}
               onSwitchToForgot={() => setMode('forgot')}
             />
@@ -86,7 +93,7 @@ export function AuthPage({
 
           {mode === 'register' && (
             <RegisterForm
-              onRegisterSuccess={(user, membership) => onAuthSuccess(user, membership)}
+              onRegisterSuccess={(user, tenant, orgs) => onAuthSuccess(user, tenant, orgs)}
               onSwitchToLogin={() => setMode('login')}
             />
           )}
