@@ -1,6 +1,15 @@
 import { ApiResponse } from '@votexa/shared';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
+const rawApiUrl = import.meta.env.VITE_API_URL;
+// When deployed on production (e.g. Vercel), never route API calls to localhost
+const isLocalhostHost =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const API_BASE =
+  !isLocalhostHost && rawApiUrl && rawApiUrl.includes('localhost')
+    ? '/api/v1'
+    : rawApiUrl || '/api/v1';
 
 class ApiClient {
   private activeTenantId: string | null = null;

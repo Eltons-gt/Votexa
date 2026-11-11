@@ -7,7 +7,7 @@ export interface ServerConfig {
   env: 'development' | 'test' | 'production';
   port: number;
   serverUrl?: string;
-  corsOrigin: string | boolean;
+  corsOrigin: string | boolean | string[];
   database: {
     url?: string;
     host: string;
@@ -56,7 +56,9 @@ export const config: ServerConfig = {
   env: (process.env.NODE_ENV as 'development' | 'test' | 'production') || 'development',
   port: parseInt(process.env.PORT || '5000', 10),
   serverUrl: process.env.SERVER_URL || `http://localhost:${process.env.PORT || '5000'}`,
-  corsOrigin: process.env.CORS_ORIGIN || true,
+  corsOrigin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : true,
   database: {
     url: process.env.DATABASE_URL,
     host: process.env.DB_HOST || 'localhost',
