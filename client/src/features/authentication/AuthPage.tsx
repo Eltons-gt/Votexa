@@ -5,21 +5,19 @@ import { RegisterForm } from './RegisterForm';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
 import { ThemeToggle } from '../../lib/theme';
 import { UserProfile } from '@votexa/shared';
-import { VotexaLogo, LogoVariant } from '../../components/brand/VotexaLogo';
+import { VotexaLogo } from '../../components/brand/VotexaLogo';
 
 interface AuthPageProps {
   initialMode?: 'login' | 'register' | 'forgot';
   targetRole?: 'organizer' | 'voter';
   onAuthSuccess: (userProfile?: UserProfile, membership?: any) => void;
   onBackToHome: () => void;
-  logoVariant?: LogoVariant;
 }
 
 export function AuthPage({
   initialMode = 'login',
   onAuthSuccess,
-  onBackToHome,
-  logoVariant = 'geometric-v'
+  onBackToHome
 }: AuthPageProps) {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(initialMode);
 
@@ -36,7 +34,7 @@ export function AuthPage({
         </button>
 
         <div className="cursor-pointer" onClick={onBackToHome}>
-          <VotexaLogo variant={logoVariant} size="md" />
+          <VotexaLogo size="md" />
         </div>
 
         <div className="flex items-center gap-2">

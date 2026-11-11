@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { ThemeToggle } from '../../lib/theme';
-import { VotexaLogo, LogoVariant } from '../brand/VotexaLogo';
+import { VotexaLogo } from '../brand/VotexaLogo';
 import {
   UserProfile,
   UserOrganizationMembership,
@@ -41,8 +41,6 @@ export interface SidebarProps {
   walletBalanceCents?: number;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
-  logoVariant?: LogoVariant;
-  onOpenLogoShowcase?: () => void;
 }
 
 export function Sidebar({
@@ -57,9 +55,7 @@ export function Sidebar({
   onSignOut,
   walletBalanceCents = 145000,
   isMobileOpen = false,
-  onCloseMobile,
-  logoVariant = 'geometric-v',
-  onOpenLogoShowcase
+  onCloseMobile
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
@@ -147,12 +143,10 @@ export function Sidebar({
         =================================================================== */}
         <div className="h-16 px-4 border-b border-border flex items-center justify-between shrink-0">
           <div
-            onClick={onOpenLogoShowcase || onNavigateHome}
+            onClick={onNavigateHome}
             className="flex items-center gap-2 cursor-pointer group overflow-hidden"
-            title="Click to view logo samples"
           >
             <VotexaLogo
-              variant={logoVariant}
               size="sm"
               showWordmark={!isCollapsed}
             />

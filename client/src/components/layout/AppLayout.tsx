@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Menu, LogOut, Sparkles } from 'lucide-react';
+import { Menu, LogOut } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from '../ui/button';
 import { ThemeToggle } from '../../lib/theme';
-import { LogoVariant } from '../brand/VotexaLogo';
 import {
   UserProfile,
   UserOrganizationMembership
@@ -23,8 +22,6 @@ export interface AppLayoutProps {
   onSignOut: () => void;
   serverStatus: string;
   walletBalanceCents?: number;
-  logoVariant?: LogoVariant;
-  onOpenLogoShowcase?: () => void;
 }
 
 export function AppLayout({
@@ -39,9 +36,7 @@ export function AppLayout({
   onNavigateHome,
   onSignOut,
   serverStatus,
-  walletBalanceCents,
-  logoVariant = 'geometric-v',
-  onOpenLogoShowcase
+  walletBalanceCents
 }: AppLayoutProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -118,8 +113,6 @@ export function AppLayout({
         walletBalanceCents={walletBalanceCents}
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
-        logoVariant={logoVariant}
-        onOpenLogoShowcase={onOpenLogoShowcase}
       />
 
       {/* Main Content Area (Offset by Sidebar on Desktop) */}
@@ -149,19 +142,6 @@ export function AppLayout({
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Logo Switcher / Preview Button */}
-            {onOpenLogoShowcase && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenLogoShowcase}
-                className="text-xs gap-1.5 h-8 border-primary/30 text-primary hover:bg-primary/10 hidden md:inline-flex"
-                title="View 3 Logo Samples"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                <span>3 Logo Samples</span>
-              </Button>
-            )}
 
             {/* Server Status Badge */}
             <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-medium">

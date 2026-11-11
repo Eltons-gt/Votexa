@@ -22,14 +22,12 @@ import {
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { ThemeToggle } from '../../lib/theme';
-import { VotexaLogo, LogoVariant } from '../../components/brand/VotexaLogo';
+import { VotexaLogo } from '../../components/brand/VotexaLogo';
 
 interface LandingPageProps {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
   onLaunchApp: (tab?: string) => void;
   onCastBallot: () => void;
-  logoVariant?: LogoVariant;
-  onOpenLogoShowcase?: () => void;
 }
 
 /**
@@ -117,9 +115,7 @@ function RevealOnScroll({
 export function LandingPage({
   onNavigateToAuth,
   onLaunchApp,
-  onCastBallot,
-  logoVariant = 'geometric-v',
-  onOpenLogoShowcase
+  onCastBallot
 }: LandingPageProps) {
   const [activeCategoryTab, setActiveCategoryTab] = useState<'institutional' | 'paid' | 'poll'>('institutional');
 
@@ -177,12 +173,8 @@ export function LandingPage({
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md transition-colors">
         <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo */}
-          <div
-            onClick={onOpenLogoShowcase}
-            className="cursor-pointer group flex items-center gap-3"
-            title="Click to preview 3 logo designs"
-          >
-            <VotexaLogo variant={logoVariant} size="md" />
+          <div className="flex items-center gap-3">
+            <VotexaLogo size="md" />
             <span className="hidden lg:inline text-[10px] uppercase font-mono font-bold bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded">
               v1.0
             </span>
@@ -198,19 +190,7 @@ export function LandingPage({
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {onOpenLogoShowcase && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenLogoShowcase}
-                className="text-xs gap-1.5 h-8 border-primary/30 text-primary hover:bg-primary/10 hidden sm:inline-flex"
-                title="View 3 Logo Samples"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                <span>3 Logo Samples</span>
-              </Button>
-            )}
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -1073,7 +1053,7 @@ export function LandingPage({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <VotexaLogo variant={logoVariant} size="sm" />
+                  <VotexaLogo size="sm" />
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Enterprise Multi-Tenant Voting & Elections Platform. Designed for governance institutions and modern talent competitions.
