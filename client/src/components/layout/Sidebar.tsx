@@ -12,7 +12,6 @@ import {
   ChevronDown,
   Building2,
   LogOut,
-  ExternalLink,
   PlusCircle,
   Check,
   Layers,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { ThemeToggle } from '../../lib/theme';
+import { VotexaLogo, LogoVariant } from '../brand/VotexaLogo';
 import {
   UserProfile,
   UserOrganizationMembership,
@@ -41,6 +41,8 @@ export interface SidebarProps {
   walletBalanceCents?: number;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
+  logoVariant?: LogoVariant;
+  onOpenLogoShowcase?: () => void;
 }
 
 export function Sidebar({
@@ -55,7 +57,9 @@ export function Sidebar({
   onSignOut,
   walletBalanceCents = 145000,
   isMobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  logoVariant = 'geometric-v',
+  onOpenLogoShowcase
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
@@ -143,20 +147,15 @@ export function Sidebar({
         =================================================================== */}
         <div className="h-16 px-4 border-b border-border flex items-center justify-between shrink-0">
           <div
-            onClick={onNavigateHome}
-            className="flex items-center gap-3 cursor-pointer group overflow-hidden"
+            onClick={onOpenLogoShowcase || onNavigateHome}
+            className="flex items-center gap-2 cursor-pointer group overflow-hidden"
+            title="Click to view logo samples"
           >
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-black shadow-md shadow-blue-500/25 shrink-0 group-hover:scale-105 transition-transform">
-              <Shield className="h-5 w-5" />
-            </div>
-            {!isCollapsed && (
-              <div className="leading-none">
-                <span className="font-extrabold text-lg text-foreground tracking-tight">VOTEXA</span>
-                <span className="block text-[10px] text-primary font-semibold tracking-wide uppercase mt-0.5">
-                  Voting Platform
-                </span>
-              </div>
-            )}
+            <VotexaLogo
+              variant={logoVariant}
+              size="sm"
+              showWordmark={!isCollapsed}
+            />
           </div>
 
           {/* Desktop Collapse Button */}
@@ -315,18 +314,18 @@ export function Sidebar({
             4. FOOTER: USER PROFILE CARD & ACTIONS
         =================================================================== */}
         <div className="p-3 border-t border-border space-y-2 shrink-0">
-          {/* Quick Controls: Theme Toggle & Public Landing */}
+          {/* Quick Controls: Theme Toggle & Log Out */}
           <div className="flex items-center gap-2">
             <ThemeToggle className="w-full flex items-center justify-center gap-2 text-xs" />
             <button
-              onClick={onNavigateHome}
-              className={`p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center justify-center shrink-0 ${
+              onClick={onSignOut}
+              className={`p-2 rounded-lg border border-rose-500/20 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center justify-center shrink-0 ${
                 isCollapsed ? 'w-full' : 'h-8 px-2.5'
               }`}
-              title="Public Landing Page"
+              title="Log Out of Account"
             >
-              <ExternalLink className="h-4 w-4" />
-              {!isCollapsed && <span className="text-xs font-medium ml-1.5 hidden sm:inline">Landing</span>}
+              <LogOut className="h-4 w-4" />
+              {!isCollapsed && <span className="text-xs font-semibold ml-1.5 hidden sm:inline">Log Out</span>}
             </button>
           </div>
 

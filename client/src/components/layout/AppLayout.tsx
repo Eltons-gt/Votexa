@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Menu, ExternalLink } from 'lucide-react';
+import { Menu, LogOut, Sparkles } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from '../ui/button';
 import { ThemeToggle } from '../../lib/theme';
+import { LogoVariant } from '../brand/VotexaLogo';
 import {
   UserProfile,
   UserOrganizationMembership
@@ -22,6 +23,8 @@ export interface AppLayoutProps {
   onSignOut: () => void;
   serverStatus: string;
   walletBalanceCents?: number;
+  logoVariant?: LogoVariant;
+  onOpenLogoShowcase?: () => void;
 }
 
 export function AppLayout({
@@ -36,7 +39,9 @@ export function AppLayout({
   onNavigateHome,
   onSignOut,
   serverStatus,
-  walletBalanceCents
+  walletBalanceCents,
+  logoVariant = 'geometric-v',
+  onOpenLogoShowcase
 }: AppLayoutProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -113,6 +118,8 @@ export function AppLayout({
         walletBalanceCents={walletBalanceCents}
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
+        logoVariant={logoVariant}
+        onOpenLogoShowcase={onOpenLogoShowcase}
       />
 
       {/* Main Content Area (Offset by Sidebar on Desktop) */}
@@ -142,6 +149,20 @@ export function AppLayout({
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Logo Switcher / Preview Button */}
+            {onOpenLogoShowcase && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenLogoShowcase}
+                className="text-xs gap-1.5 h-8 border-primary/30 text-primary hover:bg-primary/10 hidden md:inline-flex"
+                title="View 3 Logo Samples"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                <span>3 Logo Samples</span>
+              </Button>
+            )}
+
             {/* Server Status Badge */}
             <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-medium">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -151,15 +172,16 @@ export function AppLayout({
             {/* Light / Dark Mode Toggle */}
             <ThemeToggle />
 
-            {/* Public Landing Link */}
+            {/* Log Out Button */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={onNavigateHome}
-              className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5 hidden sm:inline-flex"
+              onClick={onSignOut}
+              className="text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 border border-rose-500/20 gap-1.5 inline-flex"
+              title="Log Out of Workspace"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
-              <span>Landing Page</span>
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Log Out</span>
             </Button>
 
             {/* Quick Profile Avatar */}

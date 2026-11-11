@@ -22,11 +22,14 @@ import {
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { ThemeToggle } from '../../lib/theme';
+import { VotexaLogo, LogoVariant } from '../../components/brand/VotexaLogo';
 
 interface LandingPageProps {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
   onLaunchApp: (tab?: string) => void;
   onCastBallot: () => void;
+  logoVariant?: LogoVariant;
+  onOpenLogoShowcase?: () => void;
 }
 
 /**
@@ -114,7 +117,9 @@ function RevealOnScroll({
 export function LandingPage({
   onNavigateToAuth,
   onLaunchApp,
-  onCastBallot
+  onCastBallot,
+  logoVariant = 'geometric-v',
+  onOpenLogoShowcase
 }: LandingPageProps) {
   const [activeCategoryTab, setActiveCategoryTab] = useState<'institutional' | 'paid' | 'poll'>('institutional');
 
@@ -172,19 +177,15 @@ export function LandingPage({
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md transition-colors">
         <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-black shadow-lg shadow-blue-500/25">
-              <Shield className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight text-foreground">VOTEXA</span>
-                <span className="text-[10px] uppercase font-mono font-bold bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded">
-                  v1.0-RC
-                </span>
-              </div>
-              <p className="hidden sm:block text-[11px] text-muted-foreground font-medium">Enterprise Multi-Tenant Voting SaaS</p>
-            </div>
+          <div
+            onClick={onOpenLogoShowcase}
+            className="cursor-pointer group flex items-center gap-3"
+            title="Click to preview 3 logo designs"
+          >
+            <VotexaLogo variant={logoVariant} size="md" />
+            <span className="hidden lg:inline text-[10px] uppercase font-mono font-bold bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded">
+              v1.0
+            </span>
           </div>
 
           {/* Center Links */}
@@ -197,7 +198,19 @@ export function LandingPage({
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {onOpenLogoShowcase && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenLogoShowcase}
+                className="text-xs gap-1.5 h-8 border-primary/30 text-primary hover:bg-primary/10 hidden sm:inline-flex"
+                title="View 3 Logo Samples"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                <span>3 Logo Samples</span>
+              </Button>
+            )}
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -1060,10 +1073,7 @@ export function LandingPage({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-black">
-                    <Shield className="h-4 w-4" />
-                  </div>
-                  <span className="font-extrabold text-base text-foreground">VOTEXA</span>
+                  <VotexaLogo variant={logoVariant} size="sm" />
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Enterprise Multi-Tenant Voting & Elections Platform. Designed for governance institutions and modern talent competitions.

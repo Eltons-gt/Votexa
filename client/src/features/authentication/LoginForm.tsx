@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Card, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
-import { Lock, Mail, AlertCircle, CheckCircle2, LogIn, Sparkles } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { Card, CardContent } from '../../components/ui/card';
+import { Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { apiClient } from '../../lib/api';
+import { supabase } from '../../lib/supabase';
+
+interface LoginFormProps {
+  onLoginSuccess?: () => void;
+  onSwitchToRegister?: () => void;
+  onSwitchToForgot?: () => void;
+}
 
 export function LoginForm({
   onLoginSuccess,
   onSwitchToRegister,
   onSwitchToForgot
-}: {
-  onLoginSuccess?: () => void;
-  onSwitchToRegister?: () => void;
-  onSwitchToForgot?: () => void;
-}) {
+}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +31,7 @@ export function LoginForm({
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // 1. First Attempt: Authenticate with Votexa Database API
+    // 1. Authenticate with Votexa Database API
     try {
       const res = await apiClient.post<any>('/auth/login', {
         email: normalizedEmail,
@@ -42,14 +43,14 @@ export function LoginForm({
         setSuccessMessage('Welcome back! Opening dashboard...');
         setTimeout(() => {
           if (onLoginSuccess) onLoginSuccess();
-        }, 500);
+        }, 400);
         return;
       }
     } catch {
       // Backend database login failed or offline, try Supabase Auth
     }
 
-    // 2. Second Attempt: Authenticate with Supabase Auth Provider
+    // 2. Second Attempt: Supabase Auth Provider
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
@@ -58,15 +59,14 @@ export function LoginForm({
 
       if (data?.session) {
         apiClient.setAuthToken(data.session.access_token);
-        setSuccessMessage('Successfully signed in! Opening dashboard...');
+        setSuccessMessage('Welcome back! Opening dashboard...');
         setTimeout(() => {
           if (onLoginSuccess) onLoginSuccess();
-        }, 500);
+        }, 400);
         return;
       }
 
       if (error) {
-        // If demo credentials used
         if (
           normalizedEmail === 'admin@votexa.io' ||
           normalizedEmail.includes('admin') ||
@@ -74,10 +74,10 @@ export function LoginForm({
           normalizedEmail.includes('user@university.edu')
         ) {
           apiClient.setAuthToken('mock-test-token');
-          setSuccessMessage('Welcome back! Loading your organiser dashboard...');
+          setSuccessMessage('Welcome back! Opening dashboard...');
           setTimeout(() => {
             if (onLoginSuccess) onLoginSuccess();
-          }, 500);
+          }, 400);
           return;
         }
         setErrorMessage(error.message || 'Invalid email or password.');
@@ -89,31 +89,27 @@ export function LoginForm({
     }
   };
 
-  const handleDevLogin = () => {
+  const handleQuickDemo = () => {
     apiClient.setAuthToken('mock-test-token');
-    setSuccessMessage('Welcome back! Opening dashboard...');
+    setSuccessMessage('Loading demo workspace...');
     setTimeout(() => {
       if (onLoginSuccess) onLoginSuccess();
-    }, 400);
+    }, 300);
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-2xl border-primary/20 bg-card overflow-hidden">
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 text-white text-center">
-        <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[10px] uppercase font-bold tracking-wider mb-2">
-          ★ Event Control Center
-        </Badge>
-        <CardTitle className="text-2xl font-black tracking-tight text-white flex items-center justify-center gap-2">
-          <LogIn className="h-5 w-5 text-amber-400" />
-          Event Organiser Login
-        </CardTitle>
-        <CardDescription className="text-slate-300 text-xs mt-1">
-          Sign in to monitor live votes, view audit records, and manage earnings & payouts
-        </CardDescription>
-      </div>
-
+    <Card className="w-full border-border/60 shadow-xl bg-card">
       <form onSubmit={handleSubmit}>
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 sm:p-8 space-y-4">
+          <div className="text-center space-y-1 mb-5">
+            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+              Sign In
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Enter your credentials to access your dashboard
+            </p>
+          </div>
+
           {errorMessage && (
             <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="h-4 w-4 shrink-0" />
@@ -128,17 +124,18 @@ export function LoginForm({
             </div>
           )}
 
+          {/* Email */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground" htmlFor="email">
-              Organiser Email
+            <label className="text-xs font-semibold text-foreground" htmlFor="login-email">
+              Email Address
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                id="email"
+                id="login-email"
                 type="email"
-                placeholder="user@university.edu"
-                className="pl-9 text-xs"
+                placeholder="name@organization.com"
+                className="pl-9 text-xs h-10"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -146,9 +143,10 @@ export function LoginForm({
             </div>
           </div>
 
+          {/* Password */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-foreground" htmlFor="password">
+              <label className="text-xs font-semibold text-foreground" htmlFor="login-password">
                 Password
               </label>
               <button
@@ -162,52 +160,55 @@ export function LoginForm({
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                id="password"
+                id="login-password"
                 type="password"
                 placeholder="••••••••••••"
-                className="pl-9 text-xs"
+                className="pl-9 text-xs h-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
           </div>
-        </CardContent>
 
-        <CardFooter className="p-6 pt-0 flex flex-col gap-3">
+          {/* Submit */}
           <Button
             type="submit"
-            className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white dark:bg-blue-600 dark:hover:bg-blue-500 font-black text-sm shadow-xl rounded-xl gap-2"
+            className="w-full h-10 font-bold text-xs gap-2 mt-2 shadow-md"
             disabled={isLoading}
           >
-            {isLoading ? 'Verifying Account...' : (
+            {isLoading ? (
+              'Signing In...'
+            ) : (
               <>
-                <LogIn className="h-4 w-4 text-amber-400" /> Sign In to Event Portal
+                Sign In <ArrowRight className="h-3.5 w-3.5" />
               </>
             )}
           </Button>
 
-          <div className="flex items-center justify-center text-xs text-muted-foreground w-full pt-1">
-            <span>New to Votexa?{' '}</span>
+          {/* Footer switch */}
+          <div className="pt-3 border-t border-border/60 text-center text-xs text-muted-foreground">
+            <span>Don't have an account? </span>
             <button
               type="button"
-              className="hover:underline text-primary font-bold ml-1 flex items-center gap-1"
+              className="text-primary hover:underline font-bold"
               onClick={onSwitchToRegister}
             >
-              <Sparkles className="h-3 w-3 text-amber-500" /> Host Your Event (Sign Up)
+              Sign up
             </button>
           </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="w-full text-[11px] text-muted-foreground hover:text-foreground"
-            onClick={handleDevLogin}
-          >
-            ⚡ Quick Demo Sign-In
-          </Button>
-        </CardFooter>
+          {/* Discreet Quick Demo Access */}
+          <div className="text-center pt-1">
+            <button
+              type="button"
+              onClick={handleQuickDemo}
+              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ⚡ Explore Demo Workspace
+            </button>
+          </div>
+        </CardContent>
       </form>
     </Card>
   );

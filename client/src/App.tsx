@@ -32,12 +32,19 @@ import {
   PlatformRole
 } from '@votexa/shared';
 import { apiClient } from './lib/api';
+import { supabase } from './lib/supabase';
+import { LogoVariant } from './components/brand/VotexaLogo';
+import { LogoShowcaseModal } from './components/brand/LogoShowcaseModal';
 
 export function App() {
   // Top-Level View Router: Landing Page vs. Auth Page vs. Workspace App
   const [viewMode, setViewMode] = useState<'landing' | 'auth' | 'app'>('landing');
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [authTargetRole, setAuthTargetRole] = useState<'organizer' | 'voter'>('organizer');
+
+  // Brand Logo Variant Selection (Options 1, 2, or 3)
+  const [selectedLogo, setSelectedLogo] = useState<LogoVariant>('geometric-v');
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
 
   // Workspace Navigation Tab
   const [activeTab, setActiveTab] = useState<
@@ -185,6 +192,7 @@ export function App() {
   };
 
   const handleSignOut = () => {
+    supabase.auth.signOut().catch(() => {});
     apiClient.setAuthToken('');
     setViewMode('landing');
   };
@@ -211,21 +219,31 @@ export function App() {
   // =========================================================================
   if (viewMode === 'landing') {
     return (
-      <LandingPage
-        onNavigateToAuth={(mode) => {
-          setAuthInitialMode(mode);
-          setAuthTargetRole('organizer');
-          setViewMode('auth');
-        }}
-        onLaunchApp={(targetTab) => {
-          if (targetTab) setActiveTab(targetTab as any);
-          setViewMode('app');
-        }}
-        onCastBallot={() => {
-          setActiveTab('voting');
-          setViewMode('app');
-        }}
-      />
+      <>
+        <LandingPage
+          onNavigateToAuth={(mode) => {
+            setAuthInitialMode(mode);
+            setAuthTargetRole('organizer');
+            setViewMode('auth');
+          }}
+          onLaunchApp={(targetTab) => {
+            if (targetTab) setActiveTab(targetTab as any);
+            setViewMode('app');
+          }}
+          onCastBallot={() => {
+            setActiveTab('voting');
+            setViewMode('app');
+          }}
+          logoVariant={selectedLogo}
+          onOpenLogoShowcase={() => setIsLogoModalOpen(true)}
+        />
+        <LogoShowcaseModal
+          isOpen={isLogoModalOpen}
+          onClose={() => setIsLogoModalOpen(false)}
+          selectedVariant={selectedLogo}
+          onSelectVariant={setSelectedLogo}
+        />
+      </>
     );
   }
 
@@ -234,12 +252,21 @@ export function App() {
   // =========================================================================
   if (viewMode === 'auth') {
     return (
-      <AuthPage
-        initialMode={authInitialMode}
-        targetRole={authTargetRole}
-        onAuthSuccess={handleAuthSuccess}
-        onBackToHome={() => setViewMode('landing')}
-      />
+      <>
+        <AuthPage
+          initialMode={authInitialMode}
+          targetRole={authTargetRole}
+          onAuthSuccess={handleAuthSuccess}
+          onBackToHome={() => setViewMode('landing')}
+          logoVariant={selectedLogo}
+        />
+        <LogoShowcaseModal
+          isOpen={isLogoModalOpen}
+          onClose={() => setIsLogoModalOpen(false)}
+          selectedVariant={selectedLogo}
+          onSelectVariant={setSelectedLogo}
+        />
+      </>
     );
   }
 
@@ -247,33 +274,36 @@ export function App() {
   // VIEW MODE 3: WORKSPACE APPLICATION WITH RESPONSIVE SIDEBAR
   // =========================================================================
   return (
-    <AppLayout
-      activeTab={activeTab}
-      onSelectTab={setActiveTab}
-      currentUser={currentUser}
-      memberships={memberships}
-      activeOrgId={activeOrgId}
-      onSwitchOrg={handleSwitchOrg}
-      onOpenOnboarding={() => setActiveTab('onboarding')}
-      onNavigateHome={() => setViewMode('landing')}
-      onSignOut={handleSignOut}
-      serverStatus={serverStatus}
-      walletBalanceCents={wallet.availableBalance}
-    >
-      {/* Workspace Dashboard Overview */}
-      {activeTab === 'overview' && (
-        <WorkspaceDashboardOverview
-          organization={activeOrg}
-          userRole={activeRole}
-          currentUser={currentUser}
-          walletBalanceCents={wallet.availableBalance}
-          onNavigateTab={(t) => setActiveTab(t as any)}
-          onOpenCreateElection={() => {
-            setActiveTab('elections');
-            setShowElectionWizard(true);
-          }}
-        />
-      )}
+    <>
+      <AppLayout
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        currentUser={currentUser}
+        memberships={memberships}
+        activeOrgId={activeOrgId}
+        onSwitchOrg={handleSwitchOrg}
+        onOpenOnboarding={() => setActiveTab('onboarding')}
+        onNavigateHome={() => setViewMode('landing')}
+        onSignOut={handleSignOut}
+        serverStatus={serverStatus}
+        walletBalanceCents={wallet.availableBalance}
+        logoVariant={selectedLogo}
+        onOpenLogoShowcase={() => setIsLogoModalOpen(true)}
+      >
+        {/* Workspace Dashboard Overview */}
+        {activeTab === 'overview' && (
+          <WorkspaceDashboardOverview
+            organization={activeOrg}
+            userRole={activeRole}
+            currentUser={currentUser}
+            walletBalanceCents={wallet.availableBalance}
+            onNavigateTab={(t) => setActiveTab(t as any)}
+            onOpenCreateElection={() => {
+              setActiveTab('elections');
+              setShowElectionWizard(true);
+            }}
+          />
+        )}
 
       {/* Onboarding Screen */}
       {activeTab === 'onboarding' && (
@@ -393,7 +423,14 @@ export function App() {
           <AdministrationPanel currentAdminUserId={currentUser.id} />
         </div>
       )}
-    </AppLayout>
+      </AppLayout>
+      <LogoShowcaseModal
+        isOpen={isLogoModalOpen}
+        onClose={() => setIsLogoModalOpen(false)}
+        selectedVariant={selectedLogo}
+        onSelectVariant={setSelectedLogo}
+      />
+    </>
   );
 }
 
