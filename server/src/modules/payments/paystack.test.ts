@@ -172,7 +172,9 @@ describe('Paystack Payment Gateway Integration', () => {
     it('validates genuine HMAC-SHA512 webhook signature', () => {
       const secret = 'sk_test_mock_secret_key_12345';
       const originalSecret = config.paystack.secretKey;
+      const originalWebhook = config.paystack.webhookSecret;
       config.paystack.secretKey = secret;
+      config.paystack.webhookSecret = secret;
 
       const payload = JSON.stringify({ event: 'charge.success', data: { reference: 'ref_123' } });
       const validSignature = crypto.createHmac('sha512', secret).update(payload).digest('hex');
@@ -184,11 +186,14 @@ describe('Paystack Payment Gateway Integration', () => {
       expect(paystackClient.verifyWebhookSignature(invalidSignature, payload)).toBe(false);
 
       config.paystack.secretKey = originalSecret;
+      config.paystack.webhookSecret = originalWebhook;
     });
 
     it('rejects webhooks with invalid signatures with HTTP 401 Unauthorized', async () => {
       const originalSecret = config.paystack.secretKey;
+      const originalWebhook = config.paystack.webhookSecret;
       config.paystack.secretKey = 'sk_test_actual_secret';
+      config.paystack.webhookSecret = 'sk_test_actual_secret';
 
       const payload = {
         event: 'charge.success',
@@ -207,6 +212,7 @@ describe('Paystack Payment Gateway Integration', () => {
       ).rejects.toThrow(/Invalid Paystack webhook signature/i);
 
       config.paystack.secretKey = originalSecret;
+      config.paystack.webhookSecret = originalWebhook;
     });
 
     it('successfully processes charge.success webhook and issues voter credits', async () => {
