@@ -14,7 +14,10 @@ import {
   Globe2,
   Smartphone,
   Receipt,
-  Layers
+  Layers,
+  Check,
+  RefreshCw,
+  Users
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -115,6 +118,52 @@ export function LandingPage({
 }: LandingPageProps) {
   const [activeCategoryTab, setActiveCategoryTab] = useState<'institutional' | 'paid' | 'poll'>('institutional');
 
+  // Creative Interactive Hero Showcase State
+  const [heroMode, setHeroMode] = useState<'ballot' | 'mpesa'>('ballot');
+  const [selectedCandidate, setSelectedCandidate] = useState<'amina' | 'david' | 'elena'>('amina');
+  const [hasVoted, setHasVoted] = useState(false);
+  const [receiptHash, setReceiptHash] = useState<string | null>(null);
+  const [candidateVotes, setCandidateVotes] = useState({
+    amina: 2184,
+    david: 952,
+    elena: 272
+  });
+
+  // M-Pesa Interactive Simulation State
+  const [selectedPackage, setSelectedPackage] = useState<{ votes: number; kes: number }>({ votes: 50, kes: 450 });
+  const [stkStatus, setStkStatus] = useState<'idle' | 'sending' | 'confirmed'>('idle');
+
+  const handleSimulateVote = () => {
+    if (hasVoted) return;
+    setHasVoted(true);
+    setReceiptHash(`VTX-${Math.random().toString(16).substring(2, 6).toUpperCase()}-${Math.random().toString(16).substring(2, 6).toUpperCase()}`);
+    setCandidateVotes(prev => ({
+      ...prev,
+      [selectedCandidate]: prev[selectedCandidate] + 1
+    }));
+  };
+
+  const handleResetVote = () => {
+    setHasVoted(false);
+    setReceiptHash(null);
+  };
+
+  const handleTriggerStk = () => {
+    setStkStatus('sending');
+    setTimeout(() => {
+      setStkStatus('confirmed');
+    }, 1200);
+  };
+
+  const handleResetStk = () => {
+    setStkStatus('idle');
+  };
+
+  const totalHeroVotes = candidateVotes.amina + candidateVotes.david + candidateVotes.elena;
+  const aminaPct = Math.round((candidateVotes.amina / totalHeroVotes) * 100);
+  const davidPct = Math.round((candidateVotes.david / totalHeroVotes) * 100);
+  const elenaPct = Math.max(0, 100 - aminaPct - davidPct);
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary selection:text-white transition-colors duration-200">
       {/* =====================================================================
@@ -178,209 +227,473 @@ export function LandingPage({
       </header>
 
       {/* =====================================================================
-          2. HERO SECTION WITH GRADUAL SCROLL REVEAL
+          2. HERO SECTION WITH GRADUAL SCROLL REVEAL (SPLIT 2-COLUMN LAYOUT)
       ===================================================================== */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
+      <section className="relative pt-12 pb-20 md:pt-16 md:pb-24 lg:pt-20 lg:pb-28 overflow-hidden">
         {/* Ambient Gradient Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 -translate-x-1/2 w-[300px] h-[300px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[380px] bg-primary/10 blur-[130px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 right-1/4 translate-x-1/4 w-[450px] h-[380px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 xl:gap-12 items-center">
             
-            {/* Live Trust Pill */}
-            <RevealOnScroll direction="down" delay={0}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold tracking-wide backdrop-blur-sm animate-pulse">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Safaricom M-Pesa Integrated • Automated Instant Payouts
-              </div>
-            </RevealOnScroll>
-
-            {/* Main Headline */}
-            <RevealOnScroll direction="up" delay={100}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
-                The High-Integrity Voting Platform for{' '}
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-400 bg-clip-text text-transparent">
-                  Modern Institutions & Paid Competitions
-                </span>
-              </h1>
-            </RevealOnScroll>
-
-            {/* Sub-headline */}
-            <RevealOnScroll direction="up" delay={200}>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-normal leading-relaxed">
-                Empowering universities, professional associations, and national talent competitions with
-                tamper-proof secret ballots, private organization workspaces, and instant M-Pesa payouts.
-              </p>
-            </RevealOnScroll>
-
-            {/* Hero Action Buttons */}
-            <RevealOnScroll direction="up" delay={300}>
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                <Button
-                  size="lg"
-                  onClick={() => onNavigateToAuth('register')}
-                  className="w-full sm:w-auto h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm shadow-xl shadow-primary/25 gap-2 transition-transform hover:-translate-y-0.5"
-                >
-                  Create Free Workspace <ArrowRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={onCastBallot}
-                  className="w-full sm:w-auto h-12 px-6 border-border bg-card hover:bg-muted text-foreground font-bold text-sm gap-2 transition-transform hover:-translate-y-0.5"
-                >
-                  <Vote className="h-4 w-4 text-emerald-500" /> Cast Official Ballot
-                </Button>
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  onClick={() => onLaunchApp('admin')}
-                  className="w-full sm:w-auto h-12 px-5 text-muted-foreground hover:text-foreground hover:bg-muted text-sm font-semibold gap-1.5"
-                >
-                  <BarChart3 className="h-4 w-4" /> Platform Admin
-                </Button>
-              </div>
-            </RevealOnScroll>
-
-            {/* Key Trust Signals */}
-            <RevealOnScroll direction="up" delay={400}>
-              <div className="pt-8 border-t border-border flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span>Private & Isolated Workspaces</span>
+            {/* ===============================================================
+                LEFT COLUMN: WORDS PUSHED TO THE LEFT SIDE
+            =============================================================== */}
+            <div className="lg:col-span-6 xl:col-span-6 space-y-6 text-left">
+              
+              {/* Live Trust Pill */}
+              <RevealOnScroll direction="down" delay={0}>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold tracking-wide backdrop-blur-sm">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  Safaricom M-Pesa Integrated • Automated Instant Payouts
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span>Instant M-Pesa Withdrawals</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span>Dual-Approval Payout Protection</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span>Instant Ballot Processing</span>
-                </div>
-              </div>
-            </RevealOnScroll>
-          </div>
+              </RevealOnScroll>
 
-          {/* ===================================================================
-              HERO MOCKUP PREVIEW (SMOOTH SCROLL REVEAL)
-          =================================================================== */}
-          <RevealOnScroll direction="up" delay={250} duration={850}>
-            <div className="mt-14 max-w-5xl mx-auto rounded-2xl border border-border bg-card/60 backdrop-blur-xl p-3 sm:p-5 shadow-2xl">
-              {/* Window Header */}
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-border text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-rose-500/80" />
-                  <span className="h-3 w-3 rounded-full bg-amber-500/80" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
-                  <span className="ml-2 font-mono text-[11px] text-muted-foreground">app.votexa.io/workspaces/metropolitan-uni</span>
-                </div>
-                <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 text-[10px]">
-                  RLS Scoped: org-metro-uni
-                </Badge>
-              </div>
+              {/* Main Headline */}
+              <RevealOnScroll direction="up" delay={100}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.65rem] xl:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
+                  The High-Integrity Voting Platform for{' '}
+                  <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-400 bg-clip-text text-transparent">
+                    Modern Institutions & Paid Competitions
+                  </span>
+                </h1>
+              </RevealOnScroll>
 
-              {/* Split Preview Grid with Staggered Card Reveals */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Card 1: Institutional Ballot */}
-                <RevealOnScroll direction="up" delay={100}>
-                  <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-full">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
-                        INSTITUTIONAL
-                      </Badge>
-                      <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium">1 Voter = 1 Vote</span>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground">Dean of Faculty Senate</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">Faculty Senate Executive Election 2026</p>
-                    </div>
-                    <div className="space-y-1.5 pt-1">
-                      <div className="p-2 rounded border border-primary/40 bg-primary/10 flex items-center justify-between text-xs">
-                        <span className="font-semibold text-foreground">Prof. Katherine Johnson</span>
-                        <Badge variant="success" className="text-[10px]">Selected</Badge>
-                      </div>
-                      <div className="p-2 rounded border border-border bg-muted/40 flex items-center justify-between text-xs text-muted-foreground">
-                        <span>Prof. Alan Turing</span>
-                        <span className="text-[10px]">Option 2</span>
-                      </div>
-                    </div>
-                    <div className="pt-2 text-[10px] font-mono text-muted-foreground flex items-center gap-1">
-                      <Receipt className="h-3 w-3 text-primary" />
-                      <span>Receipt: SHA256-VOTEXA-9f2e...</span>
-                    </div>
+              {/* Sub-headline */}
+              <RevealOnScroll direction="up" delay={200}>
+                <p className="text-base sm:text-lg text-muted-foreground font-normal leading-relaxed">
+                  Empowering universities, professional associations, and national talent competitions with
+                  tamper-proof secret ballots, private organization workspaces, and instant M-Pesa payouts.
+                </p>
+              </RevealOnScroll>
+
+              {/* Hero Action Buttons */}
+              <RevealOnScroll direction="up" delay={300}>
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <Button
+                    size="lg"
+                    onClick={() => onNavigateToAuth('register')}
+                    className="h-12 px-7 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm shadow-xl shadow-primary/25 gap-2 transition-transform hover:-translate-y-0.5"
+                  >
+                    Create Free Workspace <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={onCastBallot}
+                    className="h-12 px-6 border-border bg-card hover:bg-muted text-foreground font-bold text-sm gap-2 transition-transform hover:-translate-y-0.5"
+                  >
+                    <Vote className="h-4 w-4 text-emerald-500" /> Cast Official Ballot
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    onClick={() => onLaunchApp('admin')}
+                    className="hidden sm:inline-flex h-12 px-4 text-muted-foreground hover:text-foreground hover:bg-muted text-sm font-semibold gap-1.5"
+                  >
+                    <BarChart3 className="h-4 w-4" /> Platform Admin
+                  </Button>
+                </div>
+              </RevealOnScroll>
+
+              {/* Key Trust Signals */}
+              <RevealOnScroll direction="up" delay={400}>
+                <div className="pt-6 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    <span>Private & Isolated Workspaces</span>
                   </div>
-                </RevealOnScroll>
-
-                {/* Card 2: Paid Competition & M-Pesa STK */}
-                <RevealOnScroll direction="up" delay={250}>
-                  <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-full">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px]">
-                        PAID COMPETITION
-                      </Badge>
-                      <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium">M-Pesa STK Push</span>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground">Talent Showcase 2026</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">National Collegiate Arts Festival</p>
-                    </div>
-                    <div className="p-2.5 rounded-lg border border-border bg-muted/40 space-y-2">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-foreground font-medium">Fan Pack (50 Credits)</span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">KES 5,000</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '68%' }} />
-                      </div>
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>3,420 votes cast</span>
-                        <span>1,580 remaining</span>
-                      </div>
-                    </div>
-                    <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">● Callback Verified</span>
-                      <span>Credits Scoped</span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    <span>Instant M-Pesa Withdrawals</span>
                   </div>
-                </RevealOnScroll>
-
-                {/* Card 3: Organizer Treasury & Payouts */}
-                <RevealOnScroll direction="up" delay={400}>
-                  <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-full">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px]">
-                        ORGANIZER TREASURY
-                      </Badge>
-                      <span className="text-[11px] text-muted-foreground font-mono">Live Balance</span>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground">Verified Ticket Earnings</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">Instant M-Pesa Disbursements</p>
-                    </div>
-                    <div className="space-y-2 pt-1 text-xs">
-                      <div className="flex justify-between items-center p-2 rounded bg-muted/50 border border-border">
-                        <span className="text-muted-foreground">Total Ticket Sales</span>
-                        <span className="font-mono font-bold text-foreground">KES 100,000</span>
-                      </div>
-                      <div className="flex justify-between items-center p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
-                        <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Available for Payout</span>
-                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">KES 60,000</span>
-                      </div>
-                    </div>
-                    <div className="pt-1 text-[10px] text-muted-foreground flex items-center justify-between font-mono">
-                      <span>Status: Ready for Withdrawal</span>
-                      <span className="text-primary font-medium">Instant M-Pesa</span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    <span>Dual-Approval Payout Protection</span>
                   </div>
-                </RevealOnScroll>
-              </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                    <span>Instant Ballot Processing</span>
+                  </div>
+                </div>
+              </RevealOnScroll>
             </div>
-          </RevealOnScroll>
+
+            {/* ===============================================================
+                RIGHT COLUMN: SOMETHING CREATIVE - INTERACTIVE LIVE ELECTION NEXUS
+            =============================================================== */}
+            <div className="lg:col-span-6 xl:col-span-6 relative">
+              <RevealOnScroll direction="left" delay={200} duration={800}>
+                <div className="relative mx-auto max-w-lg lg:max-w-none">
+                  
+                  {/* Floating Creative Badge: Top-Right (Cryptographic Secrecy) */}
+                  <div className="absolute -top-4 -right-2 sm:-top-5 sm:-right-4 z-20 hidden sm:flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border bg-card/95 backdrop-blur-md shadow-xl text-xs transition-transform hover:scale-105">
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+                      <Shield className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-foreground text-[11px] leading-tight flex items-center gap-1">
+                        100% Secret Ballot <Lock className="h-3 w-3 text-emerald-500" />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground font-mono">Zero-Knowledge Sealed</div>
+                    </div>
+                  </div>
+
+                  {/* Floating Creative Badge: Bottom-Left (M-Pesa Settlement) */}
+                  <div className="absolute -bottom-5 -left-2 sm:-bottom-5 sm:-left-4 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-border bg-card/95 backdrop-blur-md shadow-xl text-xs transition-transform hover:scale-105">
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+                      <Zap className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-foreground text-[11px] leading-tight">Instant M-Pesa Payouts</div>
+                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">KES 42,500 Disbursed Live</div>
+                    </div>
+                  </div>
+
+                  {/* Ambient Card Back-Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-tr from-blue-600/20 via-indigo-500/20 to-emerald-500/20 rounded-3xl blur-xl opacity-75 pointer-events-none" />
+
+                  {/* The Creative Interactive Showcase Card */}
+                  <div className="relative rounded-2xl border border-border bg-card/90 backdrop-blur-xl p-5 sm:p-6 shadow-2xl transition-all">
+                    
+                    {/* Card Top Bar: Mode Switcher & Live Status */}
+                    <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
+                      {/* Segmented Mode Selector */}
+                      <div className="inline-flex p-1 rounded-lg bg-muted border border-border text-xs">
+                        <button
+                          type="button"
+                          onClick={() => setHeroMode('ballot')}
+                          className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1.5 ${
+                            heroMode === 'ballot'
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          <Vote className="h-3.5 w-3.5" />
+                          <span>Live Ballot</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHeroMode('mpesa')}
+                          className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1.5 ${
+                            heroMode === 'mpesa'
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          <Smartphone className="h-3.5 w-3.5" />
+                          <span>M-Pesa STK</span>
+                        </button>
+                      </div>
+
+                      {/* Live Tally Beacon */}
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>LIVE TALLY</span>
+                      </div>
+                    </div>
+
+                    {/* =========================================================
+                        PANEL 1: INTERACTIVE LIVE BALLOT
+                    ========================================================= */}
+                    {heroMode === 'ballot' && (
+                      <div className="space-y-4">
+                        {/* Election Title & Meta */}
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                              Institutional Council Ballot
+                            </span>
+                            <h3 className="font-extrabold text-base sm:text-lg text-foreground mt-1.5">
+                              Dean of Faculty Senate 2026
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                              Metropolitan University • Select 1 Candidate
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] font-mono text-muted-foreground uppercase">Total Votes</div>
+                            <div className="text-sm font-bold font-mono text-foreground flex items-center gap-1 justify-end">
+                              <Users className="h-3.5 w-3.5 text-primary" /> {totalHeroVotes.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Candidate Options */}
+                        <div className="space-y-2.5 pt-1">
+                          {/* Candidate 1 */}
+                          <div
+                            onClick={() => !hasVoted && setSelectedCandidate('amina')}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                              selectedCandidate === 'amina'
+                                ? 'border-primary bg-primary/10 shadow-sm'
+                                : 'border-border bg-card/60 hover:bg-muted/50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                                  selectedCandidate === 'amina'
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-muted-foreground/40'
+                                }`}>
+                                  {selectedCandidate === 'amina' && <Check className="h-2.5 w-2.5" />}
+                                </div>
+                                <span className="font-bold text-foreground">Dr. Amina Mwangi</span>
+                                <span className="hidden sm:inline text-[11px] text-muted-foreground">• Biomedical Eng.</span>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono">
+                                <span className="text-muted-foreground text-[11px]">{candidateVotes.amina.toLocaleString()} votes</span>
+                                <span className="font-bold text-primary">{aminaPct}%</span>
+                              </div>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-gradient-to-r from-blue-600 to-indigo-500 h-1.5 rounded-full transition-all duration-500"
+                                style={{ width: `${aminaPct}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Candidate 2 */}
+                          <div
+                            onClick={() => !hasVoted && setSelectedCandidate('david')}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                              selectedCandidate === 'david'
+                                ? 'border-primary bg-primary/10 shadow-sm'
+                                : 'border-border bg-card/60 hover:bg-muted/50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                                  selectedCandidate === 'david'
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-muted-foreground/40'
+                                }`}>
+                                  {selectedCandidate === 'david' && <Check className="h-2.5 w-2.5" />}
+                                </div>
+                                <span className="font-bold text-foreground">Prof. David Ochieng</span>
+                                <span className="hidden sm:inline text-[11px] text-muted-foreground">• Computer Science</span>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono">
+                                <span className="text-muted-foreground text-[11px]">{candidateVotes.david.toLocaleString()} votes</span>
+                                <span className="font-bold text-foreground">{davidPct}%</span>
+                              </div>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-muted-foreground/40 h-1.5 rounded-full transition-all duration-500"
+                                style={{ width: `${davidPct}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Candidate 3 */}
+                          <div
+                            onClick={() => !hasVoted && setSelectedCandidate('elena')}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                              selectedCandidate === 'elena'
+                                ? 'border-primary bg-primary/10 shadow-sm'
+                                : 'border-border bg-card/60 hover:bg-muted/50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                                  selectedCandidate === 'elena'
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-muted-foreground/40'
+                                }`}>
+                                  {selectedCandidate === 'elena' && <Check className="h-2.5 w-2.5" />}
+                                </div>
+                                <span className="font-bold text-foreground">Dr. Elena Vance</span>
+                                <span className="hidden sm:inline text-[11px] text-muted-foreground">• Economics</span>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono">
+                                <span className="text-muted-foreground text-[11px]">{candidateVotes.elena.toLocaleString()} votes</span>
+                                <span className="font-bold text-foreground">{elenaPct}%</span>
+                              </div>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-muted-foreground/30 h-1.5 rounded-full transition-all duration-500"
+                                style={{ width: `${elenaPct}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Action Area */}
+                        {!hasVoted ? (
+                          <div className="pt-2">
+                            <Button
+                              type="button"
+                              onClick={handleSimulateVote}
+                              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs gap-2 shadow-lg shadow-primary/20"
+                            >
+                              <Vote className="h-4 w-4" /> Cast Cryptographic Ballot
+                            </Button>
+                            <p className="text-[10px] text-center text-muted-foreground mt-2">
+                              Simulates instant client-side sealing & zero-knowledge ballot verification
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle2 className="h-4 w-4" /> Ballot Sealed & Counted!
+                              </div>
+                              <button
+                                type="button"
+                                onClick={handleResetVote}
+                                className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1 font-mono"
+                              >
+                                <RefreshCw className="h-3 w-3" /> Vote again (demo)
+                              </button>
+                            </div>
+                            <div className="p-2 rounded bg-background/80 border border-border text-[11px] font-mono flex items-center justify-between">
+                              <span className="text-muted-foreground flex items-center gap-1.5">
+                                <Receipt className="h-3.5 w-3.5 text-primary" />
+                                Receipt:
+                              </span>
+                              <span className="font-bold text-foreground">{receiptHash}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* =========================================================
+                        PANEL 2: INTERACTIVE M-PESA DARAJA CHECKOUT
+                    ========================================================= */}
+                    {heroMode === 'mpesa' && (
+                      <div className="space-y-4">
+                        <div>
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            Paid Competition • Safaricom Daraja
+                          </span>
+                          <h3 className="font-extrabold text-base sm:text-lg text-foreground mt-1.5">
+                            National Collegiate Arts Award
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            Audience Choice • Purchase Voting Credit Bundles
+                          </p>
+                        </div>
+
+                        {/* Package Selection */}
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { votes: 10, kes: 100 },
+                            { votes: 50, kes: 450, popular: true },
+                            { votes: 100, kes: 800 }
+                          ].map(pkg => (
+                            <button
+                              key={pkg.votes}
+                              type="button"
+                              onClick={() => {
+                                setSelectedPackage({ votes: pkg.votes, kes: pkg.kes });
+                                setStkStatus('idle');
+                              }}
+                              className={`p-2.5 rounded-xl border text-left transition-all ${
+                                selectedPackage.votes === pkg.votes
+                                  ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
+                                  : 'border-border bg-card/60 hover:bg-muted/50'
+                              }`}
+                            >
+                              <div className="text-[11px] font-bold text-foreground">
+                                {pkg.votes} Votes
+                              </div>
+                              <div className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                KES {pkg.kes}
+                              </div>
+                              {pkg.popular && (
+                                <span className="inline-block text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-1 rounded mt-1">
+                                  Popular
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* M-Pesa Interactive Simulation State */}
+                        <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-3">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">Kenyan Mobile Number:</span>
+                            <span className="font-mono font-bold text-foreground">🇰🇪 +254 712 ••• 890</span>
+                          </div>
+
+                          {stkStatus === 'idle' && (
+                            <Button
+                              type="button"
+                              onClick={handleTriggerStk}
+                              className="w-full h-11 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs gap-2 shadow-lg shadow-emerald-600/20"
+                            >
+                              <Smartphone className="h-4 w-4" /> Simulate M-Pesa STK Push (KES {selectedPackage.kes})
+                            </Button>
+                          )}
+
+                          {stkStatus === 'sending' && (
+                            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-center space-y-1">
+                              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2">
+                                <RefreshCw className="h-3.5 w-3.5 animate-spin" /> STK Push Prompt Sent!
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">
+                                Simulating phone prompt: Enter M-Pesa PIN for KES {selectedPackage.kes}...
+                              </p>
+                            </div>
+                          )}
+
+                          {stkStatus === 'confirmed' && (
+                            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                  <CheckCircle2 className="h-4 w-4" /> M-Pesa Callback Confirmed!
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={handleResetStk}
+                                  className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1 font-mono"
+                                >
+                                  <RefreshCw className="h-3 w-3" /> Test again
+                                </button>
+                              </div>
+                              <div className="text-[11px] font-mono text-muted-foreground space-y-0.5">
+                                <div>• Transaction: <span className="text-foreground font-semibold">SK729DK8L0</span></div>
+                                <div>• Credits Issued: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{selectedPackage.votes} Credits</span></div>
+                                <div>• Organiser Treasury: <span className="text-foreground font-semibold">+KES {(selectedPackage.kes * 0.75).toFixed(2)}</span> settled</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Card Footer: Security & Isolation Seal */}
+                    <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <Shield className="h-3.5 w-3.5 text-primary" />
+                        <span>RLS Tenant Isolated</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                        <Check className="h-3 w-3" />
+                        <span>Zero Double-Voting</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </RevealOnScroll>
+            </div>
+
+          </div>
         </div>
       </section>
 
