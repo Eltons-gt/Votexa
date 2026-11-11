@@ -28,16 +28,51 @@ export function LoginForm({
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 1. First Attempt: Authenticate with Votexa Database API
     try {
-      // Attempt authentic Supabase Auth login
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+      const res = await apiClient.post<any>('/auth/login', {
+        email: normalizedEmail,
         password
       });
 
+      if (res.success && res.data?.token) {
+        apiClient.setAuthToken(res.data.token);
+        setSuccessMessage('Welcome back! Opening dashboard...');
+        setTimeout(() => {
+          if (onLoginSuccess) onLoginSuccess();
+        }, 500);
+        return;
+      }
+    } catch {
+      // Backend database login failed or offline, try Supabase Auth
+    }
+
+    // 2. Second Attempt: Authenticate with Supabase Auth Provider
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password
+      });
+
+      if (data?.session) {
+        apiClient.setAuthToken(data.session.access_token);
+        setSuccessMessage('Successfully signed in! Opening dashboard...');
+        setTimeout(() => {
+          if (onLoginSuccess) onLoginSuccess();
+        }, 500);
+        return;
+      }
+
       if (error) {
-        // If demo/dev credentials used
-        if (email === 'admin@votexa.io' || email.includes('admin') || email.includes('test') || email.includes('user@university.edu')) {
+        // If demo credentials used
+        if (
+          normalizedEmail === 'admin@votexa.io' ||
+          normalizedEmail.includes('admin') ||
+          normalizedEmail.includes('test') ||
+          normalizedEmail.includes('user@university.edu')
+        ) {
           apiClient.setAuthToken('mock-test-token');
           setSuccessMessage('Welcome back! Loading your organiser dashboard...');
           setTimeout(() => {
@@ -45,13 +80,7 @@ export function LoginForm({
           }, 500);
           return;
         }
-        setErrorMessage(error.message);
-      } else if (data.session) {
-        apiClient.setAuthToken(data.session.access_token);
-        setSuccessMessage('Successfully signed in! Opening dashboard...');
-        setTimeout(() => {
-          if (onLoginSuccess) onLoginSuccess();
-        }, 500);
+        setErrorMessage(error.message || 'Invalid email or password.');
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');

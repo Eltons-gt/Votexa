@@ -22,6 +22,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { apiClient } from '../../lib/api';
+import { supabase } from '../../lib/supabase';
 import { ElectionCategory } from '@votexa/shared';
 
 interface RegisterFormProps {
@@ -84,6 +85,17 @@ export function RegisterForm({
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-|-$/g, '');
         payload.eventCategory = eventCategory;
+      }
+
+      // Also register in Supabase Auth in background so login works on both auth layers
+      try {
+        await supabase.auth.signUp({
+          email: payload.email,
+          password: payload.password,
+          options: { data: { full_name: payload.fullName } }
+        });
+      } catch {
+        // Fallback silently if direct Supabase signup is rate-limited
       }
 
       const res = await apiClient.post<any>('/auth/register', payload);
