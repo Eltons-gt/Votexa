@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent } from '../../components/ui/card';
-import { Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { supabase } from '../../lib/supabase';
 import {
@@ -30,6 +30,7 @@ export function LoginForm({
 }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -295,13 +296,21 @@ export function LoginForm({
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="login-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••••••"
-                className="pl-9 text-xs h-10"
+                className="pl-9 pr-10 text-xs h-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+              </button>
             </div>
           </div>
 
