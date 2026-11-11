@@ -39,13 +39,37 @@ class ApiClient {
       headers.set('X-Organization-Id', this.activeTenantId);
     }
 
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers
-    });
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers
+      });
 
-    const json = (await response.json()) as ApiResponse<T>;
-    return json;
+      const text = await response.text();
+      try {
+        const json = JSON.parse(text) as ApiResponse<T>;
+        return json;
+      } catch {
+        return {
+          success: response.ok,
+          data: undefined,
+          error: {
+            message: response.ok ? 'Unexpected response format' : `Server responded with HTTP ${response.status}`,
+            code: 'SERVER_RESPONSE_ERROR'
+          },
+          timestamp: new Date().toISOString()
+        };
+      }
+    } catch (networkErr: any) {
+      return {
+        success: false,
+        error: {
+          message: networkErr?.message || 'Network communication error',
+          code: 'NETWORK_ERROR'
+        },
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 
   get<T = unknown>(endpoint: string): Promise<ApiResponse<T>> {

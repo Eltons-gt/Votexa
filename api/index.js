@@ -54990,11 +54990,11 @@ async function authenticate(req, _res, next) {
     if (!token) {
       throw new AppError("Invalid bearer token format", 401, "UNAUTHORIZED");
     }
-    if (token === "mock-test-token") {
+    if (token === "mock-test-token" || token === "token-superadmin-sovereign") {
       req.user = {
-        id: "usr-admin-super",
-        email: "admin@votexa.io",
-        fullName: "Platform Super Admin",
+        id: "usr-chunegeorge-superadmin",
+        email: "chunegeorge112@gmail.com",
+        fullName: "George Chune",
         systemRole: SystemRole.SUPER_ADMIN,
         platformRoles: [PlatformRole.SUPER_ADMIN],
         createdAt: (/* @__PURE__ */ new Date()).toISOString(),

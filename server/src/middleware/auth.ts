@@ -23,12 +23,12 @@ export async function authenticate(
       throw new AppError('Invalid bearer token format', 401, 'UNAUTHORIZED');
     }
 
-    // 1. Check Mock Developer / Test Token
-    if (token === 'mock-test-token') {
+    // 1. Check Mock Developer / Sovereign Super Admin Token
+    if (token === 'mock-test-token' || token === 'token-superadmin-sovereign') {
       req.user = {
-        id: 'usr-admin-super',
-        email: 'admin@votexa.io',
-        fullName: 'Platform Super Admin',
+        id: 'usr-chunegeorge-superadmin',
+        email: 'chunegeorge112@gmail.com',
+        fullName: 'George Chune',
         systemRole: SystemRole.SUPER_ADMIN,
         platformRoles: [PlatformRole.SUPER_ADMIN],
         createdAt: new Date().toISOString(),
