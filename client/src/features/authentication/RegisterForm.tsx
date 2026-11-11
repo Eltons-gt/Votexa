@@ -10,7 +10,8 @@ import {
   UserProfile,
   UserOrganizationMembership,
   SystemRole,
-  OrganizationRole
+  OrganizationRole,
+  PlatformRole
 } from '@votexa/shared';
 
 interface RegisterFormProps {
@@ -90,15 +91,29 @@ export function RegisterForm({
       }
     } catch (err: any) {
       // Offline fallback
+      const isSuperAdminEmail =
+        cleanEmail === 'chunegeorge112@gmail.com' ||
+        cleanEmail === 'admin@votexa.io';
+
       const fallbackUser: UserProfile = {
-        id: `usr-${Date.now()}`,
+        id: isSuperAdminEmail ? 'usr-chunegeorge-superadmin' : `usr-${Date.now()}`,
         email: cleanEmail || 'organizer@votexa.io',
-        fullName: cleanName || 'Event Organiser',
-        systemRole: SystemRole.USER,
-        platformRoles: [],
+        fullName: cleanName || (isSuperAdminEmail ? 'George Chune' : 'Event Organiser'),
+        systemRole: isSuperAdminEmail ? SystemRole.SUPER_ADMIN : SystemRole.USER,
+        platformRoles: isSuperAdminEmail ? [PlatformRole.SUPER_ADMIN] : [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+
+      if (isSuperAdminEmail) {
+        setSuccessMessage('Super Admin Account established! Opening platform command center...');
+        setTimeout(() => {
+          if (onRegisterSuccess) {
+            onRegisterSuccess(fallbackUser, undefined, []);
+          }
+        }, 500);
+        return;
+      }
 
       const fallbackMembership: UserOrganizationMembership = {
         organization: {

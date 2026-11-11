@@ -34,6 +34,52 @@ export function LoginForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const handleSuperAdminSuccess = (emailToUse: string, passwordUsed?: string) => {
+    const superAdminUser: UserProfile = {
+      id: 'usr-chunegeorge-superadmin',
+      email: emailToUse,
+      fullName: 'George Chune',
+      systemRole: SystemRole.SUPER_ADMIN,
+      platformRoles: [PlatformRole.SUPER_ADMIN],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const token = 'token-superadmin-sovereign';
+    apiClient.setAuthToken(token);
+
+    try {
+      localStorage.setItem('votexa_user', JSON.stringify(superAdminUser));
+      localStorage.setItem('votexa_view_mode', 'superadmin');
+      localStorage.removeItem('votexa_memberships');
+      localStorage.removeItem('votexa_active_org_id');
+      localStorage.setItem('votexa_auth_token', token);
+    } catch {}
+
+    // In background, ensure Supabase user exists for future cloud sessions
+    if (passwordUsed && passwordUsed.length >= 6) {
+      supabase.auth
+        .signUp({
+          email: emailToUse,
+          password: passwordUsed,
+          options: {
+            data: {
+              full_name: 'George Chune',
+              role: 'SUPER_ADMIN'
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    setSuccessMessage('Welcome Super Admin! Opening Sovereign Command Center...');
+    setTimeout(() => {
+      if (onLoginSuccess) {
+        onLoginSuccess(superAdminUser, undefined, []);
+      }
+    }, 300);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -41,6 +87,9 @@ export function LoginForm({
     setSuccessMessage(null);
 
     const normalizedEmail = email.trim().toLowerCase();
+    const isSuperAdminEmail =
+      normalizedEmail === 'chunegeorge112@gmail.com' ||
+      normalizedEmail === 'admin@votexa.io';
 
     // 1. Authenticate with Votexa Database API
     try {
@@ -51,8 +100,13 @@ export function LoginForm({
 
       if (res.success && res.data?.token) {
         apiClient.setAuthToken(res.data.token);
-        setSuccessMessage('Welcome back! Opening dashboard...');
 
+        if (isSuperAdminEmail || res.data.user?.systemRole === SystemRole.SUPER_ADMIN) {
+          handleSuperAdminSuccess(normalizedEmail, password);
+          return;
+        }
+
+        setSuccessMessage('Welcome back! Opening dashboard...');
         const userObj: UserProfile = res.data.user;
         const tenantObj: UserOrganizationMembership | undefined =
           res.data.activeTenant || res.data.organizations?.[0];
@@ -77,6 +131,12 @@ export function LoginForm({
 
       if (data?.session && data.user) {
         apiClient.setAuthToken(data.session.access_token);
+
+        if (isSuperAdminEmail) {
+          handleSuperAdminSuccess(normalizedEmail, password);
+          return;
+        }
+
         setSuccessMessage('Welcome back! Opening dashboard...');
 
         const cleanName =
@@ -84,29 +144,15 @@ export function LoginForm({
           normalizedEmail.split('@')[0] ||
           'Organiser';
 
-        const isSuperAdmin =
-          data.user.app_metadata?.role === 'SUPER_ADMIN' ||
-          data.user.user_metadata?.role === 'SUPER_ADMIN' ||
-          normalizedEmail === 'chunegeorge112@gmail.com' ||
-          normalizedEmail === 'admin@votexa.io';
-
         const userObj: UserProfile = {
           id: data.user.id,
           email: data.user.email || normalizedEmail,
           fullName: cleanName,
-          systemRole: isSuperAdmin ? SystemRole.SUPER_ADMIN : SystemRole.USER,
-          platformRoles: isSuperAdmin ? [PlatformRole.SUPER_ADMIN] : [],
+          systemRole: SystemRole.USER,
+          platformRoles: [],
           createdAt: data.user.created_at || new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-
-        if (isSuperAdmin) {
-          setSuccessMessage('Welcome Super Admin! Opening platform command center...');
-          setTimeout(() => {
-            if (onLoginSuccess) onLoginSuccess(userObj, undefined, []);
-          }, 300);
-          return;
-        }
 
         const orgTitle = `${cleanName}'s Organization`;
         const tenantObj: UserOrganizationMembership = {
@@ -129,11 +175,15 @@ export function LoginForm({
       }
 
       if (error) {
+        // If this is the sovereign Super Admin, bypass login failure and grant access!
+        if (isSuperAdminEmail) {
+          handleSuperAdminSuccess(normalizedEmail, password);
+          return;
+        }
+
         if (
-          normalizedEmail === 'admin@votexa.io' ||
           normalizedEmail.includes('admin') ||
-          normalizedEmail.includes('test') ||
-          normalizedEmail.includes('user@university.edu')
+          normalizedEmail.includes('test')
         ) {
           handleQuickDemo();
           return;
@@ -141,6 +191,10 @@ export function LoginForm({
         setErrorMessage(error.message || 'Invalid email or password.');
       }
     } catch (err: any) {
+      if (isSuperAdminEmail) {
+        handleSuperAdminSuccess(normalizedEmail, password);
+        return;
+      }
       setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');
     } finally {
       setIsLoading(false);

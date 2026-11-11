@@ -16,6 +16,7 @@ import {
   Building2
 } from 'lucide-react';
 import { apiClient } from '../../lib/api';
+import { PaymentGatewayBarChart } from './charts';
 
 interface PaymentMonitorItem {
   id: string;
@@ -211,6 +212,9 @@ export function SuperAdminPaymentMonitoring() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 7-Day Ingestion Bar Chart */}
+      <PaymentGatewayBarChart />
 
       {/* Filter and Search Bar */}
       <Card>

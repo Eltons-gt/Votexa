@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { SuperAdminFinancialMetrics } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import { RevenueSplitDonutChart, RevenueSplineChart } from './charts';
 
 export function SuperAdminFinancialDashboard() {
   const [metrics, setMetrics] = useState<SuperAdminFinancialMetrics | null>(null);
@@ -129,6 +130,16 @@ export function SuperAdminFinancialDashboard() {
             <p className="text-[11px] text-muted-foreground mt-0.5">M-Pesa / Gateway processing</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Visual Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8">
+          <RevenueSplineChart />
+        </div>
+        <div className="lg:col-span-4">
+          <RevenueSplitDonutChart />
+        </div>
       </div>
 
       {/* Secondary Risk & Reconciliation Grid */}

@@ -17,7 +17,7 @@
     "build:shared": "npm run build --workspace=shared",
     "build:server": "npm run build --workspace=server",
     "build:client": "npm run build --workspace=client",
-    "build:api": "esbuild server/src/serverless.ts --bundle --platform=node --target=node20 --format=esm --outfile=api/index.js --external:pg --external:pg-native --external:dotenv --external:express --external:cors --external:helmet --external:@supabase/supabase-js",
+    "build:api": "esbuild server/src/serverless.ts --bundle --platform=node --target=node20 --format=esm --outfile=api/index.js --external:pg-native",
     "test": "npm run test --workspace=server && npm run test --workspace=client",
     "test:server": "npm run test --workspace=server",
     "test:client": "npm run test --workspace=client",

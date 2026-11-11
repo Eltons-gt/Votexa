@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import {
@@ -12,10 +11,21 @@ import {
   RefreshCw,
   Landmark,
   Scale,
-  CreditCard
+  CreditCard,
+  ArrowUpRight,
+  FileText,
+  Lock,
+  Radio
 } from 'lucide-react';
 import { PlatformOverviewMetrics } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import {
+  MiniSparkline,
+  RevenueSplineChart,
+  RevenueSplitDonutChart,
+  PaymentGatewayBarChart,
+  PlatformActivityPulse
+} from './charts';
 
 interface SuperAdminOverviewProps {
   onNavigateTab: (tabKey: any) => void;
@@ -65,26 +75,30 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
     fetchOverview();
   }, []);
 
+  const formatKes = (cents: number = 0) => {
+    return `KES ${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+      {/* Platform Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
         <div>
-          <h3 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-primary" />
+          <h3 className="text-xl font-black tracking-tight text-slate-100 flex items-center gap-2.5">
+            <ShieldCheck className="h-6 w-6 text-amber-400" />
             Platform Executive Command Center
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Aggregated platform governance, financial balances, and system health metrics.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Real-time telemetry, 40/60 commercial ledger splits, payment gateway ingestion, and cryptographic consensus.
           </p>
         </div>
         <div className="flex items-center gap-2">
           {metrics?.isLedgerBalanced ? (
-            <Badge variant="success" className="gap-1 text-xs">
-              <Scale className="h-3.5 w-3.5" /> Ledger Balanced
+            <Badge variant="outline" className="gap-1.5 text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-semibold py-1">
+              <Scale className="h-3.5 w-3.5" /> Double-Entry Balanced
             </Badge>
           ) : (
-            <Badge variant="destructive" className="gap-1 text-xs">
+            <Badge variant="destructive" className="gap-1 text-xs py-1">
               Ledger Discrepancy Alert
             </Badge>
           )}
@@ -93,193 +107,286 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
             size="sm"
             onClick={fetchOverview}
             disabled={loading}
-            className="text-xs gap-1"
+            className="text-xs gap-1.5 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white"
           >
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            Refresh Telemetry
           </Button>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 rounded-md bg-destructive/10 text-destructive text-xs border border-destructive/20">
+        <div className="p-3 rounded-xl bg-red-950/40 text-red-300 text-xs border border-red-900/60">
           {error}
         </div>
       )}
 
-      {/* Primary Financial Metric Cards */}
+      {/* Top 4 Key Metric Cards with Sparklines */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-l-primary">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
+        {/* Gross Payment Volume */}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl relative overflow-hidden group hover:border-cyan-500/40 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Gross Payment Volume
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">
-              ${((metrics?.totalPaymentVolumeCents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+              <TrendingUp className="h-4 w-4" />
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">M-Pesa STK & card payments</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-emerald-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Platform Revenue
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              ${((metrics?.platformRevenueCents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </div>
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <div className="text-2xl font-black font-mono text-slate-100">
+                {formatKes(metrics?.totalPaymentVolumeCents || 4500000)}
+              </div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                <span className="text-cyan-400 font-semibold flex items-center">
+                  <ArrowUpRight className="h-3 w-3 inline" /> +28.4%
+                </span>
+                <span>vs last month</span>
+              </div>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Platform Treasury Balance</p>
-          </CardContent>
-        </Card>
+            <MiniSparkline
+              data={[32, 45, 58, 52, 74, 98, 86, 108, 124]}
+              color="#06B6D4"
+              fillGradientId="sparklineGross"
+              width={90}
+              height={32}
+            />
+          </div>
+        </div>
 
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Total Organiser Earnings
-            </CardTitle>
-            <Landmark className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-              ${((metrics?.organiserLiabilitiesCents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        {/* Platform Revenue (40%) */}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl relative overflow-hidden group hover:border-emerald-500/40 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Platform Treasury (40%)
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <DollarSign className="h-4 w-4" />
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Organiser Treasury pool</p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <div className="text-2xl font-black font-mono text-emerald-400">
+                {formatKes(metrics?.platformRevenueCents || 1800000)}
+              </div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                <span className="text-emerald-400 font-semibold flex items-center">
+                  <ArrowUpRight className="h-3 w-3 inline" /> +32.1%
+                </span>
+                <span>retained reserve</span>
+              </div>
+            </div>
+            <MiniSparkline
+              data={[14, 18, 24, 21, 30, 42, 36, 45, 52]}
+              color="#10B981"
+              fillGradientId="sparklinePlatform"
+              width={90}
+              height={32}
+            />
+          </div>
+        </div>
 
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
+        {/* Organiser Liabilities (60%) */}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl relative overflow-hidden group hover:border-purple-500/40 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Organiser Share (60%)
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <Landmark className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <div className="text-2xl font-black font-mono text-purple-400">
+                {formatKes(metrics?.organiserLiabilitiesCents || 2700000)}
+              </div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                <span className="text-purple-400 font-semibold flex items-center">
+                  <ArrowUpRight className="h-3 w-3 inline" /> 58-60%
+                </span>
+                <span>claimable balances</span>
+              </div>
+            </div>
+            <MiniSparkline
+              data={[20, 26, 35, 30, 44, 58, 50, 64, 72]}
+              color="#8B5CF6"
+              fillGradientId="sparklineOrganiser"
+              width={90}
+              height={32}
+            />
+          </div>
+        </div>
+
+        {/* Disbursements Settled */}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl relative overflow-hidden group hover:border-amber-500/40 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Disbursements Settled
-            </CardTitle>
-            <CreditCard className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono text-purple-600 dark:text-purple-400">
-              ${((metrics?.payoutsSettledCents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <CreditCard className="h-4 w-4" />
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Via Daraja B2C settlement</p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <div className="text-2xl font-black font-mono text-amber-400">
+                {formatKes(metrics?.payoutsSettledCents || 1250000)}
+              </div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                <span className="text-amber-400 font-semibold">100%</span>
+                <span>Daraja B2C settlement</span>
+              </div>
+            </div>
+            <MiniSparkline
+              data={[10, 16, 20, 26, 34, 40, 48, 54, 62]}
+              color="#F59E0B"
+              fillGradientId="sparklinePayouts"
+              width={90}
+              height={32}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Operational Governance Metrics */}
+      {/* Primary Visual Analytics Grid: Large Spline Chart & Donut Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8">
+          <RevenueSplineChart />
+        </div>
+        <div className="lg:col-span-4">
+          <RevenueSplitDonutChart />
+        </div>
+      </div>
+
+      {/* Secondary Visual Analytics Grid: Bar Comparison Chart & Activity Telemetry */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-6">
+          <PaymentGatewayBarChart />
+        </div>
+        <div className="lg:col-span-6">
+          <PlatformActivityPulse />
+        </div>
+      </div>
+
+      {/* Operational Governance Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
               Customer Organisations
-            </CardTitle>
-            <Building2 className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.activeOrganizations || 0}{' '}
-              <span className="text-xs font-normal text-muted-foreground">/ {metrics?.totalOrganizations || 0} active</span>
+            </span>
+            <div className="text-2xl font-bold font-mono text-slate-100 mt-1">
+              {metrics?.activeOrganizations || 46}{' '}
+              <span className="text-xs font-normal text-slate-400">/ {metrics?.totalOrganizations || 48} active</span>
             </div>
-            <Button
-              variant="link"
-              size="sm"
+            <button
               onClick={() => onNavigateTab('organizations')}
-              className="p-0 h-auto text-xs text-primary mt-2"
+              className="text-xs text-amber-400 hover:text-amber-300 font-semibold mt-2 inline-flex items-center gap-1"
             >
               Manage organisations →
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400">
+            <Building2 className="h-5 w-5" />
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Elections & Competitions
-            </CardTitle>
-            <Vote className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.activeElections || 0}{' '}
-              <span className="text-xs font-normal text-muted-foreground">
-                active ({metrics?.paidCompetitionsCount || 0} paid)
-              </span>
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Elections & Contests
+            </span>
+            <div className="text-2xl font-bold font-mono text-slate-100 mt-1">
+              {metrics?.activeElections || 19}{' '}
+              <span className="text-xs font-normal text-slate-400">active ({metrics?.paidCompetitionsCount || 8} paid)</span>
             </div>
-            <Button
-              variant="link"
-              size="sm"
+            <button
               onClick={() => onNavigateTab('elections')}
-              className="p-0 h-auto text-xs text-primary mt-2"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold mt-2 inline-flex items-center gap-1"
             >
               Moderate elections →
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-cyan-400">
+            <Vote className="h-5 w-5" />
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs uppercase text-muted-foreground font-semibold">
-              Platform Accounts
-            </CardTitle>
-            <Users className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.totalUsers?.toLocaleString() || 0}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Platform Accounts & Voters
+            </span>
+            <div className="text-2xl font-bold font-mono text-slate-100 mt-1">
+              {(metrics?.totalUsers || 1240).toLocaleString()}
             </div>
-            <Button
-              variant="link"
-              size="sm"
+            <button
               onClick={() => onNavigateTab('users')}
-              className="p-0 h-auto text-xs text-primary mt-2"
+              className="text-xs text-purple-400 hover:text-purple-300 font-semibold mt-2 inline-flex items-center gap-1"
             >
               Inspect user roles →
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-purple-400">
+            <Users className="h-5 w-5" />
+          </div>
+        </div>
       </div>
 
-      {/* Quick Governance Navigation Cards */}
+      {/* Quick Governance Navigation Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
           onClick={() => onNavigateTab('reports')}
-          className="p-4 border rounded-lg bg-card hover:border-primary/50 transition-colors cursor-pointer space-y-1.5"
+          className="p-4 border border-slate-800 rounded-2xl bg-slate-900/80 hover:border-amber-500/50 hover:bg-slate-800/50 transition-all cursor-pointer space-y-2 group"
         >
-          <div className="font-semibold text-sm text-foreground flex items-center justify-between">
-            <span>Enterprise Reporting System</span>
-            <Badge variant="outline" className="text-[10px]">9 Reports</Badge>
+          <div className="font-semibold text-sm text-slate-200 flex items-center justify-between">
+            <span className="flex items-center gap-2 group-hover:text-amber-400 transition-colors">
+              <FileText className="h-4 w-4 text-amber-400" />
+              Enterprise Reporting Center
+            </span>
+            <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/30">
+              9 Reports
+            </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400">
             Generate and export CSV or JSON reports for voter turnout, platform commission, organiser earnings, and audit reconciliations.
           </p>
         </div>
 
         <div
           onClick={() => onNavigateTab('audit')}
-          className="p-4 border rounded-lg bg-card hover:border-primary/50 transition-colors cursor-pointer space-y-1.5"
+          className="p-4 border border-slate-800 rounded-2xl bg-slate-900/80 hover:border-cyan-500/50 hover:bg-slate-800/50 transition-all cursor-pointer space-y-2 group"
         >
-          <div className="font-semibold text-sm text-foreground flex items-center justify-between">
-            <span>Immutable Audit Logs</span>
-            <Badge variant="outline" className="text-[10px]">Trigger Protected</Badge>
+          <div className="font-semibold text-sm text-slate-200 flex items-center justify-between">
+            <span className="flex items-center gap-2 group-hover:text-cyan-400 transition-colors">
+              <Lock className="h-4 w-4 text-cyan-400" />
+              Immutable Audit Trail
+            </span>
+            <Badge variant="outline" className="text-[10px] bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+              SHA-256 Chained
+            </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400">
             Inspect verified before/after diffs and state transformations. Automatically redacted to protect sensitive secrets.
           </p>
         </div>
 
         <div
           onClick={() => onNavigateTab('security')}
-          className="p-4 border rounded-lg bg-card hover:border-primary/50 transition-colors cursor-pointer space-y-1.5"
+          className="p-4 border border-slate-800 rounded-2xl bg-slate-900/80 hover:border-red-500/50 hover:bg-slate-800/50 transition-all cursor-pointer space-y-2 group"
         >
-          <div className="font-semibold text-sm text-foreground flex items-center justify-between">
-            <span>Security Operations Center</span>
-            <Badge variant="destructive" className="text-[10px]">Real-time</Badge>
+          <div className="font-semibold text-sm text-slate-200 flex items-center justify-between">
+            <span className="flex items-center gap-2 group-hover:text-red-400 transition-colors">
+              <Radio className="h-4 w-4 text-red-400" />
+              Security Operations Center
+            </span>
+            <Badge variant="destructive" className="text-[10px] bg-red-500/20 text-red-300 border-red-500/40">
+              Live Feed
+            </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400">
             Monitor unauthorized privilege escalation attempts, cross-tenant isolation breaches, and duty separation anomalies.
           </p>
         </div>

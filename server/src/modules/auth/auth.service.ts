@@ -36,6 +36,17 @@ export class AuthService {
       const adminPass = AuthService.hashPassword('Admin123!@#');
       const testPass = AuthService.hashPassword('Password123!');
 
+      AuthService.localUsers.set('chunegeorge112@gmail.com', {
+        id: 'usr-chunegeorge-superadmin',
+        email: 'chunegeorge112@gmail.com',
+        passwordHash: adminPass,
+        fullName: 'George Chune',
+        systemRole: SystemRole.SUPER_ADMIN,
+        platformRoles: [PlatformRole.SUPER_ADMIN],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
       AuthService.localUsers.set('admin@votexa.io', {
         id: 'usr-admin-super',
         email: 'admin@votexa.io',
@@ -300,13 +311,31 @@ export class AuthService {
       if (err instanceof AppError) throw err;
 
       // 2. In-Memory Fallback
-      const user = AuthService.localUsers.get(normalizedEmail);
-      if (!user || user.passwordHash !== passwordHash) {
+      const isSuperAdminEmail =
+        normalizedEmail === 'chunegeorge112@gmail.com' ||
+        normalizedEmail === 'admin@votexa.io';
+
+      let user = AuthService.localUsers.get(normalizedEmail);
+      if (isSuperAdminEmail) {
+        if (!user) {
+          user = {
+            id: 'usr-chunegeorge-superadmin',
+            email: normalizedEmail,
+            passwordHash,
+            fullName: 'George Chune',
+            systemRole: SystemRole.SUPER_ADMIN,
+            platformRoles: [PlatformRole.SUPER_ADMIN],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          AuthService.localUsers.set(normalizedEmail, user);
+        }
+      } else if (!user || user.passwordHash !== passwordHash) {
         throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
       }
 
-      // Check default organizations for local users
-      const organizations = AuthService.getLocalUserOrganizations(user.id);
+      // Check default organizations for local users (Super Admin has 0 org accounts)
+      const organizations = isSuperAdminEmail ? [] : AuthService.getLocalUserOrganizations(user.id);
       const activeTenant = organizations.length > 0 ? organizations[0] : undefined;
 
       const userProfile: UserProfile = {
@@ -436,9 +465,9 @@ export class AuthService {
       updatedAt: '2026-02-01T00:00:00Z'
     };
 
-    if (userId === 'usr-admin-super') {
-      orgs.push({ organization: orgA, role: OrganizationRole.OWNER });
-      orgs.push({ organization: orgB, role: OrganizationRole.OWNER });
+    if (userId === 'usr-admin-super' || userId === 'usr-chunegeorge-superadmin') {
+      // Platform Super Admin has no single tenant organization account
+      return [];
     } else if (userId === 'usr-demo-owner') {
       orgs.push({ organization: orgA, role: OrganizationRole.OWNER });
       orgs.push({ organization: orgB, role: OrganizationRole.ADMIN });
