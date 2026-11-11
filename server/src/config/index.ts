@@ -60,21 +60,23 @@ export const config: ServerConfig = {
     ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
     : true,
   database: {
-    url: process.env.DATABASE_URL,
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    name: process.env.DB_NAME || 'votexa',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
+    url:
+      process.env.DATABASE_URL ||
+      'postgresql://postgres.inuleocyvdzcspopiipl:%40Patcherian254@aws-0-eu-west-1.pooler.supabase.com:6543/postgres',
+    host: process.env.DB_HOST || 'aws-0-eu-west-1.pooler.supabase.com',
+    port: parseInt(process.env.DB_PORT || '6543', 10),
+    name: process.env.DB_NAME || 'postgres',
+    user: process.env.DB_USER || 'postgres.inuleocyvdzcspopiipl',
+    password: process.env.DB_PASSWORD || '@Patcherian254',
     ssl:
       process.env.DB_SSL === 'true' ||
-      (process.env.DATABASE_URL?.includes('supabase') ?? false) ||
+      (process.env.DATABASE_URL?.includes('supabase') ?? true) ||
       (process.env.DATABASE_URL?.includes('sslmode=require') ?? false),
     poolMax: parseInt(process.env.DB_POOL_MAX || '20', 10)
   },
   supabase: {
-    url: process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-    anonKey: process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key',
+    url: process.env.SUPABASE_URL || 'https://inuleocyvdzcspopiipl.supabase.co',
+    anonKey: process.env.SUPABASE_ANON_KEY || 'sb_publishable_PfeFM4jmSey-Kggq5UcBlQ_-CjhB7MB',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY
   },
   jwt: {

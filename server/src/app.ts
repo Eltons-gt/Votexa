@@ -41,8 +41,8 @@ export function createApp(): Express {
     next();
   });
 
-  // Health Check Endpoint
-  app.get('/health', (req: Request, res: Response) => {
+  // Health Check Endpoints
+  const handleHealth = (req: Request, res: Response) => {
     sendSuccess(
       res,
       {
@@ -54,6 +54,16 @@ export function createApp(): Express {
       200,
       req.requestId
     );
+  };
+
+  app.get('/health', handleHealth);
+  app.get('/api/health', handleHealth);
+  app.get('/api/v1/health', handleHealth);
+  app.get('/', (_req: Request, res: Response) => {
+    res.json({ name: 'Votexa API', status: 'UP', version: '1.0.0' });
+  });
+  app.get('/api', (_req: Request, res: Response) => {
+    res.json({ name: 'Votexa API', status: 'UP', version: '1.0.0' });
   });
 
   // Mount API Router (supports both /api/v1 and /api aliases)
