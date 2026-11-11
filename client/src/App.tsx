@@ -338,7 +338,32 @@ export function App() {
       .catch(() => {
         setServerStatus('System Online');
       });
-  }, [activeOrgId]);
+
+    // Synchronize user's organizations from the database
+    if (viewMode === 'app' && currentUser?.id) {
+      apiClient
+        .get<UserOrganizationMembership[]>('/organizations')
+        .then((res) => {
+          if (res.success && res.data && res.data.length > 0) {
+            setMemberships(res.data);
+            try {
+              localStorage.setItem('votexa_memberships', JSON.stringify(res.data));
+            } catch {}
+            if (!res.data.some((m) => m.organization.id === activeOrgId)) {
+              const firstOrg = res.data[0];
+              if (firstOrg?.organization) {
+                setActiveOrgId(firstOrg.organization.id);
+                apiClient.setTenant(firstOrg.organization.id);
+                try {
+                  localStorage.setItem('votexa_active_org_id', firstOrg.organization.id);
+                } catch {}
+              }
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [activeOrgId, viewMode, currentUser?.id]);
 
   // =========================================================================
   // VIEW MODE 1: PUBLIC LANDING PAGE

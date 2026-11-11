@@ -23,57 +23,6 @@ import {
 } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
 
-const DEFAULT_DEMO_ELECTIONS: Election[] = [
-  {
-    id: 'elec-inst-1',
-    organizationId: 'current',
-    category: ElectionCategory.INSTITUTIONAL,
-    title: 'Student Government Executive Council Election 2026',
-    description: 'Official annual election for executive council and student body representation.',
-    status: ElectionStatus.ACTIVE,
-    startTime: new Date(Date.now() - 86400000).toISOString(),
-    endTime: new Date(Date.now() + 86400000 * 3).toISOString(),
-    timezone: 'America/New_York',
-    allowSelfRegistration: false,
-    isPaidVoting: false,
-    createdById: 'usr-demo-owner',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'elec-paid-1',
-    organizationId: 'current',
-    category: ElectionCategory.PAID_COMPETITION,
-    title: 'National Collegiate Performing Arts & Talent Showcase',
-    description: 'Audience-choice public voting for top collegiate performing ensemble. Multiple votes permitted.',
-    status: ElectionStatus.ACTIVE,
-    startTime: new Date(Date.now() - 3600000 * 12).toISOString(),
-    endTime: new Date(Date.now() + 86400000 * 5).toISOString(),
-    timezone: 'America/New_York',
-    allowSelfRegistration: true,
-    isPaidVoting: true,
-    createdById: 'usr-demo-owner',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'elec-poll-1',
-    organizationId: 'current',
-    category: ElectionCategory.PUBLIC_POLL,
-    title: 'Campus Carbon Neutrality & Light Rail Transit Initiative',
-    description: 'Community survey on campus transport electrification and renewable energy investments.',
-    status: ElectionStatus.DRAFT,
-    startTime: new Date(Date.now() + 86400000).toISOString(),
-    endTime: new Date(Date.now() + 86400000 * 14).toISOString(),
-    timezone: 'America/New_York',
-    allowSelfRegistration: true,
-    isPaidVoting: false,
-    createdById: 'usr-demo-owner',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
 interface ElectionDashboardProps {
   organizationName: string;
   userRole?: OrganizationRole;
@@ -87,7 +36,7 @@ export function ElectionDashboard({
   onSelectElection,
   onOpenWizard
 }: ElectionDashboardProps) {
-  const [elections, setElections] = useState<Election[]>(DEFAULT_DEMO_ELECTIONS);
+  const [elections, setElections] = useState<Election[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [search, setSearch] = useState('');
@@ -103,13 +52,13 @@ export function ElectionDashboard({
       if (params.length > 0) query += `?${params.join('&')}`;
 
       const res = await apiClient.get<Election[]>(query);
-      if (res.data && res.data.length > 0) {
+      if (res.data) {
         setElections(res.data);
       } else {
-        setElections(DEFAULT_DEMO_ELECTIONS);
+        setElections([]);
       }
     } catch {
-      setElections(DEFAULT_DEMO_ELECTIONS);
+      setElections([]);
     } finally {
       setLoading(false);
     }

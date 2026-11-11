@@ -128,10 +128,33 @@ export class AdminService {
     const paidPayouts = payouts.filter((p) => p.status === 'PAID');
     const payoutsSettledCents = paidPayouts.reduce((acc, p) => acc + p.netAmountCents, 0);
 
+    let totalOrganizations = AdminService.localOrganizations.size;
+    let activeOrganizations = Array.from(AdminService.localOrganizations.values()).filter((o) => o.status === 'ACTIVE').length;
+    let totalUsers = AdminService.localUsers.size;
+
+    try {
+      const client = await pool.connect();
+      try {
+        const orgRes = await client.query("SELECT COUNT(1) as total, COUNT(1) FILTER (WHERE status = 'ACTIVE') as active FROM organizations");
+        const userRes = await client.query("SELECT COUNT(1) as total FROM users");
+        if (orgRes.rows.length > 0 && parseInt(orgRes.rows[0].total, 10) > 0) {
+          totalOrganizations = parseInt(orgRes.rows[0].total, 10);
+          activeOrganizations = parseInt(orgRes.rows[0].active || '0', 10);
+        }
+        if (userRes.rows.length > 0 && parseInt(userRes.rows[0].total, 10) > 0) {
+          totalUsers = parseInt(userRes.rows[0].total, 10);
+        }
+      } finally {
+        client.release();
+      }
+    } catch {
+      // Fallback to local memory if disconnected
+    }
+
     return {
-      totalOrganizations: AdminService.localOrganizations.size,
-      activeOrganizations: Array.from(AdminService.localOrganizations.values()).filter((o) => o.status === 'ACTIVE').length,
-      totalUsers: AdminService.localUsers.size,
+      totalOrganizations,
+      activeOrganizations,
+      totalUsers,
       totalElections: elections.length,
       activeElections: activeElections.length,
       paidCompetitionsCount: paidCompetitions.length,
