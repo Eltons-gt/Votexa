@@ -2,6 +2,7 @@
   "name": "votexa-workspace",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Votexa - Enterprise Multi-Tenant Voting SaaS Platform",
   "workspaces": [
     "shared",
