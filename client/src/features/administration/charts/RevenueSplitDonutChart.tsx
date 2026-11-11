@@ -88,8 +88,8 @@ export function RevenueSplitDonutChart() {
       </div>
 
       {/* Donut and Center Callout */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 py-2">
-        <div className="relative w-48 h-48 flex items-center justify-center shrink-0">
+      <div className="flex flex-col items-center justify-center gap-4 py-2 w-full">
+        <div className="relative w-40 h-40 flex items-center justify-center shrink-0 mx-auto">
           <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 200 200">
             {/* Background Track */}
             <circle
@@ -128,11 +128,11 @@ export function RevenueSplitDonutChart() {
           </svg>
 
           {/* Central KPI */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 pointer-events-none">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2 pointer-events-none">
             <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
               {hoveredSlice && activeSlice ? activeSlice.label.split(' ')[0] : 'Total Gross'}
             </span>
-            <span className="text-lg font-black font-mono text-slate-100 tracking-tight">
+            <span className="text-base font-black font-mono text-slate-100 tracking-tight">
               {hoveredSlice && activeSlice
                 ? `${activeSlice.percentage}%`
                 : formatKes(totalGrossCents).replace('KES ', '')}
@@ -144,7 +144,7 @@ export function RevenueSplitDonutChart() {
         </div>
 
         {/* Breakdown Stat List */}
-        <div className="flex-1 w-full space-y-2.5">
+        <div className="w-full space-y-2">
           {slices.map((slice) => {
             const isHovered = hoveredSlice === slice.id;
             return (
@@ -154,12 +154,12 @@ export function RevenueSplitDonutChart() {
                 onMouseLeave={() => setHoveredSlice(null)}
                 className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                   isHovered
-                    ? 'bg-slate-800/90 border-slate-700 shadow-md scale-[1.02]'
+                    ? 'bg-slate-800/90 border-slate-600 shadow-md'
                     : 'bg-slate-800/40 border-slate-800/60 hover:bg-slate-800/60'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between text-xs font-semibold gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     <span
                       className="h-2.5 w-2.5 rounded-full shrink-0"
                       style={{
@@ -167,15 +167,15 @@ export function RevenueSplitDonutChart() {
                         boxShadow: `0 0 8px ${slice.color}`
                       }}
                     />
-                    <span className="text-slate-200">{slice.label}</span>
+                    <span className="text-slate-200 truncate">{slice.label}</span>
                   </div>
-                  <span className="font-mono font-bold text-slate-100">
+                  <span className="font-mono font-bold text-slate-100 shrink-0">
                     {formatKes(slice.amountCents)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between mt-1 text-[10px] text-slate-400">
-                  <span className="truncate max-w-[180px]">{slice.description}</span>
-                  <span className="font-bold text-slate-300 font-mono">{slice.percentage}%</span>
+                <div className="flex items-center justify-between mt-1 text-[10px] text-slate-400 pl-4.5 gap-2">
+                  <span className="truncate">{slice.description}</span>
+                  <span className="font-bold text-slate-300 font-mono shrink-0">{slice.percentage}%</span>
                 </div>
               </div>
             );

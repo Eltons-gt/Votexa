@@ -236,29 +236,23 @@ export function SuperAdminPortal({
           ))}
         </nav>
 
-        {/* Footer: User Identity & Workspace Switcher */}
-        <div className="p-3 border-t border-slate-800/80 bg-slate-900/60 space-y-2">
+        {/* Footer: User Identity */}
+        <div className="p-3 border-t border-slate-800/80 bg-slate-900/60">
           {/* Identity Pill */}
-          <div className="p-2 rounded-lg bg-slate-800/50 border border-slate-800 flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/60 flex items-center gap-2.5 shadow-sm">
             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-bold flex items-center justify-center text-xs shrink-0 shadow">
-              {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'A'}
+              {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : 'G'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-100 truncate">
-                {currentUser.fullName || 'Platform Super Admin'}
+              <p className="text-xs font-bold text-slate-100 truncate">
+                {currentUser.fullName || 'George Chune'}
               </p>
-              <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
+              <p className="text-[10px] text-amber-400/90 font-medium truncate flex items-center gap-1">
+                <Crown className="h-2.5 w-2.5 inline" />
+                Super Admin
+              </p>
             </div>
           </div>
-
-          {/* Log Out */}
-          <button
-            onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-semibold text-red-400 bg-red-950/20 border border-red-900/40 hover:bg-red-950/40 hover:text-red-300 transition-colors shadow-sm"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Sign Out Admin</span>
-          </button>
         </div>
       </aside>
 

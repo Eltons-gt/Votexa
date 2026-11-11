@@ -61,8 +61,8 @@ export function RevenueSplineChart() {
   // Chart coordinates
   const svgWidth = 800;
   const svgHeight = 240;
-  const padLeft = 40;
-  const padRight = 20;
+  const padLeft = 58;
+  const padRight = 28;
   const padTop = 20;
   const padBottom = 30;
 
@@ -411,7 +411,7 @@ export function RevenueSplineChart() {
 
       {/* Legend & Aggregate Stat Pills */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/80 text-xs">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <div className="flex items-center gap-1.5 text-slate-300">
             <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#06B6D4]"></span>
             <span className="font-medium text-slate-300">Gross Processed Volume</span>

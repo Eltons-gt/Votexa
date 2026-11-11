@@ -81,24 +81,25 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Platform Executive Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
-        <div>
-          <h3 className="text-xl font-black tracking-tight text-slate-100 flex items-center gap-2.5">
-            <ShieldCheck className="h-6 w-6 text-amber-400" />
-            Platform Executive Command Center
-          </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real-time telemetry, 40/60 commercial ledger splits, payment gateway ingestion, and cryptographic consensus.
-          </p>
+      {/* Platform Executive Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-800/80">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-amber-400" />
+            Live Sovereign Telemetry
+          </span>
+          <span className="text-slate-600 hidden sm:inline">•</span>
+          <span className="text-xs text-slate-400 hidden sm:inline">
+            Real-time multi-tenant ledger & consensus throughput
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {metrics?.isLedgerBalanced ? (
-            <Badge variant="outline" className="gap-1.5 text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-semibold py-1">
-              <Scale className="h-3.5 w-3.5" /> Double-Entry Balanced
+            <Badge variant="outline" className="gap-1.5 text-[11px] bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-semibold py-0.5">
+              <Scale className="h-3 w-3" /> Double-Entry Balanced
             </Badge>
           ) : (
-            <Badge variant="destructive" className="gap-1 text-xs py-1">
+            <Badge variant="destructive" className="gap-1 text-[11px] py-0.5">
               Ledger Discrepancy Alert
             </Badge>
           )}
@@ -107,10 +108,10 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
             size="sm"
             onClick={fetchOverview}
             disabled={loading}
-            className="text-xs gap-1.5 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white"
+            className="text-xs h-7 gap-1.5 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white px-2.5"
           >
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
-            Refresh Telemetry
+            <span>Refresh Telemetry</span>
           </Button>
         </div>
       </div>
@@ -133,9 +134,9 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               <TrendingUp className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div>
-              <div className="text-2xl font-black font-mono text-slate-100">
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xl sm:text-2xl font-black font-mono text-slate-100 truncate">
                 {formatKes(metrics?.totalPaymentVolumeCents || 4500000)}
               </div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -149,7 +150,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               data={[32, 45, 58, 52, 74, 98, 86, 108, 124]}
               color="#06B6D4"
               fillGradientId="sparklineGross"
-              width={90}
+              width={80}
               height={32}
             />
           </div>
@@ -165,9 +166,9 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               <DollarSign className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div>
-              <div className="text-2xl font-black font-mono text-emerald-400">
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 truncate">
                 {formatKes(metrics?.platformRevenueCents || 1800000)}
               </div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -181,7 +182,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               data={[14, 18, 24, 21, 30, 42, 36, 45, 52]}
               color="#10B981"
               fillGradientId="sparklinePlatform"
-              width={90}
+              width={80}
               height={32}
             />
           </div>
@@ -197,9 +198,9 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               <Landmark className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div>
-              <div className="text-2xl font-black font-mono text-purple-400">
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xl sm:text-2xl font-black font-mono text-purple-400 truncate">
                 {formatKes(metrics?.organiserLiabilitiesCents || 2700000)}
               </div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -213,7 +214,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               data={[20, 26, 35, 30, 44, 58, 50, 64, 72]}
               color="#8B5CF6"
               fillGradientId="sparklineOrganiser"
-              width={90}
+              width={80}
               height={32}
             />
           </div>
@@ -229,9 +230,9 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               <CreditCard className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div>
-              <div className="text-2xl font-black font-mono text-amber-400">
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xl sm:text-2xl font-black font-mono text-amber-400 truncate">
                 {formatKes(metrics?.payoutsSettledCents || 1250000)}
               </div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -243,7 +244,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
               data={[10, 16, 20, 26, 34, 40, 48, 54, 62]}
               color="#F59E0B"
               fillGradientId="sparklinePayouts"
-              width={90}
+              width={80}
               height={32}
             />
           </div>
