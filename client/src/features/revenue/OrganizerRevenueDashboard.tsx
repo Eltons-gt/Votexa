@@ -140,7 +140,7 @@ export function OrganizerRevenueDashboard({ organizationId }: OrganizerRevenueDa
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black text-primary">{formatCents(metrics?.availableBalance)}</div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Ready for instant M-Pesa transfer</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Ready for instant payout withdrawal</p>
           </CardContent>
         </Card>
       </div>

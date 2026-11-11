@@ -135,7 +135,7 @@ export function AuthPage({
                     <CreditCard className="h-3.5 w-3.5" />
                   </div>
                   <span>
-                    <strong>Instant M-Pesa Integration:</strong> Automated vote purchases and real-time revenue disbursement to your phone.
+                    <strong>Instant Voter Checkout:</strong> Frictionless credit purchases and real-time revenue disbursement to your account.
                   </span>
                 </div>
                 <div className="flex items-start gap-3 text-xs text-slate-200">
@@ -256,7 +256,7 @@ export function AuthPage({
 
       {/* Footer Notice */}
       <footer className="h-12 border-t border-border px-4 text-center text-[11px] text-muted-foreground flex items-center justify-center bg-card/40">
-        © 2026 Votexa • Africa's Most Trusted Digital Voting Infrastructure • Instant M-Pesa Payouts
+        © 2026 Votexa • Africa's Most Trusted Digital Voting Infrastructure • Instant Organizer Payouts
       </footer>
     </div>
   );

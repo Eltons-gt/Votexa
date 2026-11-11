@@ -8,6 +8,7 @@ import {
   CreditCard,
   Lock,
   Smartphone,
+  ShieldCheck,
   X
 } from 'lucide-react';
 import { VotingPackage, PurchasePackageResponse } from '@votexa/shared';
@@ -203,16 +204,16 @@ export function PackagePurchaseModal({
           </div>
         )}
 
-        {/* Simulated Sandbox Card Callout */}
-        <div className="p-3.5 rounded-xl bg-muted/50 border text-xs space-y-2">
+        {/* Safe Checkout Callout */}
+        <div className="p-3.5 rounded-xl bg-muted/50 border text-xs space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="font-semibold flex items-center gap-1.5 text-foreground">
-              <CreditCard className="h-4 w-4 text-primary" /> Development Payment Simulator
+              <ShieldCheck className="h-4 w-4 text-emerald-500" /> Secure Instant Checkout
             </span>
-            <span className="text-[10px] text-muted-foreground font-mono">SANDBOX GATEWAY</span>
+            <span className="text-[10px] text-muted-foreground font-mono">ENCRYPTED</span>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            In development, payments are confirmed instantly via our mock provider without charging real currency. Transactions are recorded with <code>is_mock_payment: true</code> in the audit ledger.
+            Voting credits are credited immediately to your ballot wallet upon successful confirmation. Choose your preferred checkout method below.
           </p>
         </div>
 
@@ -236,7 +237,7 @@ export function PackagePurchaseModal({
               className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 shadow-sm"
             >
               <CreditCard className="h-3.5 w-3.5" />
-              Paystack
+              Card / Mobile
             </Button>
             <Button
               size="sm"
@@ -245,7 +246,7 @@ export function PackagePurchaseModal({
               className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9 shadow-sm"
             >
               <Smartphone className="h-3.5 w-3.5" />
-              M-Pesa STK
+              M-Pesa Express
             </Button>
             <Button
               size="sm"
@@ -255,7 +256,7 @@ export function PackagePurchaseModal({
               className="gap-1.5 text-xs border-amber-500/40 text-amber-600 hover:bg-amber-500/10 h-9"
             >
               <DollarSign className="h-3.5 w-3.5" />
-              {isProcessing ? 'Processing...' : 'Sandbox Demo'}
+              {isProcessing ? 'Processing...' : 'Free Demo Top-Up'}
             </Button>
           </div>
         </div>

@@ -79,7 +79,7 @@ export function LoginForm({
           Event Organiser Login
         </CardTitle>
         <CardDescription className="text-slate-300 text-xs mt-1">
-          Sign in to monitor live votes, view audit records, and manage M-Pesa payouts
+          Sign in to monitor live votes, view audit records, and manage earnings & payouts
         </CardDescription>
       </div>
 

@@ -76,7 +76,7 @@ export function AppLayout({
     },
     finance: {
       title: 'Treasury & Payouts',
-      subtitle: 'View ticket sales, available earnings, and request instant M-Pesa disbursements.'
+      subtitle: 'View ticket sales, available earnings, and request organizer payouts.'
     },
     admin: {
       title: 'Platform Administration',
@@ -197,8 +197,8 @@ export function AppLayout({
           </div>
           <div className="flex items-center gap-4">
             <span className="text-emerald-600 dark:text-emerald-400 font-medium">● Workspace Protected</span>
-            <span>M-Pesa Verified</span>
-            <span>Automated Payouts Ready</span>
+            <span>Verified Payout Account</span>
+            <span>Instant Payouts Ready</span>
           </div>
         </footer>
       </div>

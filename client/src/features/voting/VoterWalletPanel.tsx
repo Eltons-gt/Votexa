@@ -173,14 +173,14 @@ export function VoterWalletPanel({
               onClick={() => setShowPaystackDirect(true)}
               className="text-xs h-8 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold"
             >
-              <CreditCard className="h-3.5 w-3.5" /> Paystack
+              <CreditCard className="h-3.5 w-3.5" /> Card / Mobile
             </Button>
             <Button
               size="sm"
               onClick={() => setShowMpesaDirect(true)}
               className="text-xs h-8 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
             >
-              <Smartphone className="h-3.5 w-3.5" /> M-Pesa Top-Up
+              <Smartphone className="h-3.5 w-3.5" /> M-Pesa Express
             </Button>
             <Button
               size="sm"

@@ -12,7 +12,7 @@ import {
   Award,
   BarChart3,
   Globe2,
-  Smartphone,
+  CreditCard,
   Receipt,
   Layers,
   Check,
@@ -192,7 +192,7 @@ export function LandingPage({
             <a href="#categories" className="hover:text-foreground transition-colors">Election Types</a>
             <a href="#features" className="hover:text-foreground transition-colors">Key Features</a>
             <a href="#security" className="hover:text-foreground transition-colors">Security & Privacy</a>
-            <a href="#mpesa" className="hover:text-foreground transition-colors">M-Pesa Finance</a>
+            <a href="#payouts" className="hover:text-foreground transition-colors">Contests & Payouts</a>
             <a href="#reports" className="hover:text-foreground transition-colors">Audit & Reports</a>
           </nav>
 
@@ -249,7 +249,7 @@ export function LandingPage({
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  Safaricom M-Pesa Integrated • Automated Instant Payouts
+                  Verified Digital Balloting • Instant Voter Checkout & Payouts
                 </div>
               </RevealOnScroll>
 
@@ -267,7 +267,7 @@ export function LandingPage({
               <RevealOnScroll direction="up" delay={200}>
                 <p className="text-base sm:text-lg text-muted-foreground font-normal leading-relaxed">
                   Empowering universities, professional associations, and national talent competitions with
-                  tamper-proof secret ballots, private organization workspaces, and instant M-Pesa payouts.
+                  tamper-proof secret ballots, private organization workspaces, and instant revenue payouts.
                 </p>
               </RevealOnScroll>
 
@@ -309,7 +309,7 @@ export function LandingPage({
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                    <span>Instant M-Pesa Withdrawals</span>
+                    <span>Instant Organizer Payouts</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
@@ -343,13 +343,13 @@ export function LandingPage({
                     </div>
                   </div>
 
-                  {/* Floating Creative Badge: Bottom-Left (M-Pesa Settlement) */}
+                  {/* Floating Creative Badge: Bottom-Left (Earnings Settlement) */}
                   <div className="absolute -bottom-5 -left-2 sm:-bottom-5 sm:-left-4 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-border bg-card/95 backdrop-blur-md shadow-xl text-xs transition-transform hover:scale-105">
                     <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
                       <Zap className="h-4 w-4 text-emerald-500" />
                     </div>
                     <div>
-                      <div className="font-bold text-foreground text-[11px] leading-tight">Instant M-Pesa Payouts</div>
+                      <div className="font-bold text-foreground text-[11px] leading-tight">Instant Earnings Payouts</div>
                       <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">KES 42,500 Disbursed Live</div>
                     </div>
                   </div>
@@ -385,8 +385,8 @@ export function LandingPage({
                               : 'text-muted-foreground hover:text-foreground'
                           }`}
                         >
-                          <Smartphone className="h-3.5 w-3.5" />
-                          <span>M-Pesa STK</span>
+                          <CreditCard className="h-3.5 w-3.5" />
+                          <span>Quick Checkout</span>
                         </button>
                       </div>
 
@@ -572,13 +572,13 @@ export function LandingPage({
                     )}
 
                     {/* =========================================================
-                        PANEL 2: INTERACTIVE M-PESA DARAJA CHECKOUT
+                        PANEL 2: INTERACTIVE QUICK CHECKOUT & CREDITS
                     ========================================================= */}
                     {heroMode === 'mpesa' && (
                       <div className="space-y-4">
                         <div>
                           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                            Paid Competition • Safaricom Daraja
+                            Paid Competition • Instant Voter Checkout
                           </span>
                           <h3 className="font-extrabold text-base sm:text-lg text-foreground mt-1.5">
                             National Collegiate Arts Award
@@ -623,10 +623,10 @@ export function LandingPage({
                           ))}
                         </div>
 
-                        {/* M-Pesa Interactive Simulation State */}
+                        {/* Interactive Checkout Simulation State */}
                         <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-3">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">Kenyan Mobile Number:</span>
+                            <span className="text-muted-foreground">Voter Mobile Number:</span>
                             <span className="font-mono font-bold text-foreground">🇰🇪 +254 712 ••• 890</span>
                           </div>
 
@@ -636,17 +636,17 @@ export function LandingPage({
                               onClick={handleTriggerStk}
                               className="w-full h-11 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs gap-2 shadow-lg shadow-emerald-600/20"
                             >
-                              <Smartphone className="h-4 w-4" /> Simulate M-Pesa STK Push (KES {selectedPackage.kes})
+                              <CreditCard className="h-4 w-4" /> Simulate Quick Checkout (KES {selectedPackage.kes})
                             </Button>
                           )}
 
                           {stkStatus === 'sending' && (
                             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-center space-y-1">
                               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2">
-                                <RefreshCw className="h-3.5 w-3.5 animate-spin" /> STK Push Prompt Sent!
+                                <RefreshCw className="h-3.5 w-3.5 animate-spin" /> Payment Prompt Sent!
                               </div>
                               <p className="text-[11px] text-muted-foreground">
-                                Simulating phone prompt: Enter M-Pesa PIN for KES {selectedPackage.kes}...
+                                Simulating phone authorization: Enter PIN for KES {selectedPackage.kes}...
                               </p>
                             </div>
                           )}
@@ -655,7 +655,7 @@ export function LandingPage({
                             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 space-y-2">
                               <div className="flex items-center justify-between">
                                 <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                                  <CheckCircle2 className="h-4 w-4" /> M-Pesa Callback Confirmed!
+                                  <CheckCircle2 className="h-4 w-4" /> Payment Confirmed!
                                 </div>
                                 <button
                                   type="button"
@@ -666,9 +666,9 @@ export function LandingPage({
                                 </button>
                               </div>
                               <div className="text-[11px] font-mono text-muted-foreground space-y-0.5">
-                                <div>• Transaction: <span className="text-foreground font-semibold">SK729DK8L0</span></div>
+                                <div>• Transaction: <span className="text-foreground font-semibold">TX-729DK8L0</span></div>
                                 <div>• Credits Issued: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{selectedPackage.votes} Credits</span></div>
-                                <div>• Organiser Treasury: <span className="text-foreground font-semibold">+KES {(selectedPackage.kes * 0.75).toFixed(2)}</span> settled</div>
+                                <div>• Organiser Balance: <span className="text-foreground font-semibold">+KES {(selectedPackage.kes * 0.75).toFixed(2)}</span> ready</div>
                               </div>
                             </div>
                           )}
@@ -809,9 +809,9 @@ export function LandingPage({
                     <div className="inline-flex items-center gap-2 text-amber-500 text-xs font-mono font-semibold">
                       <Award className="h-4 w-4" /> TALENT SHOWS • FAN VOTING • AUDIENCE AWARDS
                     </div>
-                    <h3 className="text-2xl font-bold text-foreground">Monetized Voting with M-Pesa STK Push</h3>
+                    <h3 className="text-2xl font-bold text-foreground">Monetized Voting & Contest Credit Bundles</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Allow audiences and fans to purchase bundles of voting credits via Safaricom Daraja STK push.
+                      Allow audiences and fans to purchase bundles of voting credits seamlessly via mobile money or debit card.
                       Credits are strictly scoped to the specific election and cannot cross tenant or contest boundaries.
                     </p>
                     <ul className="space-y-2.5 text-xs text-foreground">
@@ -839,11 +839,11 @@ export function LandingPage({
                     <div className="text-muted-foreground border-b border-border pb-2">
                       // Paid Voting & Wallet Isolation
                     </div>
-                    <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ STK Push initiated: AccountRef = VTX-ELECP1</div>
-                    <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Credit Issuance: Exactly-Once per CheckoutRequestID</div>
+                    <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Checkout Session: AccountRef = VTX-ELECP1</div>
+                    <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Credit Issuance: Exactly-Once per Verified Reference</div>
                     <div className="text-amber-600 dark:text-amber-400 font-semibold">✓ Cross-Election Token Transfer: BLOCKED (403)</div>
                     <div className="text-muted-foreground pt-2 text-[11px]">
-                      "Automated M-Pesa disbursement delivers organizer earnings upon approval."
+                      "Automated disbursement delivers organizer earnings directly upon approval."
                     </div>
                   </div>
                 </div>
@@ -938,12 +938,12 @@ export function LandingPage({
             <RevealOnScroll direction="up" delay={150}>
               <div className="rounded-2xl border border-border bg-card p-6 space-y-3 hover:border-primary/50 transition-colors shadow-sm h-full">
                 <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
-                  <Smartphone className="h-5 w-5" />
+                  <CreditCard className="h-5 w-5" />
                 </div>
-                <h3 className="font-bold text-lg text-foreground">Direct M-Pesa Integration</h3>
+                <h3 className="font-bold text-lg text-foreground">Seamless Mobile & Card Payments</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Seamless STK push for voters purchasing packages, paired with fast automated withdrawals
-                  straight to organizer M-Pesa numbers upon administrative approval.
+                  Frictionless checkout for voters purchasing credit packages, paired with fast automated payouts
+                  straight to organizer accounts upon administrative approval.
                 </p>
               </div>
             </RevealOnScroll>
@@ -1066,7 +1066,7 @@ export function LandingPage({
                   <span className="font-extrabold text-base text-foreground">VOTEXA</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Enterprise Multi-Tenant Voting & Elections Platform. Powered by Supabase Auth and Safaricom Daraja APIs.
+                  Enterprise Multi-Tenant Voting & Elections Platform. Designed for governance institutions and modern talent competitions.
                 </p>
               </div>
 
@@ -1084,8 +1084,8 @@ export function LandingPage({
                 <h4 className="font-bold text-foreground">Treasury & Payouts</h4>
                 <ul className="space-y-1.5 text-muted-foreground text-[11px]">
                   <li>Instant Organizer Earnings</li>
-                  <li>Direct M-Pesa Checkout</li>
-                  <li>Automated Mobile Disbursements</li>
+                  <li>Instant Mobile Checkout</li>
+                  <li>Automated Revenue Disbursements</li>
                   <li>Protected Payout Authorization</li>
                 </ul>
               </div>

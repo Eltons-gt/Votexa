@@ -213,11 +213,11 @@ export function MpesaCheckoutModal({
                 M-Pesa Express
               </Badge>
               <Badge variant="outline" className="text-[10px]">
-                Daraja API
+                Instant Top-Up
               </Badge>
             </div>
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2 mt-1">
-              <Smartphone className="h-5 w-5 text-emerald-600" /> Pay with Safaricom M-Pesa
+              <Smartphone className="h-5 w-5 text-emerald-600" /> Pay with M-Pesa
             </h3>
             <p className="text-xs text-muted-foreground">
               Official instant mobile money top-up for election voting credits.
@@ -379,7 +379,7 @@ export function MpesaCheckoutModal({
 
             <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-              Direct Safaricom Daraja secure payment channel
+              Direct encrypted mobile payment channel
             </p>
           </div>
         )}

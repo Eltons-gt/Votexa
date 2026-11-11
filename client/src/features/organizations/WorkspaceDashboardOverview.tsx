@@ -67,7 +67,7 @@ export function WorkspaceDashboardOverview({
       votersTotal: 8000,
       endTime: 'In 5 days',
       badgeColor: 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10',
-      rule: 'M-Pesa STK Bundles'
+      rule: 'Voting Credit Bundles'
     },
     {
       id: 'elec-poll-1',
@@ -94,8 +94,8 @@ export function WorkspaceDashboardOverview({
     },
     {
       id: 'ev-2',
-      title: 'M-Pesa Payment Callback Verified',
-      description: '50 Credits issued to FAN-KENYA-99 via Daraja STK Push (KES 5,000).',
+      title: 'Credit Package Purchased',
+      description: '50 Credits issued to FAN-KENYA-99 via mobile payment (KES 5,000).',
       timestamp: '14 minutes ago',
       icon: Smartphone,
       iconColor: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20'
@@ -242,7 +242,7 @@ export function WorkspaceDashboardOverview({
               {formatKes(walletBalanceCents)}
             </div>
             <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-1 flex items-center gap-1">
-              <Smartphone className="h-3 w-3" /> Ready for M-Pesa Withdrawal
+              <Wallet className="h-3 w-3" /> Ready for Withdrawal
             </p>
           </div>
         </div>
@@ -402,9 +402,9 @@ export function WorkspaceDashboardOverview({
               >
                 <div>
                   <div className="text-xs font-bold text-foreground group-hover:text-amber-500 transition-colors">
-                    Request M-Pesa Withdrawal
+                    Request Payout
                   </div>
-                  <div className="text-[10px] text-muted-foreground">Withdraw available earnings to M-Pesa</div>
+                  <div className="text-[10px] text-muted-foreground">Withdraw available earnings to your account</div>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" />
               </button>

@@ -196,7 +196,7 @@ export function WithdrawalRequestModal({
                     }`}
                   />
                   <div>
-                    <div className="font-bold text-xs">M-Pesa B2C</div>
+                    <div className="font-bold text-xs">Mobile Money (M-Pesa)</div>
                     <div className="text-[10px] text-muted-foreground mt-0.5">Kenyan Mobile Wallet ($0.50 Fee)</div>
                   </div>
                 </button>
@@ -227,7 +227,7 @@ export function WithdrawalRequestModal({
             {method === PayoutMethod.MPESA_B2C ? (
               <div className="space-y-3 p-3 rounded-xl bg-muted/20 border text-xs">
                 <div className="space-y-1">
-                  <label className="font-semibold text-foreground">M-Pesa Phone Number (MSISDN)</label>
+                  <label className="font-semibold text-foreground">M-Pesa Mobile Number</label>
                   <Input
                     type="text"
                     placeholder="254712345678 or 0712345678"

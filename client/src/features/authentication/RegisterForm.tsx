@@ -246,14 +246,14 @@ export function RegisterForm({
             </div>
           </div>
 
-          {/* Mobile Phone (Crucial for M-Pesa & SMS Voting) */}
+          {/* Mobile Phone (Crucial for Verification & SMS Voting) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-foreground" htmlFor="reg-phone">
-                Mobile Number (M-Pesa & Payout Ready)
+                Mobile Number (For Verification & Payouts)
               </label>
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                <CreditCard className="h-3 w-3" /> Instant M-Pesa Disbursals
+                <CreditCard className="h-3 w-3" /> Fast Payouts
               </span>
             </div>
             <div className="relative flex">
@@ -307,7 +307,7 @@ export function RegisterForm({
                       id: ElectionCategory.PAID_COMPETITION,
                       label: 'Awards & Contests',
                       icon: Trophy,
-                      desc: 'Paid Voting & M-Pesa'
+                      desc: 'Paid Voting & Contests'
                     },
                     {
                       id: 'PAGEANT',

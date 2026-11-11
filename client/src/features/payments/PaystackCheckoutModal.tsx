@@ -204,7 +204,7 @@ export function PaystackCheckoutModal({
         }
       } else {
         setStep('CHECKOUT_OPEN');
-        setErrorMessage('Payment has not been completed yet. Please complete checkout in Paystack or try again.');
+        setErrorMessage('Payment has not been completed yet. Please complete checkout or try again.');
       }
     } catch (err: unknown) {
       setStep('CHECKOUT_OPEN');
@@ -223,15 +223,15 @@ export function PaystackCheckoutModal({
           <div>
             <div className="flex items-center gap-2">
               <span className="h-6 px-2 rounded-md bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-[10px] font-mono font-bold flex items-center gap-1">
-                <CreditCard className="h-3 w-3" /> PAYSTACK
+                <CreditCard className="h-3 w-3" /> SECURE CHECKOUT
               </span>
               <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                Cards • M-Pesa • Bank
+                Cards • Mobile Money • Bank
               </Badge>
             </div>
             <h3 className="font-extrabold text-lg text-foreground mt-1.5">Purchase Voting Credits</h3>
             <p className="text-xs text-muted-foreground">
-              Official instant credit top-up for your contest ballot
+              Instant credit top-up for your contest ballot
             </p>
           </div>
           <button
@@ -287,7 +287,7 @@ export function PaystackCheckoutModal({
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Receipt Email (Optional):</span>
-                <span className="text-[10px] text-muted-foreground font-mono">Paystack e-Receipt</span>
+                <span className="text-[10px] text-muted-foreground font-mono">Official e-Receipt</span>
               </label>
               <Input
                 type="email"
@@ -306,10 +306,10 @@ export function PaystackCheckoutModal({
             <div className="p-3 rounded-xl border border-border bg-muted/40 text-[11px] text-muted-foreground space-y-1.5">
               <div className="flex items-center gap-1.5 font-semibold text-foreground text-xs">
                 <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                <span>PCI-DSS Level 1 Encrypted Checkout</span>
+                <span>256-Bit Encrypted Secure Checkout</span>
               </div>
               <p>
-                Payments are securely processed via Paystack. Your financial details never touch Votexa servers.
+                Payments are securely processed via encrypted checkout. Your financial details never touch Votexa servers.
               </p>
               <div className="pt-1 flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
                 <Lock className="h-3 w-3 text-primary" />
@@ -345,9 +345,9 @@ export function PaystackCheckoutModal({
         {step === 'INITIALIZING' && (
           <div className="py-10 text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
-            <div className="font-bold text-sm text-foreground">Contacting Paystack Gateway...</div>
+            <div className="font-bold text-sm text-foreground">Connecting to Secure Checkout...</div>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              Preparing your encrypted session with Paystack for {selectedPackage?.credits} votes.
+              Preparing your encrypted session for {selectedPackage?.credits} votes.
             </p>
           </div>
         )}
@@ -360,7 +360,7 @@ export function PaystackCheckoutModal({
             </div>
 
             <div>
-              <h4 className="font-bold text-base text-foreground">Complete Payment in Paystack</h4>
+              <h4 className="font-bold text-base text-foreground">Complete Your Payment</h4>
               <p className="text-xs text-muted-foreground mt-1">
                 A secure checkout window was opened. If it didn't open automatically, click the button below.
               </p>
@@ -372,7 +372,7 @@ export function PaystackCheckoutModal({
                 onClick={() => window.open(authUrl, 'PaystackCheckout', 'width=500,height=680')}
                 className="w-full text-xs gap-1.5 border-blue-500/40 text-blue-600 hover:bg-blue-500/10"
               >
-                <ExternalLink className="h-4 w-4" /> Open Paystack Checkout Window
+                <ExternalLink className="h-4 w-4" /> Open Payment Window
               </Button>
             )}
 
@@ -382,7 +382,7 @@ export function PaystackCheckoutModal({
                 <span>Checking payment status ({pollCountdown}s remaining)...</span>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Once payment is confirmed on Paystack, voting credits will be issued immediately to your ballot wallet.
+                Once payment is confirmed, voting credits will be issued immediately to your ballot wallet.
               </p>
             </div>
 
@@ -410,9 +410,9 @@ export function PaystackCheckoutModal({
         {step === 'VERIFYING' && (
           <div className="py-10 text-center space-y-3">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
-            <div className="font-bold text-sm text-foreground">Verifying Paystack Payment...</div>
+            <div className="font-bold text-sm text-foreground">Confirming Payment...</div>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              Confirming transaction with Paystack API and issuing election credits...
+              Confirming transaction and issuing election credits...
             </p>
           </div>
         )}
@@ -438,7 +438,7 @@ export function PaystackCheckoutModal({
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Channel:</span>
-                <span className="uppercase font-semibold text-foreground">{verifyResult?.channel || 'Paystack'}</span>
+                <span className="uppercase font-semibold text-foreground">{verifyResult?.channel || 'Online Payment'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Amount:</span>
