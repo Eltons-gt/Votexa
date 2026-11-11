@@ -56,8 +56,9 @@ export function createApp(): Express {
     );
   });
 
-  // Mount API Router
+  // Mount API Router (supports both /api/v1 and /api aliases)
   app.use('/api/v1', apiRouter);
+  app.use('/api', apiRouter);
 
   // 404 Not Found Handler
   app.use((req: Request, _res: Response, next: NextFunction) => {

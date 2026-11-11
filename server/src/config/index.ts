@@ -91,11 +91,11 @@ export const config: ServerConfig = {
     b2cTimeoutUrl: process.env.MPESA_B2C_TIMEOUT_URL || 'https://api.votexa.io/api/v1/webhooks/mpesa/b2c-timeout'
   },
   paystack: {
-    publicKey: process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_13bbcf7c4fa855705ebd6f0d5744674e84648163',
+    publicKey: process.env.PAYSTACK_PUBLIC_KEY || 'pk_live_9090f5293424a38a4d847cc72daf35f811ed5154',
     secretKey: process.env.PAYSTACK_SECRET_KEY || '',
     webhookSecret: process.env.PAYSTACK_WEBHOOK_SECRET || process.env.PAYSTACK_SECRET_KEY || '',
     baseUrl: process.env.PAYSTACK_BASE_URL || 'https://api.paystack.co',
-    callbackUrl: process.env.PAYSTACK_CALLBACK_URL || 'https://api.votexa.io/api/v1/payments/paystack/callback'
+    callbackUrl: process.env.PAYSTACK_CALLBACK_URL || 'https://votexa-nu.vercel.app/elections'
   },
   security: {
     rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
