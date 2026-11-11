@@ -10,7 +10,13 @@ export function createApp(): Express {
   const app = express();
 
   // Security Headers
-  app.use(helmet());
+  app.disable('x-powered-by');
+  app.use(
+    helmet({
+      hidePoweredBy: false,
+      contentSecurityPolicy: false
+    })
+  );
 
   // CORS Configuration
   app.use(

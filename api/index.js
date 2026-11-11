@@ -64856,7 +64856,13 @@ function errorHandler(err, req, res, _next) {
 init_apiResponse();
 function createApp() {
   const app2 = (0, import_express23.default)();
-  app2.use(helmet());
+  app2.disable("x-powered-by");
+  app2.use(
+    helmet({
+      hidePoweredBy: false,
+      contentSecurityPolicy: false
+    })
+  );
   app2.use(
     (0, import_cors.default)({
       origin: config.corsOrigin,
