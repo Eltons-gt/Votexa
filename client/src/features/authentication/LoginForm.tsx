@@ -9,7 +9,8 @@ import {
   UserProfile,
   UserOrganizationMembership,
   SystemRole,
-  OrganizationRole
+  OrganizationRole,
+  PlatformRole
 } from '@votexa/shared';
 
 interface LoginFormProps {
@@ -83,12 +84,18 @@ export function LoginForm({
           normalizedEmail.split('@')[0] ||
           'Organiser';
 
+        const isSuperAdmin =
+          data.user.app_metadata?.role === 'SUPER_ADMIN' ||
+          data.user.user_metadata?.role === 'SUPER_ADMIN' ||
+          normalizedEmail === 'chunegeorge112@gmail.com' ||
+          normalizedEmail === 'admin@votexa.io';
+
         const userObj: UserProfile = {
           id: data.user.id,
           email: data.user.email || normalizedEmail,
           fullName: cleanName,
-          systemRole: SystemRole.USER,
-          platformRoles: [],
+          systemRole: isSuperAdmin ? SystemRole.SUPER_ADMIN : SystemRole.USER,
+          platformRoles: isSuperAdmin ? [PlatformRole.SUPER_ADMIN] : [],
           createdAt: data.user.created_at || new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };

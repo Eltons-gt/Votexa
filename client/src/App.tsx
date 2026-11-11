@@ -28,7 +28,8 @@ import {
   UserProfile,
   UserOrganizationMembership,
   SystemRole,
-  OrganizationRole
+  OrganizationRole,
+  PlatformRole
 } from '@votexa/shared';
 import { apiClient } from './lib/api';
 import { supabase } from './lib/supabase';
@@ -54,7 +55,21 @@ export function App() {
   const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
     try {
       const saved = localStorage.getItem('votexa_user');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed.email === 'chunegeorge112@gmail.com' ||
+          parsed.email === 'admin@votexa.io' ||
+          parsed.systemRole === SystemRole.SUPER_ADMIN ||
+          parsed.platformRoles?.includes(PlatformRole.SUPER_ADMIN)
+        ) {
+          parsed.systemRole = SystemRole.SUPER_ADMIN;
+          if (!parsed.platformRoles || !parsed.platformRoles.includes(PlatformRole.SUPER_ADMIN)) {
+            parsed.platformRoles = [PlatformRole.SUPER_ADMIN];
+          }
+        }
+        return parsed;
+      }
     } catch {}
     return {
       id: 'usr-organizer',
@@ -185,6 +200,19 @@ export function App() {
     organizations?: UserOrganizationMembership[]
   ) => {
     if (authenticatedUser) {
+      if (
+        authenticatedUser.email === 'chunegeorge112@gmail.com' ||
+        authenticatedUser.email === 'admin@votexa.io' ||
+        authenticatedUser.systemRole === SystemRole.SUPER_ADMIN
+      ) {
+        authenticatedUser.systemRole = SystemRole.SUPER_ADMIN;
+        if (!authenticatedUser.platformRoles?.includes(PlatformRole.SUPER_ADMIN)) {
+          authenticatedUser.platformRoles = [
+            ...(authenticatedUser.platformRoles || []),
+            PlatformRole.SUPER_ADMIN
+          ];
+        }
+      }
       setCurrentUser(authenticatedUser);
       try {
         localStorage.setItem('votexa_user', JSON.stringify(authenticatedUser));

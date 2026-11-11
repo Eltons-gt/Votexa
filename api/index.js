@@ -1083,13 +1083,16 @@ async function authenticate(req, _res, next) {
     if (error || !user) {
       throw new AppError("Invalid or expired authentication session", 401, "UNAUTHORIZED");
     }
+    const isSuperAdminEmail = user.email === "chunegeorge112@gmail.com" || user.email === "admin@votexa.io";
+    const systemRole = isSuperAdminEmail ? SystemRole.SUPER_ADMIN : user.app_metadata?.role || SystemRole.USER;
+    const platformRoles = isSuperAdminEmail ? [PlatformRole.SUPER_ADMIN] : user.app_metadata?.platform_roles || [];
     req.user = {
       id: user.id,
       email: user.email || "",
       fullName: user.user_metadata?.full_name || user.email || "",
       avatarUrl: user.user_metadata?.avatar_url,
-      systemRole: user.app_metadata?.role || SystemRole.USER,
-      platformRoles: user.app_metadata?.platform_roles || [],
+      systemRole,
+      platformRoles,
       createdAt: user.created_at,
       updatedAt: user.updated_at || user.created_at
     };

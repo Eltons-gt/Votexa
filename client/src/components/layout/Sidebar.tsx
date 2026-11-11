@@ -68,7 +68,9 @@ export function Sidebar({
   const isSuperAdmin =
     currentUser.systemRole === SystemRole.SUPER_ADMIN ||
     currentUser.platformRoles?.includes(PlatformRole.SUPER_ADMIN) ||
-    currentUser.platformRoles?.includes(PlatformRole.SUPPORT_ADMIN);
+    currentUser.platformRoles?.includes(PlatformRole.SUPPORT_ADMIN) ||
+    currentUser.email === 'chunegeorge112@gmail.com' ||
+    currentUser.email === 'admin@votexa.io';
 
   const formatKes = (cents: number) => {
     return `KES ${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
