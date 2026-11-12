@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { sendSuccess } from '../../utils/apiResponse.js';
+import { authService } from '../auth/auth.service.js';
 
 export class UsersController {
   async list(_req: Request, res: Response): Promise<void> {
@@ -16,5 +17,10 @@ export class UsersController {
 
   async getProfile(req: Request, res: Response): Promise<void> {
     sendSuccess(res, req.user);
+  }
+
+  async deleteMe(req: Request, res: Response): Promise<void> {
+    const result = await authService.deleteAccount(req.user!.id);
+    sendSuccess(res, result);
   }
 }

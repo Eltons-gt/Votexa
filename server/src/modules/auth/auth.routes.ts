@@ -33,4 +33,8 @@ router.post('/logout', authenticate, (req, res, next) => {
   controller.logout(req, res).catch(next);
 });
 
+router.delete('/account', authenticate, (req, res, next) => {
+  controller.deleteAccount(req, res).catch(next);
+});
+
 export default router;

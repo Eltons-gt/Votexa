@@ -3,22 +3,28 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
-import { User, Shield, Building2, CheckCircle2 } from 'lucide-react';
+import { User, Shield, Building2, CheckCircle2, AlertTriangle, Trash2 } from 'lucide-react';
 import { UserProfile, UserOrganizationMembership } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import { DeleteAccountModal } from '../../components/modals/DeleteAccountModal';
+
+export interface UserProfileScreenProps {
+  user: UserProfile;
+  memberships?: UserOrganizationMembership[];
+  onProfileUpdated?: (updated: UserProfile) => void;
+  onAccountDeleted?: () => void;
+}
 
 export function UserProfileScreen({
   user,
   memberships = [],
-  onProfileUpdated
-}: {
-  user: UserProfile;
-  memberships?: UserOrganizationMembership[];
-  onProfileUpdated?: (updated: UserProfile) => void;
-}) {
+  onProfileUpdated,
+  onAccountDeleted
+}: UserProfileScreenProps) {
   const [fullName, setFullName] = useState(user.fullName);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleUpdate = async () => {
     setIsSaving(true);
@@ -115,7 +121,55 @@ export function UserProfileScreen({
           )}
         </CardContent>
       </Card>
+
+      {/* Danger Zone */}
+      <Card className="border-destructive/30 bg-destructive/5 overflow-hidden">
+        <CardHeader className="border-b border-destructive/20 pb-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <CardTitle className="text-destructive text-lg font-bold">
+              Danger Zone
+            </CardTitle>
+          </div>
+          <CardDescription className="text-xs">
+            Destructive actions for your personal account
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-destructive/20 bg-card">
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-foreground">
+                Delete Account
+              </h4>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Permanently delete your Votexa personal account, credentials, and organization memberships. Once deleted, your account cannot be recovered.
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowDeleteModal(true)}
+              className="shrink-0 gap-1.5"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Account
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {showDeleteModal && (
+        <DeleteAccountModal
+          userEmail={user.email}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleted={() => {
+            setShowDeleteModal(false);
+            if (onAccountDeleted) {
+              onAccountDeleted();
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
-

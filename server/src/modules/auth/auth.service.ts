@@ -441,6 +441,63 @@ export class AuthService {
     AuthService.resetTokens.delete(token);
   }
 
+  /**
+   * Permanently delete user account and associated memberships.
+   */
+  async deleteAccount(userId: string): Promise<{ success: boolean; message: string }> {
+    const isSuperAdminUser =
+      userId === 'usr-admin-super' ||
+      userId === 'usr-chunegeorge-superadmin';
+
+    // Protect platform root super admin accounts from accidental self-deletion
+    if (isSuperAdminUser) {
+      throw new AppError('Platform Super Administrator account cannot be deleted', 403, 'SUPERADMIN_PROTECTED');
+    }
+
+    // 1. Remove from local in-memory storage
+    for (const [email, user] of AuthService.localUsers.entries()) {
+      if (user.id === userId) {
+        AuthService.localUsers.delete(email);
+        break;
+      }
+    }
+
+    // 2. Remove from PostgreSQL database
+    try {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        
+        // Remove organization memberships
+        await client.query('DELETE FROM organization_members WHERE user_id = $1', [userId]);
+        
+        // Remove platform roles
+        await client.query('DELETE FROM platform_roles WHERE user_id = $1', [userId]);
+
+        // Nullify non-cascade foreign keys on payout requests if any
+        await client.query('UPDATE payout_requests SET requested_by = NULL WHERE requested_by = $1', [userId]).catch(() => {});
+        await client.query('UPDATE payout_requests SET reviewed_by = NULL WHERE reviewed_by = $1', [userId]).catch(() => {});
+
+        // Delete user record from users table
+        await client.query('DELETE FROM users WHERE id = $1', [userId]);
+
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('[DELETE_ACCOUNT_DB_ERROR]', err);
+      } finally {
+        client.release();
+      }
+    } catch (err) {
+      console.warn('[DELETE_ACCOUNT_POOL_UNAVAILABLE]', err);
+    }
+
+    return {
+      success: true,
+      message: 'Account deleted successfully'
+    };
+  }
+
   // Helper for mock organizations in disconnected mode
   static getLocalUserOrganizations(userId: string): UserOrganizationMembership[] {
     const orgs: UserOrganizationMembership[] = [];

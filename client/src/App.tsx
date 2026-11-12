@@ -313,6 +313,19 @@ export function App() {
     setViewMode('landing');
   };
 
+  const handleAccountDeleted = () => {
+    supabase.auth.signOut().catch(() => {});
+    apiClient.setAuthToken('');
+    try {
+      localStorage.removeItem('votexa_user');
+      localStorage.removeItem('votexa_auth_token');
+      localStorage.removeItem('votexa_memberships');
+      localStorage.removeItem('votexa_active_org_id');
+      localStorage.removeItem('votexa_view_mode');
+    } catch {}
+    setViewMode('landing');
+  };
+
   // Restore stored session token on mount
   useEffect(() => {
     try {
@@ -526,6 +539,8 @@ export function App() {
         <OrgSettingsScreen
           organization={activeOrg}
           userRole={activeRole}
+          currentUser={currentUser}
+          onAccountDeleted={handleAccountDeleted}
           onUpdated={(updatedOrg) => {
             setMemberships(
               memberships.map((m) =>
@@ -561,6 +576,7 @@ export function App() {
         <UserProfileScreen
           user={currentUser}
           memberships={memberships}
+          onAccountDeleted={handleAccountDeleted}
           onProfileUpdated={(updated) => setCurrentUser(updated)}
         />
       )}

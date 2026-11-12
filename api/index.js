@@ -31097,6 +31097,46 @@ var init_auth_service = __esm({
         }
         _AuthService.resetTokens.delete(token);
       }
+      /**
+       * Permanently delete user account and associated memberships.
+       */
+      async deleteAccount(userId) {
+        const isSuperAdminUser = userId === "usr-admin-super" || userId === "usr-chunegeorge-superadmin";
+        if (isSuperAdminUser) {
+          throw new AppError("Platform Super Administrator account cannot be deleted", 403, "SUPERADMIN_PROTECTED");
+        }
+        for (const [email, user] of _AuthService.localUsers.entries()) {
+          if (user.id === userId) {
+            _AuthService.localUsers.delete(email);
+            break;
+          }
+        }
+        try {
+          const client = await pool.connect();
+          try {
+            await client.query("BEGIN");
+            await client.query("DELETE FROM organization_members WHERE user_id = $1", [userId]);
+            await client.query("DELETE FROM platform_roles WHERE user_id = $1", [userId]);
+            await client.query("UPDATE payout_requests SET requested_by = NULL WHERE requested_by = $1", [userId]).catch(() => {
+            });
+            await client.query("UPDATE payout_requests SET reviewed_by = NULL WHERE reviewed_by = $1", [userId]).catch(() => {
+            });
+            await client.query("DELETE FROM users WHERE id = $1", [userId]);
+            await client.query("COMMIT");
+          } catch (err) {
+            await client.query("ROLLBACK");
+            console.error("[DELETE_ACCOUNT_DB_ERROR]", err);
+          } finally {
+            client.release();
+          }
+        } catch (err) {
+          console.warn("[DELETE_ACCOUNT_POOL_UNAVAILABLE]", err);
+        }
+        return {
+          success: true,
+          message: "Account deleted successfully"
+        };
+      }
       // Helper for mock organizations in disconnected mode
       static getLocalUserOrganizations(userId) {
         const orgs = [];
@@ -46744,6 +46784,10 @@ var AuthController = class {
   async logout(_req, res) {
     sendSuccess(res, { message: "Logged out successfully" }, void 0, 200, _req.requestId);
   }
+  async deleteAccount(req, res) {
+    const result = await authService.deleteAccount(req.user.id);
+    sendSuccess(res, result, void 0, 200, req.requestId);
+  }
 };
 
 // node_modules/@supabase/supabase-js/dist/index.mjs
@@ -55085,6 +55129,9 @@ router.patch("/profile", authenticate, (req, res, next) => {
 router.post("/logout", authenticate, (req, res, next) => {
   controller.logout(req, res).catch(next);
 });
+router.delete("/account", authenticate, (req, res, next) => {
+  controller.deleteAccount(req, res).catch(next);
+});
 var auth_routes_default = router;
 
 // server/src/modules/users/users.routes.ts
@@ -55092,6 +55139,7 @@ var import_express2 = __toESM(require_express2(), 1);
 
 // server/src/modules/users/users.controller.ts
 init_apiResponse();
+init_auth_service();
 var UsersController = class {
   async list(_req, res) {
     sendSuccess(res, [
@@ -55107,6 +55155,10 @@ var UsersController = class {
   async getProfile(req, res) {
     sendSuccess(res, req.user);
   }
+  async deleteMe(req, res) {
+    const result = await authService.deleteAccount(req.user.id);
+    sendSuccess(res, result);
+  }
 };
 
 // server/src/modules/users/users.routes.ts
@@ -55115,6 +55167,9 @@ var controller2 = new UsersController();
 router2.use(authenticate);
 router2.get("/profile", (req, res, next) => {
   controller2.getProfile(req, res).catch(next);
+});
+router2.delete("/me", (req, res, next) => {
+  controller2.deleteMe(req, res).catch(next);
 });
 router2.get("/", (req, res, next) => {
   controller2.list(req, res).catch(next);

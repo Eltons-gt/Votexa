@@ -44,4 +44,9 @@ export class AuthController {
   async logout(_req: Request, res: Response): Promise<void> {
     sendSuccess(res, { message: 'Logged out successfully' }, undefined, 200, _req.requestId);
   }
+
+  async deleteAccount(req: Request, res: Response): Promise<void> {
+    const result = await authService.deleteAccount(req.user!.id);
+    sendSuccess(res, result, undefined, 200, req.requestId);
+  }
 }

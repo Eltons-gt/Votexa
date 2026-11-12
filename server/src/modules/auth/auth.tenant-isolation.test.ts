@@ -279,5 +279,40 @@ describe('Votexa Authentication & Multi-Tenant Isolation Security Suite', () => 
       expect(error.statusCode).toBe(400);
     });
   });
+
+  // 7. Account Deletion and Self-Service Controls
+  describe('7. Account Deletion & Safety Constraints', () => {
+    it('should protect platform root super admin accounts from accidental self-deletion', async () => {
+      await expect(
+        authService.deleteAccount('usr-admin-super')
+      ).rejects.toThrowError('Platform Super Administrator account cannot be deleted');
+
+      await expect(
+        authService.deleteAccount('usr-chunegeorge-superadmin')
+      ).rejects.toThrowError('Platform Super Administrator account cannot be deleted');
+    });
+
+    it('should allow regular users to permanently delete their account', async () => {
+      const email = `delete_me_${Date.now()}@domain.edu`;
+      const registered = await authService.register({
+        email,
+        password: 'SecurePassword123!',
+        fullName: 'Ephemeral User'
+      });
+
+      expect(registered.user.id).toBeDefined();
+
+      const deleteRes = await authService.deleteAccount(registered.user.id);
+      expect(deleteRes.success).toBe(true);
+
+      // Attempting to log back in should fail
+      await expect(
+        authService.login({
+          email,
+          password: 'SecurePassword123!'
+        })
+      ).rejects.toThrowError('Invalid email or password');
+    });
+  });
 });
 
