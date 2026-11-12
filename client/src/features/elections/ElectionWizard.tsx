@@ -124,7 +124,12 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
       if (res.success && res.data) {
         onCreated(res.data);
       } else {
-        setError(res.error?.message || 'Failed to create draft election. Please check your session and organization permissions.');
+        const isClientFallback = localStorage.getItem('votexa_auth_token')?.startsWith('token-client-');
+        if (res.error?.code === 'UNAUTHORIZED' && isClientFallback) {
+          setError('Your session was created while the API was offline and is not synced to the server. Please log out and sign in or create your account again.');
+        } else {
+          setError(res.error?.message || 'Failed to create election. Please check your session and organization permissions.');
+        }
       }
     } catch (err) {
       setError((err as Error).message || 'Failed to create election');
@@ -458,7 +463,7 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
       {/* STEP 4: REVIEW & CONFIRM */}
       {step === 4 && (
         <Card className="p-6 space-y-4">
-          <h3 className="text-base font-bold">Review & Initialize Draft Election</h3>
+          <h3 className="text-base font-bold">Review & Create Election</h3>
 
           <div className="bg-muted/40 p-4 rounded-xl border space-y-2 text-xs">
             <div className="flex justify-between border-b pb-2">
@@ -488,7 +493,7 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            Once created, you will be directed to the Election Workspace to configure positions, candidates, and voter rolls before scheduling.
+            Newly created elections start in <strong>DRAFT</strong> status so you can add positions, candidates, and voter rolls in the Election Workspace before clicking <strong>Open Polls Now</strong> or <strong>Schedule Election</strong>.
           </p>
         </Card>
       )}
@@ -517,7 +522,7 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
         ) : (
           <Button size="sm" onClick={handleCreate} disabled={loading} className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
             <CheckCircle2 className="h-4 w-4" />
-            {loading ? 'Initializing Workspace...' : 'Create Draft Election'}
+            {loading ? 'Creating Election...' : 'Create Election'}
           </Button>
         )}
       </div>

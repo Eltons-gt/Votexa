@@ -1,3 +1,4 @@
+import { createRequire as __createRequire } from 'module'; const require = __createRequire(import.meta.url);
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -64945,21 +64946,56 @@ function createApp() {
 // server/src/serverless.ts
 var app = createApp();
 function handler(req, res) {
-  const matchedPath = req.headers["x-matched-path"] || req.headers["x-now-route-matches"] || req.originalUrl;
-  if (matchedPath && matchedPath.startsWith("/") && req.url === "/api") {
-    req.url = matchedPath;
-  }
-  if (req.url === "/health" || req.url === "/api/health" || req.url === "/api/v1/health") {
-    return res.status(200).json({
-      success: true,
-      data: {
-        status: "UP",
-        environment: process.env.NODE_ENV || "production",
-        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  try {
+    if (req.url === "/api" || req.url?.startsWith("/api?")) {
+      const matchedPath = req.headers["x-matched-path"];
+      const nowMatches = req.headers["x-now-route-matches"];
+      const origUrl = req.originalUrl;
+      if (matchedPath && matchedPath.startsWith("/") && matchedPath !== "/api") {
+        req.url = matchedPath;
+      } else if (origUrl && origUrl.startsWith("/") && origUrl !== "/api") {
+        req.url = origUrl;
+      } else if (nowMatches) {
+        const params = new URLSearchParams(nowMatches);
+        const captured = params.get("1");
+        if (captured) {
+          req.url = `/api/${captured.replace(/^\/+/, "")}`;
+        }
       }
-    });
+    }
+    if (req.url === "/health" || req.url === "/api/health" || req.url === "/api/v1/health") {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(
+        JSON.stringify({
+          success: true,
+          data: {
+            status: "UP",
+            environment: process.env.NODE_ENV || "production",
+            timestamp: (/* @__PURE__ */ new Date()).toISOString()
+          }
+        })
+      );
+      return;
+    }
+    return app(req, res);
+  } catch (err) {
+    console.error("[SERVERLESS_HANDLER_ERROR]", err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: "SERVERLESS_ERROR",
+            message: "Internal server error handling request"
+          },
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        })
+      );
+    }
   }
-  return app(req, res);
 }
 export {
   handler as default
