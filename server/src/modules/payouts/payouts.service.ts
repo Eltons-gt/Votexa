@@ -176,7 +176,7 @@ export class PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query('BEGIN');
 
         await client.query(
@@ -608,7 +608,7 @@ export class PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO organization_payout_accounts (
             id, organization_id, method, account_name, account_identifier,
@@ -647,7 +647,7 @@ export class PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM organization_payout_accounts WHERE organization_id = $1 ORDER BY is_default DESC, created_at DESC`,
           [organizationId]

@@ -67,7 +67,7 @@ export class VotingPackagesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM voting_packages
            WHERE election_id = $1 AND organization_id = $2 AND is_active = TRUE
@@ -134,7 +134,7 @@ export class VotingPackagesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO voting_packages (
             id, organization_id, election_id, name, credits,

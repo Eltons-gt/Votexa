@@ -131,7 +131,7 @@ export class MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO payment_transactions (
             id, organization_id, election_id, package_id, voter_code,
@@ -184,7 +184,7 @@ export class MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM payment_transactions WHERE (id = $1 OR checkout_request_id = $1) AND organization_id = $2`,
           [paymentId, organizationId]
@@ -560,7 +560,7 @@ export class MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = 'SELECT * FROM payment_transactions WHERE organization_id = $1';
         const params: unknown[] = [organizationId];
 

@@ -87,7 +87,7 @@ export class VotingService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query('BEGIN');
 
         await client.query(

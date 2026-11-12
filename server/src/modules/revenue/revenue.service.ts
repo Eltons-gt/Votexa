@@ -264,7 +264,7 @@ export class RevenueService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [paymentTransaction.organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [paymentTransaction.organizationId]);
         await client.query(
           `INSERT INTO revenue_allocations (
             id, payment_transaction_id, organization_id, election_id,
@@ -432,7 +432,7 @@ export class RevenueService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM revenue_allocations WHERE organization_id = $1 ORDER BY allocated_at DESC`,
           [organizationId]

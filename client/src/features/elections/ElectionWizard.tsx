@@ -121,8 +121,10 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
 
     try {
       const res = await apiClient.post<Election>('/elections', payload);
-      if (res.data) {
+      if (res.success && res.data) {
         onCreated(res.data);
+      } else {
+        setError(res.error?.message || 'Failed to create draft election. Please check your session and organization permissions.');
       }
     } catch (err) {
       setError((err as Error).message || 'Failed to create election');
@@ -489,6 +491,13 @@ export function ElectionWizard({ onCreated, onCancel }: ElectionWizardProps) {
             Once created, you will be directed to the Election Workspace to configure positions, candidates, and voter rolls before scheduling.
           </p>
         </Card>
+      )}
+
+      {error && (
+        <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
       )}
 
       {/* Wizard Footer Controls */}

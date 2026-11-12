@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   ElectionPosition,
   CreatePositionRequest,
@@ -84,7 +85,7 @@ export class PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT p.*, COUNT(c.id)::int as candidates_count
            FROM election_positions p
@@ -140,7 +141,7 @@ export class PositionsService {
       );
     }
 
-    const posId = `pos-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const posId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     const newPosition: ElectionPosition = {
@@ -159,7 +160,7 @@ export class PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO election_positions (
             id, election_id, organization_id, title, description,
@@ -225,7 +226,7 @@ export class PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE election_positions SET
             title = $1, description = $2, min_selections = $3,
@@ -266,7 +267,7 @@ export class PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `DELETE FROM election_positions WHERE id = $1 AND election_id = $2 AND organization_id = $3`,
           [positionId, electionId, organizationId]

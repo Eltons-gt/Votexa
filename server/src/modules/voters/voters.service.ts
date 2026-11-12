@@ -105,7 +105,7 @@ export class VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = `
           SELECT * FROM voters
           WHERE election_id = $1 AND organization_id = $2
@@ -173,7 +173,7 @@ export class VotersService {
       throw new AppError('A voter with this code or email is already registered', 409, 'DUPLICATE_VOTER');
     }
 
-    const voterId = `vtr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const voterId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     const newVoter: Voter = {
@@ -195,7 +195,7 @@ export class VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO voters (
             id, organization_id, election_id, voter_code, email, phone,
@@ -264,7 +264,7 @@ export class VotersService {
       }
 
       const voter: Voter = {
-        id: `vtr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        id: crypto.randomUUID(),
         organizationId,
         electionId,
         voterCode: code,
@@ -288,7 +288,7 @@ export class VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         for (const v of imported) {
           await client.query(
             `INSERT INTO voters (
@@ -479,7 +479,7 @@ export class VotersService {
     for (const v of targetVoters) {
       const token = `inv-${crypto.randomBytes(16).toString('hex')}`;
       const invite: ElectionInvitation = {
-        id: `invite-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        id: crypto.randomUUID(),
         electionId,
         organizationId,
         email: v.email!,
@@ -496,7 +496,7 @@ export class VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         for (const inv of invites) {
           await client.query(
             `INSERT INTO election_invitations (

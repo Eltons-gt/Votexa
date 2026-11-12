@@ -20278,14 +20278,14 @@ var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports, module) {
     "use strict";
     module.exports = etag;
-    var crypto19 = __require("crypto");
+    var crypto22 = __require("crypto");
     var Stats = __require("fs").Stats;
     var toString = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
       }
-      var hash = crypto19.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var hash = crypto22.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
       var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
       return '"' + len.toString(16) + "-" + hash + '"';
     }
@@ -23194,11 +23194,11 @@ var require_request = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports) {
-    var crypto19 = __require("crypto");
+    var crypto22 = __require("crypto");
     exports.sign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Cookie value must be provided as a string.");
       if (null == secret) throw new TypeError("Secret key must be provided.");
-      return val + "." + crypto19.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+      return val + "." + crypto22.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
     };
     exports.unsign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Signed cookie string must be provided.");
@@ -23207,7 +23207,7 @@ var require_cookie_signature = __commonJS({
       return sha1(mac) == sha1(val) ? str : false;
     };
     function sha1(str) {
-      return crypto19.createHash("sha1").update(str).digest("hex");
+      return crypto22.createHash("sha1").update(str).digest("hex");
     }
   }
 });
@@ -24527,7 +24527,7 @@ var require_main = __commonJS({
     var fs = __require("fs");
     var path = __require("path");
     var os = __require("os");
-    var crypto19 = __require("crypto");
+    var crypto22 = __require("crypto");
     var packageJson = require_package();
     var version3 = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
@@ -24746,7 +24746,7 @@ var require_main = __commonJS({
       const authTag = ciphertext.subarray(-16);
       ciphertext = ciphertext.subarray(12, -16);
       try {
-        const aesgcm = crypto19.createDecipheriv("aes-256-gcm", key, nonce);
+        const aesgcm = crypto22.createDecipheriv("aes-256-gcm", key, nonce);
         aesgcm.setAuthTag(authTag);
         return `${aesgcm.update(ciphertext)}${aesgcm.final()}`;
       } catch (error) {
@@ -26464,7 +26464,7 @@ var require_cert_signatures = __commonJS({
 var require_sasl = __commonJS({
   "node_modules/pg/lib/crypto/sasl.js"(exports, module) {
     "use strict";
-    var crypto19 = require_utils4();
+    var crypto22 = require_utils4();
     var { signatureAlgorithmHashFromCertificate } = require_cert_signatures();
     function saslprep(password) {
       const nonAsciiSpace = /[\u00A0\u1680\u2000-\u200B\u202F\u205F\u3000]/g;
@@ -26482,7 +26482,7 @@ var require_sasl = __commonJS({
       if (mechanism === "SCRAM-SHA-256-PLUS" && typeof stream.getPeerCertificate !== "function") {
         throw new Error("SASL: Mechanism SCRAM-SHA-256-PLUS requires a certificate");
       }
-      const clientNonce = crypto19.randomBytes(18).toString("base64");
+      const clientNonce = crypto22.randomBytes(18).toString("base64");
       const gs2Header = mechanism === "SCRAM-SHA-256-PLUS" ? "p=tls-server-end-point" : stream ? "y" : "n";
       return {
         mechanism,
@@ -26524,20 +26524,20 @@ var require_sasl = __commonJS({
         const peerCert = stream.getPeerCertificate().raw;
         let hashName = signatureAlgorithmHashFromCertificate(peerCert);
         if (hashName === "MD5" || hashName === "SHA-1") hashName = "SHA-256";
-        const certHash = await crypto19.hashByName(hashName, peerCert);
+        const certHash = await crypto22.hashByName(hashName, peerCert);
         const bindingData = Buffer.concat([Buffer.from("p=tls-server-end-point,,"), Buffer.from(certHash)]);
         channelBinding = bindingData.toString("base64");
       }
       const clientFinalMessageWithoutProof = "c=" + channelBinding + ",r=" + sv.nonce;
       const authMessage = clientFirstMessageBare + "," + serverFirstMessage + "," + clientFinalMessageWithoutProof;
       const saltBytes = Buffer.from(sv.salt, "base64");
-      const saltedPassword = await crypto19.deriveKey(saslprep(password), saltBytes, sv.iteration);
-      const clientKey = await crypto19.hmacSha256(saltedPassword, "Client Key");
-      const storedKey = await crypto19.sha256(clientKey);
-      const clientSignature = await crypto19.hmacSha256(storedKey, authMessage);
+      const saltedPassword = await crypto22.deriveKey(saslprep(password), saltBytes, sv.iteration);
+      const clientKey = await crypto22.hmacSha256(saltedPassword, "Client Key");
+      const storedKey = await crypto22.sha256(clientKey);
+      const clientSignature = await crypto22.hmacSha256(storedKey, authMessage);
       const clientProof = xorBuffers(Buffer.from(clientKey), Buffer.from(clientSignature)).toString("base64");
-      const serverKey = await crypto19.hmacSha256(saltedPassword, "Server Key");
-      const serverSignatureBytes = await crypto19.hmacSha256(serverKey, authMessage);
+      const serverKey = await crypto22.hmacSha256(saltedPassword, "Server Key");
+      const serverSignatureBytes = await crypto22.hmacSha256(serverKey, authMessage);
       session.message = "SASLResponse";
       session.serverSignature = Buffer.from(serverSignatureBytes).toString("base64");
       session.response = clientFinalMessageWithoutProof + ",p=" + clientProof;
@@ -28776,7 +28776,7 @@ var require_client = __commonJS({
     var Query2 = require_query2();
     var defaults2 = require_defaults();
     var Connection2 = require_connection();
-    var crypto19 = require_utils4();
+    var crypto22 = require_utils4();
     var activeQueryDeprecationNotice = nodeUtils.deprecate(
       () => {
       },
@@ -29031,7 +29031,7 @@ var require_client = __commonJS({
       _handleAuthMD5Password(msg) {
         this._getPassword(async () => {
           try {
-            const hashedPassword = await crypto19.postgresMd5PasswordHash(this.user, this.password, msg.salt);
+            const hashedPassword = await crypto22.postgresMd5PasswordHash(this.user, this.password, msg.salt);
             this.connection.password(hashedPassword);
           } catch (e) {
             this.emit("error", e);
@@ -38227,9 +38227,9 @@ var require_helpers = __commonJS({
           throw new Error("Invalid alg claim");
       }
     }
-    var UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    var UUID_REGEX2 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     function validateUUID(str) {
-      if (!UUID_REGEX.test(str)) {
+      if (!UUID_REGEX2.test(str)) {
         throw new Error("@supabase/auth-js: Expected parameter to be UUID but is not");
       }
     }
@@ -55537,6 +55537,9 @@ init_apiResponse();
 init_dist();
 init_apiResponse();
 init_db();
+import crypto5 from "crypto";
+var UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+var toUuidOrNull = (val) => val && UUID_REGEX.test(val) ? val : null;
 var ElectionsService = class _ElectionsService {
   static localElections = /* @__PURE__ */ new Map();
   static localSettings = /* @__PURE__ */ new Map();
@@ -55655,7 +55658,7 @@ var ElectionsService = class _ElectionsService {
       const client = await pool.connect();
       try {
         if (organizationId) {
-          await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+          await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         }
         let query = `
           SELECT e.*, 
@@ -55707,7 +55710,7 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT e.*, row_to_json(s.*) as settings
            FROM elections e
@@ -55782,7 +55785,7 @@ var ElectionsService = class _ElectionsService {
     } else if (category === ElectionCategory.PAID_COMPETITION) {
       isPaidVoting = true;
     }
-    const electionId = `elec-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const electionId = crypto5.randomUUID();
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const newElection = {
       id: electionId,
@@ -55801,7 +55804,7 @@ var ElectionsService = class _ElectionsService {
       updatedAt: now
     };
     const newSettings = {
-      id: `set-${electionId}`,
+      id: crypto5.randomUUID(),
       electionId,
       organizationId,
       resultsVisibility: req.settings?.resultsVisibility || (category === ElectionCategory.PAID_COMPETITION ? ResultsVisibility.LIVE : ResultsVisibility.AFTER_CLOSE),
@@ -55819,8 +55822,8 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
         await client.query("BEGIN");
+        await client.query("SELECT set_config('app.current_organization_id', $1, true)", [organizationId]);
         await client.query(
           `INSERT INTO elections (
             id, organization_id, category, title, description, status,
@@ -55839,7 +55842,7 @@ var ElectionsService = class _ElectionsService {
             newElection.timezone,
             newElection.allowSelfRegistration,
             newElection.isPaidVoting,
-            newElection.createdById,
+            toUuidOrNull(newElection.createdById),
             newElection.createdAt,
             newElection.updatedAt
           ]
@@ -55877,7 +55880,7 @@ var ElectionsService = class _ElectionsService {
           [
             electionId,
             organizationId,
-            userId,
+            toUuidOrNull(userId),
             "ELECTION_CREATED",
             JSON.stringify(newElection),
             "Initial creation of election workspace"
@@ -55963,7 +55966,7 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE elections SET
             title = $1, description = $2, category = $3,
@@ -56083,7 +56086,7 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE election_settings SET
             results_visibility = $1, allow_multiple_votes = $2,
@@ -56174,7 +56177,7 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE elections SET status = $1, updated_at = $2 WHERE id = $3 AND organization_id = $4`,
           [targetStatus, now, electionId, organizationId]
@@ -56221,7 +56224,7 @@ var ElectionsService = class _ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM election_audit_logs WHERE election_id = $1 ORDER BY created_at DESC`,
           [electionId]
@@ -56277,6 +56280,7 @@ var electionsService = new ElectionsService();
 // server/src/modules/elections/positions.service.ts
 init_apiResponse();
 init_db();
+import crypto6 from "crypto";
 var PositionsService = class _PositionsService {
   static localPositions = /* @__PURE__ */ new Map();
   constructor() {
@@ -56345,7 +56349,7 @@ var PositionsService = class _PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT p.*, COUNT(c.id)::int as candidates_count
            FROM election_positions p
@@ -56391,7 +56395,7 @@ var PositionsService = class _PositionsService {
         "INVALID_SELECTION_RANGE"
       );
     }
-    const posId = `pos-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const posId = crypto6.randomUUID();
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const newPosition = {
       id: posId,
@@ -56408,7 +56412,7 @@ var PositionsService = class _PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO election_positions (
             id, election_id, organization_id, title, description,
@@ -56462,7 +56466,7 @@ var PositionsService = class _PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE election_positions SET
             title = $1, description = $2, min_selections = $3,
@@ -56500,7 +56504,7 @@ var PositionsService = class _PositionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `DELETE FROM election_positions WHERE id = $1 AND election_id = $2 AND organization_id = $3`,
           [positionId, electionId, organizationId]
@@ -56684,6 +56688,7 @@ init_apiResponse();
 init_dist();
 init_apiResponse();
 init_db();
+import crypto7 from "crypto";
 var CandidatesService = class _CandidatesService {
   static localCandidates = /* @__PURE__ */ new Map();
   constructor() {
@@ -56796,7 +56801,7 @@ var CandidatesService = class _CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = `
           SELECT * FROM candidates
           WHERE election_id = $1 AND organization_id = $2
@@ -56853,7 +56858,7 @@ var CandidatesService = class _CandidatesService {
         "INVALID_POSITION_FOR_ELECTION"
       );
     }
-    const candId = `cand-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const candId = crypto7.randomUUID();
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const newCandidate = {
       id: candId,
@@ -56873,7 +56878,7 @@ var CandidatesService = class _CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO candidates (
             id, election_id, organization_id, position_id, name,
@@ -56938,7 +56943,7 @@ var CandidatesService = class _CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE candidates SET
             position_id = $1, name = $2, bio = $3, avatar_url = $4,
@@ -56979,7 +56984,7 @@ var CandidatesService = class _CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `DELETE FROM candidates WHERE id = $1 AND election_id = $2 AND organization_id = $3`,
           [candidateId, electionId, organizationId]
@@ -57092,7 +57097,7 @@ init_apiResponse();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto5 from "crypto";
+import crypto8 from "crypto";
 var VotersService = class _VotersService {
   static localVoters = /* @__PURE__ */ new Map();
   static localInvitations = /* @__PURE__ */ new Map();
@@ -57171,7 +57176,7 @@ var VotersService = class _VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = `
           SELECT * FROM voters
           WHERE election_id = $1 AND organization_id = $2
@@ -57223,7 +57228,7 @@ var VotersService = class _VotersService {
     if (existing.some((v) => v.voterCode === voterCode || req.email && v.email === req.email)) {
       throw new AppError("A voter with this code or email is already registered", 409, "DUPLICATE_VOTER");
     }
-    const voterId = `vtr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const voterId = crypto8.randomUUID();
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const newVoter = {
       id: voterId,
@@ -57243,7 +57248,7 @@ var VotersService = class _VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO voters (
             id, organization_id, election_id, voter_code, email, phone,
@@ -57301,7 +57306,7 @@ var VotersService = class _VotersService {
         continue;
       }
       const voter = {
-        id: `vtr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        id: crypto8.randomUUID(),
         organizationId,
         electionId,
         voterCode: code,
@@ -57322,7 +57327,7 @@ var VotersService = class _VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         for (const v of imported) {
           await client.query(
             `INSERT INTO voters (
@@ -57468,9 +57473,9 @@ var VotersService = class _VotersService {
     const invites = [];
     const expiresAt = new Date(Date.now() + 864e5 * 7).toISOString();
     for (const v of targetVoters) {
-      const token = `inv-${crypto5.randomBytes(16).toString("hex")}`;
+      const token = `inv-${crypto8.randomBytes(16).toString("hex")}`;
       const invite = {
-        id: `invite-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        id: crypto8.randomUUID(),
         electionId,
         organizationId,
         email: v.email,
@@ -57486,7 +57491,7 @@ var VotersService = class _VotersService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         for (const inv of invites) {
           await client.query(
             `INSERT INTO election_invitations (
@@ -57692,7 +57697,7 @@ init_dist();
 
 // server/src/modules/voting/voting.crypto.ts
 init_config();
-import crypto6 from "crypto";
+import crypto9 from "crypto";
 var VotingCrypto = class {
   static SECRET_SALT = config.jwt.secret || "votexa-crypto-ballot-salt-key";
   /**
@@ -57701,7 +57706,7 @@ var VotingCrypto = class {
    * while providing a tamper-evident audit proof that the ballot belonged to a legitimate voter.
    */
   static computeVoterHash(voterCode, electionId) {
-    return crypto6.createHmac("sha256", this.SECRET_SALT).update(`${electionId}:${voterCode.trim().toUpperCase()}`).digest("hex");
+    return crypto9.createHmac("sha256", this.SECRET_SALT).update(`${electionId}:${voterCode.trim().toUpperCase()}`).digest("hex");
   }
   /**
    * Generates a tamper-evident cryptographic receipt for the voter.
@@ -57715,7 +57720,7 @@ var VotingCrypto = class {
       selections: selections.sort((a, b) => a.questionId.localeCompare(b.questionId)),
       castAt
     });
-    const encryptedPayload = crypto6.createHmac("sha256", this.SECRET_SALT).update(rawPayload).digest("hex");
+    const encryptedPayload = crypto9.createHmac("sha256", this.SECRET_SALT).update(rawPayload).digest("hex");
     const shortDigest = encryptedPayload.substring(0, 16).toUpperCase();
     const receiptCode = `VTX-${shortDigest.slice(0, 4)}-${shortDigest.slice(4, 8)}-${shortDigest.slice(8, 12)}-${shortDigest.slice(12, 16)}`;
     return {
@@ -57751,7 +57756,7 @@ init_db();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto7 from "crypto";
+import crypto10 from "crypto";
 
 // server/src/modules/voting/voter-wallet.service.ts
 init_dist();
@@ -57819,7 +57824,7 @@ var VoterWalletService = class _VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let res = await client.query(
           `SELECT * FROM voter_wallets WHERE election_id = $1 AND voter_code = $2`,
           [electionId, normalizedCode]
@@ -57921,7 +57926,7 @@ var VoterWalletService = class _VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query("BEGIN");
         await client.query(
           `UPDATE voter_wallets SET credits_balance = credits_balance + $1, updated_at = $2 WHERE id = $3`,
@@ -57988,7 +57993,7 @@ var VoterWalletService = class _VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query("BEGIN");
         const walletRes = await client.query(
           `SELECT credits_balance FROM voter_wallets WHERE id = $1 FOR UPDATE`,
@@ -58152,7 +58157,7 @@ var VoteAuthorizationService = class _VoteAuthorizationService {
       try {
         const client = await pool.connect();
         try {
-          await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+          await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
           const checkRes = await client.query(
             `SELECT id FROM vote_authorizations 
              WHERE election_id = $1 AND position_id = $2 AND voter_hash = $3 AND is_used = TRUE`,
@@ -58173,7 +58178,7 @@ var VoteAuthorizationService = class _VoteAuthorizationService {
       }
     } else if (election.category === ElectionCategory.PAID_COMPETITION) {
       const txDesc = `Authorized ${creditsRequested} vote(s) for position: ${position.title}`;
-      const authRef = `AUTH-REQ-${crypto7.randomBytes(4).toString("hex").toUpperCase()}`;
+      const authRef = `AUTH-REQ-${crypto10.randomBytes(4).toString("hex").toUpperCase()}`;
       await voterWalletService.consumeCredits(
         organizationId,
         electionId,
@@ -58183,8 +58188,8 @@ var VoteAuthorizationService = class _VoteAuthorizationService {
         txDesc
       );
     }
-    const rawToken = `AUTH-${crypto7.randomBytes(24).toString("hex").toUpperCase()}`;
-    const tokenHash = crypto7.createHash("sha256").update(rawToken).digest("hex");
+    const rawToken = `AUTH-${crypto10.randomBytes(24).toString("hex").toUpperCase()}`;
+    const tokenHash = crypto10.createHash("sha256").update(rawToken).digest("hex");
     const authId = `auth-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1e3).toISOString();
     const now = (/* @__PURE__ */ new Date()).toISOString();
@@ -58205,7 +58210,7 @@ var VoteAuthorizationService = class _VoteAuthorizationService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO vote_authorizations (
             id, organization_id, election_id, position_id, token_hash, voter_hash,
@@ -58249,7 +58254,7 @@ var VoteAuthorizationService = class _VoteAuthorizationService {
       throw new AppError("Vote authorization token is required", 400, "TOKEN_REQUIRED");
     }
     const cleanToken = rawToken.trim();
-    const tokenHash = crypto7.createHash("sha256").update(cleanToken).digest("hex");
+    const tokenHash = crypto10.createHash("sha256").update(cleanToken).digest("hex");
     const now = /* @__PURE__ */ new Date();
     try {
       const client = await pool.connect();
@@ -58375,7 +58380,7 @@ var VotingService = class _VotingService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query("BEGIN");
         await client.query(
           `INSERT INTO votes (
@@ -58683,7 +58688,7 @@ var VotingPackagesService = class _VotingPackagesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM voting_packages
            WHERE election_id = $1 AND organization_id = $2 AND is_active = TRUE
@@ -58738,7 +58743,7 @@ var VotingPackagesService = class _VotingPackagesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO voting_packages (
             id, organization_id, election_id, name, credits,
@@ -58797,7 +58802,7 @@ var votingPackagesService = new VotingPackagesService();
 
 // server/src/modules/voting/mock-payment.service.ts
 init_apiResponse();
-import crypto8 from "crypto";
+import crypto11 from "crypto";
 var MockPaymentService = class {
   /**
    * Process a development-only mock payment and credit the voter's election wallet.
@@ -58812,7 +58817,7 @@ var MockPaymentService = class {
     if (!pkg.isActive) {
       throw new AppError("This voting package is not currently available", 400, "PACKAGE_INACTIVE");
     }
-    const mockRef = `MOCK-PAY-${crypto8.randomBytes(4).toString("hex").toUpperCase()}-${crypto8.randomBytes(4).toString("hex").toUpperCase()}`;
+    const mockRef = `MOCK-PAY-${crypto11.randomBytes(4).toString("hex").toUpperCase()}-${crypto11.randomBytes(4).toString("hex").toUpperCase()}`;
     const desc = `[DEV SIMULATED] Purchased ${pkg.name} (${pkg.credits} credits @ $${(pkg.priceCents / 100).toFixed(2)})`;
     const { wallet, transaction } = await voterWalletService.addCredits(
       organizationId,
@@ -59318,7 +59323,7 @@ var paymentsService = new PaymentsService();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto11 from "crypto";
+import crypto14 from "crypto";
 
 // server/src/modules/payments/mpesa.client.ts
 init_config();
@@ -59578,13 +59583,13 @@ var mpesaClient = new MpesaClient();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto10 from "crypto";
+import crypto13 from "crypto";
 
 // server/src/modules/financial-ledger/financial-ledger.service.ts
 init_dist();
 init_apiResponse();
 init_db();
-import crypto9 from "crypto";
+import crypto12 from "crypto";
 var FinancialLedgerService = class _FinancialLedgerService {
   // In-memory fallback stores for test and offline execution
   static localAccounts = /* @__PURE__ */ new Map();
@@ -59617,7 +59622,7 @@ var FinancialLedgerService = class _FinancialLedgerService {
           [normOrgId, accountType, normCurrency]
         );
         if (res.rows.length === 0) {
-          const newId = `acc-${Date.now()}-${crypto9.randomBytes(3).toString("hex")}`;
+          const newId = `acc-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
           const now = (/* @__PURE__ */ new Date()).toISOString();
           res = await client.query(
             `INSERT INTO financial_accounts (
@@ -59636,7 +59641,7 @@ var FinancialLedgerService = class _FinancialLedgerService {
       let acc = _FinancialLedgerService.localAccounts.get(key);
       if (!acc) {
         acc = {
-          id: `acc-${Date.now()}-${crypto9.randomBytes(3).toString("hex")}`,
+          id: `acc-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`,
           organizationId: normOrgId || void 0,
           type: accountType,
           currency: normCurrency,
@@ -59688,7 +59693,7 @@ var FinancialLedgerService = class _FinancialLedgerService {
         "LEDGER_UNBALANCED"
       );
     }
-    const entryGroupId = `grp-${Date.now()}-${crypto9.randomBytes(4).toString("hex")}`;
+    const entryGroupId = `grp-${Date.now()}-${crypto12.randomBytes(4).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const createdRecords = [];
     try {
@@ -59726,7 +59731,7 @@ var FinancialLedgerService = class _FinancialLedgerService {
              WHERE id = $4`,
             [currentAvailable, currentReserved, now, entry.accountId]
           );
-          const entryId = `led-${Date.now()}-${crypto9.randomBytes(3).toString("hex")}`;
+          const entryId = `led-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
           const entryDesc = entry.description || description;
           const insertedRes = await client.query(
             `INSERT INTO financial_ledger_entries (
@@ -59795,7 +59800,7 @@ var FinancialLedgerService = class _FinancialLedgerService {
         }
         matchedAcc.updatedAt = now;
         const record = {
-          id: `led-${Date.now()}-${crypto9.randomBytes(3).toString("hex")}`,
+          id: `led-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`,
           entryGroupId,
           accountId: entry.accountId,
           organizationId: matchedAcc.organizationId,
@@ -60045,7 +60050,7 @@ var RevenueService = class _RevenueService {
       approvedDeductionCents,
       platformRate
     );
-    const allocationId = `rev-${Date.now()}-${crypto10.randomBytes(3).toString("hex")}`;
+    const allocationId = `rev-${Date.now()}-${crypto13.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const allocation = {
       id: allocationId,
@@ -60140,7 +60145,7 @@ var RevenueService = class _RevenueService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [paymentTransaction.organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [paymentTransaction.organizationId]);
         await client.query(
           `INSERT INTO revenue_allocations (
             id, payment_transaction_id, organization_id, election_id,
@@ -60295,7 +60300,7 @@ var RevenueService = class _RevenueService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM revenue_allocations WHERE organization_id = $1 ORDER BY allocated_at DESC`,
           [organizationId]
@@ -60414,7 +60419,7 @@ var MpesaService = class _MpesaService {
       accountReference: accountRef,
       transactionDesc: desc
     });
-    const paymentId = `pay-mpesa-${Date.now()}-${crypto11.randomBytes(3).toString("hex")}`;
+    const paymentId = `pay-mpesa-${Date.now()}-${crypto14.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const transaction = {
       id: paymentId,
@@ -60436,7 +60441,7 @@ var MpesaService = class _MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO payment_transactions (
             id, organization_id, election_id, package_id, voter_code,
@@ -60485,7 +60490,7 @@ var MpesaService = class _MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM payment_transactions WHERE (id = $1 OR checkout_request_id = $1) AND organization_id = $2`,
           [paymentId, organizationId]
@@ -60541,7 +60546,7 @@ var MpesaService = class _MpesaService {
       CallbackMetadata
     } = stkCallback;
     const now = (/* @__PURE__ */ new Date()).toISOString();
-    const eventId = `ev-${Date.now()}-${crypto11.randomBytes(3).toString("hex")}`;
+    const eventId = `ev-${Date.now()}-${crypto14.randomBytes(3).toString("hex")}`;
     try {
       const client = await pool.connect();
       try {
@@ -60774,7 +60779,7 @@ var MpesaService = class _MpesaService {
    * Helper: Record reconciliation discrepancy
    */
   async flagReconciliationDiscrepancy(paymentId, reason) {
-    const id = `rec-${Date.now()}-${crypto11.randomBytes(3).toString("hex")}`;
+    const id = `rec-${Date.now()}-${crypto14.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     try {
       const client = await pool.connect();
@@ -60804,7 +60809,7 @@ var MpesaService = class _MpesaService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = "SELECT * FROM payment_transactions WHERE organization_id = $1";
         const params = [organizationId];
         if (filter?.electionId) {
@@ -60873,13 +60878,13 @@ var mpesaService = new MpesaService();
 init_dist();
 init_db();
 init_apiResponse();
-import crypto13 from "crypto";
+import crypto16 from "crypto";
 
 // server/src/modules/payouts/payouts.service.ts
 init_dist();
 init_apiResponse();
 init_db();
-import crypto12 from "crypto";
+import crypto15 from "crypto";
 var PayoutsService = class _PayoutsService {
   static localPayouts = /* @__PURE__ */ new Map();
   static localReservations = /* @__PURE__ */ new Map();
@@ -60948,8 +60953,8 @@ var PayoutsService = class _PayoutsService {
     if (netAmountCents <= 0) {
       throw new AppError("Withdrawal amount must exceed the disbursement processing fee", 400, "AMOUNT_BELOW_FEE");
     }
-    const payoutId = `pot-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
-    const reservationId = `res-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
+    const payoutId = `pot-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`;
+    const reservationId = `res-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     await financialLedgerService.recordDoubleEntryBatch({
       organizationId,
@@ -60997,7 +61002,7 @@ var PayoutsService = class _PayoutsService {
       reservedAt: now
     };
     const auditLog = {
-      id: `aud-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`,
+      id: `aud-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`,
       payoutId,
       organizationId,
       performedBy: userId,
@@ -61010,7 +61015,7 @@ var PayoutsService = class _PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query("BEGIN");
         await client.query(
           `INSERT INTO organizer_payouts (
@@ -61314,7 +61319,7 @@ var PayoutsService = class _PayoutsService {
    * 7. Save Destination Payout Account
    */
   async savePayoutAccount(organizationId, req) {
-    const id = `pac-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
+    const id = `pac-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     let identifier = req.accountIdentifier.trim();
     if (req.method === PayoutMethod.MPESA_B2C) {
@@ -61336,7 +61341,7 @@ var PayoutsService = class _PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO organization_payout_accounts (
             id, organization_id, method, account_name, account_identifier,
@@ -61373,7 +61378,7 @@ var PayoutsService = class _PayoutsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM organization_payout_accounts WHERE organization_id = $1 ORDER BY is_default DESC, created_at DESC`,
           [organizationId]
@@ -61466,7 +61471,7 @@ var PayoutsService = class _PayoutsService {
     }
   }
   async recordAudit(payoutId, organizationId, performedBy, action, fromStatus, toStatus, notes) {
-    const id = `aud-${Date.now()}-${crypto12.randomBytes(3).toString("hex")}`;
+    const id = `aud-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const log = {
       id,
@@ -61705,7 +61710,7 @@ var MpesaB2CService = class _MpesaB2CService {
       occasion: `Payout-${payout.id.substring(0, 12)}`
     });
     const now = (/* @__PURE__ */ new Date()).toISOString();
-    const disbursementId = `b2c-${Date.now()}-${crypto13.randomBytes(3).toString("hex")}`;
+    const disbursementId = `b2c-${Date.now()}-${crypto16.randomBytes(3).toString("hex")}`;
     const record = {
       id: disbursementId,
       payoutId: payout.id,
@@ -62008,12 +62013,12 @@ var mpesaB2CService = new MpesaB2CService();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto15 from "crypto";
+import crypto18 from "crypto";
 
 // server/src/modules/payments/paystack.client.ts
 init_config();
 init_apiResponse();
-import crypto14 from "crypto";
+import crypto17 from "crypto";
 var PaystackClient = class {
   isSimulatedMode = false;
   constructor(options) {
@@ -62035,7 +62040,7 @@ var PaystackClient = class {
       throw new AppError("Email, amount, currency, and reference are required to initialize Paystack checkout", 400, "PAYSTACK_INVALID_PARAMS");
     }
     if (this.isSimulatedMode) {
-      const accessCode = `pstk_acc_${Date.now()}_${crypto14.randomBytes(4).toString("hex")}`;
+      const accessCode = `pstk_acc_${Date.now()}_${crypto17.randomBytes(4).toString("hex")}`;
       return {
         authorizationUrl: `https://checkout.paystack.com/${accessCode}`,
         accessCode,
@@ -62143,12 +62148,12 @@ var PaystackClient = class {
     if (!secret) {
       return config.env === "test" || this.isSimulatedMode;
     }
-    const expected = crypto14.createHmac("sha512", secret).update(rawBody).digest("hex");
+    const expected = crypto17.createHmac("sha512", secret).update(rawBody).digest("hex");
     if (expected.length !== signature.length) {
       return false;
     }
     try {
-      return crypto14.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+      return crypto17.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
     } catch {
       return false;
     }
@@ -62204,8 +62209,8 @@ var PaystackService = class _PaystackService {
     const customerEmail = email && email.includes("@") ? email.trim().toLowerCase() : `voter-${voterCode.toLowerCase().replace(/[^a-z0-9]/g, "")}@voter.votexa.io`;
     const txCurrency = (currency || pkg.currency || "KES").toUpperCase();
     const amountSubunit = pkg.priceCents;
-    const reference = `pstk_vtx_${Date.now()}_${crypto15.randomBytes(4).toString("hex")}`;
-    const paymentId = `pay-pstk-${Date.now()}-${crypto15.randomBytes(3).toString("hex")}`;
+    const reference = `pstk_vtx_${Date.now()}_${crypto18.randomBytes(4).toString("hex")}`;
+    const paymentId = `pay-pstk-${Date.now()}-${crypto18.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const initResult = await paystackClient.initializeTransaction({
       email: customerEmail,
@@ -62243,7 +62248,7 @@ var PaystackService = class _PaystackService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO payment_transactions (
             id, organization_id, election_id, package_id, voter_code,
@@ -62301,7 +62306,7 @@ var PaystackService = class _PaystackService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM payment_transactions WHERE (checkout_request_id = $1 OR gateway_reference = $1 OR id = $1) AND organization_id = $2`,
           [reference, organizationId]
@@ -62339,7 +62344,7 @@ var PaystackService = class _PaystackService {
         try {
           const client = await pool.connect();
           try {
-            await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+            await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
             await client.query(
               `UPDATE payment_transactions SET 
                 status = $1, credits_issued = TRUE, credits_issued_at = $2,
@@ -62503,7 +62508,7 @@ var PaystackService = class _PaystackService {
         try {
           const client = await pool.connect();
           try {
-            await client.query("SET LOCAL app.current_organization_id = $1", [tx.organizationId]);
+            await client.query("SELECT set_config('app.current_organization_id', $1, false)", [tx.organizationId]);
             await client.query(
               `UPDATE payment_transactions SET
                 status = $1, credits_issued = TRUE, credits_issued_at = $2,
@@ -62857,7 +62862,7 @@ init_apiResponse();
 init_dist();
 init_apiResponse();
 init_db();
-import crypto16 from "crypto";
+import crypto19 from "crypto";
 var RefundsService = class _RefundsService {
   static localRefunds = [];
   static localChargebacks = [];
@@ -62963,7 +62968,7 @@ var RefundsService = class _RefundsService {
       description: `Refund reversal for payment ${paymentTransactionId}: ${reason}`,
       entries: reversalEntries
     });
-    const refundId = `ref-${Date.now()}-${crypto16.randomBytes(3).toString("hex")}`;
+    const refundId = `ref-${Date.now()}-${crypto19.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const refundRecord = {
       id: refundId,
@@ -62989,7 +62994,7 @@ var RefundsService = class _RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO refunds (
             id, payment_transaction_id, revenue_allocation_id, organization_id, election_id,
@@ -63070,7 +63075,7 @@ var RefundsService = class _RefundsService {
         }
       ]
     });
-    const chargebackId = `chb-${Date.now()}-${crypto16.randomBytes(3).toString("hex")}`;
+    const chargebackId = `chb-${Date.now()}-${crypto19.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const record = {
       id: chargebackId,
@@ -63088,7 +63093,7 @@ var RefundsService = class _RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO chargebacks (
             id, payment_transaction_id, revenue_allocation_id, organization_id,
@@ -63126,7 +63131,7 @@ var RefundsService = class _RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query("SET LOCAL app.current_organization_id = $1", [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM refunds WHERE organization_id = $1 ORDER BY created_at DESC`,
           [organizationId]
@@ -63751,7 +63756,7 @@ init_apiResponse();
 // server/src/modules/audit/audit.service.ts
 init_dist();
 init_db();
-import crypto17 from "crypto";
+import crypto20 from "crypto";
 var AuditService = class _AuditService {
   // In-memory stores for unit testing and offline environments
   static localAuditLogs = [];
@@ -63801,7 +63806,7 @@ var AuditService = class _AuditService {
    * 1. Record an Immutable Platform Audit Log Entry
    */
   async recordAudit(params) {
-    const id = `aud-${Date.now()}-${crypto17.randomBytes(3).toString("hex")}`;
+    const id = `aud-${Date.now()}-${crypto20.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const sanitizedBefore = params.beforeState ? this.sanitizeData(params.beforeState) : void 0;
     const sanitizedAfter = params.afterState ? this.sanitizeData(params.afterState) : void 0;
@@ -63860,7 +63865,7 @@ var AuditService = class _AuditService {
    * 2. Record a Security Event
    */
   async recordSecurityEvent(params) {
-    const id = `sec-${Date.now()}-${crypto17.randomBytes(3).toString("hex")}`;
+    const id = `sec-${Date.now()}-${crypto20.randomBytes(3).toString("hex")}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const severity = params.severity || SecurityEventSeverity.MEDIUM;
     const sanitizedDetails = params.details ? this.sanitizeData(params.details) : {};
@@ -64044,7 +64049,7 @@ init_apiResponse();
 init_dist();
 init_db();
 init_apiResponse();
-import crypto18 from "crypto";
+import crypto21 from "crypto";
 var AdminService = class _AdminService {
   // In-memory local stores for test mode and offline preview
   static localOrganizations = /* @__PURE__ */ new Map([
@@ -64386,7 +64391,7 @@ var AdminService = class _AdminService {
     const organiserRate = 1e4 - platformRateBasisPoints;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const record = {
-      id: `com-${Date.now()}-${crypto18.randomBytes(3).toString("hex")}`,
+      id: `com-${Date.now()}-${crypto21.randomBytes(3).toString("hex")}`,
       platformRateBasisPoints,
       organiserRateBasisPoints: organiserRate,
       updatedBy: adminUserId,

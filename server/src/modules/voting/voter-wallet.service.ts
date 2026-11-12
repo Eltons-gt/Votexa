@@ -82,7 +82,7 @@ export class VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         
         let res = await client.query(
           `SELECT * FROM voter_wallets WHERE election_id = $1 AND voter_code = $2`,
@@ -203,7 +203,7 @@ export class VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query('BEGIN');
 
         await client.query(
@@ -295,7 +295,7 @@ export class VoterWalletService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query('BEGIN');
 
         // Atomic row lock on wallet

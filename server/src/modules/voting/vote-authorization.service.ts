@@ -86,7 +86,7 @@ export class VoteAuthorizationService {
       try {
         const client = await pool.connect();
         try {
-          await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+          await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
           const checkRes = await client.query(
             `SELECT id FROM vote_authorizations 
              WHERE election_id = $1 AND position_id = $2 AND voter_hash = $3 AND is_used = TRUE`,
@@ -144,7 +144,7 @@ export class VoteAuthorizationService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO vote_authorizations (
             id, organization_id, election_id, position_id, token_hash, voter_hash,

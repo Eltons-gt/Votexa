@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   Candidate,
   CandidateStatus,
@@ -132,7 +133,7 @@ export class CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         let query = `
           SELECT * FROM candidates
           WHERE election_id = $1 AND organization_id = $2
@@ -202,7 +203,7 @@ export class CandidatesService {
       );
     }
 
-    const candId = `cand-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const candId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     const newCandidate: Candidate = {
@@ -224,7 +225,7 @@ export class CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO candidates (
             id, election_id, organization_id, position_id, name,
@@ -300,7 +301,7 @@ export class CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE candidates SET
             position_id = $1, name = $2, bio = $3, avatar_url = $4,
@@ -344,7 +345,7 @@ export class CandidatesService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `DELETE FROM candidates WHERE id = $1 AND election_id = $2 AND organization_id = $3`,
           [candidateId, electionId, organizationId]

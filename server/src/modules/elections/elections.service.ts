@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   Election,
   ElectionCategory,
@@ -11,6 +12,9 @@ import {
 } from '@votexa/shared';
 import { AppError } from '../../utils/apiResponse.js';
 import { pool } from '../../database/db.js';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const toUuidOrNull = (val?: string) => (val && UUID_REGEX.test(val) ? val : null);
 
 export class ElectionsService {
   private static localElections = new Map<string, Election>();
@@ -141,7 +145,7 @@ export class ElectionsService {
       const client = await pool.connect();
       try {
         if (organizationId) {
-          await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+          await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         }
         let query = `
           SELECT e.*, 
@@ -200,7 +204,7 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT e.*, row_to_json(s.*) as settings
            FROM elections e
@@ -294,7 +298,7 @@ export class ElectionsService {
       isPaidVoting = true;
     }
 
-    const electionId = `elec-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const electionId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     const newElection: Election = {
@@ -315,7 +319,7 @@ export class ElectionsService {
     };
 
     const newSettings: ElectionSettings = {
-      id: `set-${electionId}`,
+      id: crypto.randomUUID(),
       electionId,
       organizationId,
       resultsVisibility: req.settings?.resultsVisibility || (
@@ -346,8 +350,8 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
         await client.query('BEGIN');
+        await client.query("SELECT set_config('app.current_organization_id', $1, true)", [organizationId]);
 
         await client.query(
           `INSERT INTO elections (
@@ -367,7 +371,7 @@ export class ElectionsService {
             newElection.timezone,
             newElection.allowSelfRegistration,
             newElection.isPaidVoting,
-            newElection.createdById,
+            toUuidOrNull(newElection.createdById),
             newElection.createdAt,
             newElection.updatedAt
           ]
@@ -407,7 +411,7 @@ export class ElectionsService {
           [
             electionId,
             organizationId,
-            userId,
+            toUuidOrNull(userId),
             'ELECTION_CREATED',
             JSON.stringify(newElection),
             'Initial creation of election workspace'
@@ -517,7 +521,7 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE elections SET
             title = $1, description = $2, category = $3,
@@ -657,7 +661,7 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE election_settings SET
             results_visibility = $1, allow_multiple_votes = $2,
@@ -768,7 +772,7 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `UPDATE elections SET status = $1, updated_at = $2 WHERE id = $3 AND organization_id = $4`,
           [targetStatus, now, electionId, organizationId]
@@ -819,7 +823,7 @@ export class ElectionsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM election_audit_logs WHERE election_id = $1 ORDER BY created_at DESC`,
           [electionId]

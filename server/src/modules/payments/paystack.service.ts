@@ -126,7 +126,7 @@ export class PaystackService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO payment_transactions (
             id, organization_id, election_id, package_id, voter_code,
@@ -194,7 +194,7 @@ export class PaystackService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM payment_transactions WHERE (checkout_request_id = $1 OR gateway_reference = $1 OR id = $1) AND organization_id = $2`,
           [reference, organizationId]
@@ -242,7 +242,7 @@ export class PaystackService {
         try {
           const client = await pool.connect();
           try {
-            await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+            await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
             await client.query(
               `UPDATE payment_transactions SET 
                 status = $1, credits_issued = TRUE, credits_issued_at = $2,
@@ -438,7 +438,7 @@ export class PaystackService {
         try {
           const client = await pool.connect();
           try {
-            await client.query('SET LOCAL app.current_organization_id = $1', [tx.organizationId]);
+            await client.query("SELECT set_config('app.current_organization_id', $1, false)", [tx.organizationId]);
             await client.query(
               `UPDATE payment_transactions SET
                 status = $1, credits_issued = TRUE, credits_issued_at = $2,

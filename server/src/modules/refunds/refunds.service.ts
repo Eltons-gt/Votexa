@@ -188,7 +188,7 @@ export class RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO refunds (
             id, payment_transaction_id, revenue_allocation_id, organization_id, election_id,
@@ -301,7 +301,7 @@ export class RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         await client.query(
           `INSERT INTO chargebacks (
             id, payment_transaction_id, revenue_allocation_id, organization_id,
@@ -342,7 +342,7 @@ export class RefundsService {
     try {
       const client = await pool.connect();
       try {
-        await client.query('SET LOCAL app.current_organization_id = $1', [organizationId]);
+        await client.query("SELECT set_config('app.current_organization_id', $1, false)", [organizationId]);
         const res = await client.query(
           `SELECT * FROM refunds WHERE organization_id = $1 ORDER BY created_at DESC`,
           [organizationId]
