@@ -362,18 +362,26 @@ export function PaystackCheckoutModal({
             <div>
               <h4 className="font-bold text-base text-foreground">Complete Your Payment</h4>
               <p className="text-xs text-muted-foreground mt-1">
-                A secure checkout window was opened. If it didn't open automatically, click the button below.
+                A secure checkout session has been initialized. Click the button below to complete payment on Paystack.
               </p>
             </div>
 
             {authUrl && (
-              <Button
-                variant="outline"
-                onClick={() => window.open(authUrl, 'PaystackCheckout', 'width=500,height=680')}
-                className="w-full text-xs gap-1.5 border-blue-500/40 text-blue-600 hover:bg-blue-500/10"
-              >
-                <ExternalLink className="h-4 w-4" /> Open Payment Window
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={() => window.open(authUrl, '_blank', 'noopener,noreferrer')}
+                  className="w-full py-5 text-xs font-bold gap-2 bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/20"
+                >
+                  <ExternalLink className="h-4 w-4" /> Open Secure Paystack Checkout
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => { window.location.href = authUrl; }}
+                  className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-2"
+                >
+                  Or redirect directly to payment page &rarr;
+                </button>
+              </div>
             )}
 
             <div className="p-3 rounded-xl border border-border bg-muted/40 text-xs space-y-2">

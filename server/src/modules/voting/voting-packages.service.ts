@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   VotingPackage,
   ElectionCategory,
@@ -62,7 +63,7 @@ export class VotingPackagesService {
    * List active packages for an election.
    */
   async listPackages(organizationId: string, electionId: string): Promise<VotingPackage[]> {
-    await electionsService.getElectionById(organizationId, electionId);
+    const election = await electionsService.getElectionById(organizationId, electionId);
 
     try {
       const client = await pool.connect();
@@ -74,12 +75,90 @@ export class VotingPackagesService {
            ORDER BY price_cents ASC`,
           [electionId, organizationId]
         );
+
+        if (res.rows.length === 0 && (election.category === ElectionCategory.PAID_COMPETITION || election.isPaidVoting)) {
+          const unitPrice = 1000; // 1000 KES cents = KES 10
+          const curr = 'KES';
+          const defaultTiers = [
+            { name: 'Single Vote', credits: 1, priceCents: unitPrice },
+            { name: 'Supporter 5-Pack', credits: 5, priceCents: Math.round(unitPrice * 4.5) },
+            { name: 'Fan Supporter 10-Pack', credits: 10, priceCents: Math.round(unitPrice * 8.5) },
+            { name: 'Superfan 20-Pack', credits: 20, priceCents: Math.round(unitPrice * 16.0) }
+          ];
+
+          const seeded: VotingPackage[] = [];
+          for (const tier of defaultTiers) {
+            const pkgId = crypto.randomUUID();
+            const now = new Date().toISOString();
+            await client.query(
+              `INSERT INTO voting_packages (id, organization_id, election_id, name, credits, price_cents, currency, is_active, created_at, updated_at)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, $8, $8)`,
+              [pkgId, organizationId, electionId, tier.name, tier.credits, tier.priceCents, curr, now]
+            );
+            seeded.push({
+              id: pkgId,
+              organizationId,
+              electionId,
+              name: tier.name,
+              credits: tier.credits,
+              priceCents: tier.priceCents,
+              currency: curr,
+              isActive: true,
+              createdAt: now,
+              updatedAt: now
+            });
+          }
+          return seeded;
+        }
+
         return res.rows.map((r) => this.mapDbPackage(r));
       } finally {
         client.release();
       }
     } catch {
-      const list = VotingPackagesService.localPackages.get(electionId) || [];
+      let list = VotingPackagesService.localPackages.get(electionId) || [];
+      if (list.length === 0 && (election.category === ElectionCategory.PAID_COMPETITION || election.isPaidVoting)) {
+        const now = new Date().toISOString();
+        list = [
+          {
+            id: `pkg-default-1-${electionId}`,
+            organizationId,
+            electionId,
+            name: 'Single Vote',
+            credits: 1,
+            priceCents: 1000,
+            currency: 'KES',
+            isActive: true,
+            createdAt: now,
+            updatedAt: now
+          },
+          {
+            id: `pkg-default-2-${electionId}`,
+            organizationId,
+            electionId,
+            name: 'Supporter 5-Pack',
+            credits: 5,
+            priceCents: 4500,
+            currency: 'KES',
+            isActive: true,
+            createdAt: now,
+            updatedAt: now
+          },
+          {
+            id: `pkg-default-3-${electionId}`,
+            organizationId,
+            electionId,
+            name: 'Fan Supporter 10-Pack',
+            credits: 10,
+            priceCents: 8500,
+            currency: 'KES',
+            isActive: true,
+            createdAt: now,
+            updatedAt: now
+          }
+        ];
+        VotingPackagesService.localPackages.set(electionId, list);
+      }
       return list.filter((p) => p.isActive);
     }
   }
