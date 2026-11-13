@@ -23,6 +23,7 @@ import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { ThemeToggle } from '../../lib/theme';
 import { VotexaLogo } from '../../components/brand/VotexaLogo';
+import { LegalModal } from '../../components/legal/LegalModal';
 
 interface LandingPageProps {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
@@ -118,6 +119,10 @@ export function LandingPage({
   onCastBallot
 }: LandingPageProps) {
   const [activeCategoryTab, setActiveCategoryTab] = useState<'institutional' | 'paid' | 'poll'>('institutional');
+  const [legalModalState, setLegalModalState] = useState<{ isOpen: boolean; tab: 'terms' | 'privacy' }>({
+    isOpen: false,
+    tab: 'terms'
+  });
 
   // Creative Interactive Hero Showcase State
   const [heroMode, setHeroMode] = useState<'ballot' | 'mpesa'>('ballot');
@@ -184,7 +189,12 @@ export function LandingPage({
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="#categories" className="hover:text-foreground transition-colors">Election Types</a>
             <a href="#features" className="hover:text-foreground transition-colors">Key Features</a>
-            <a href="#security" className="hover:text-foreground transition-colors">Security & Privacy</a>
+            <button
+              onClick={() => setLegalModalState({ isOpen: true, tab: 'privacy' })}
+              className="hover:text-foreground transition-colors"
+            >
+              Security & Privacy
+            </button>
             <a href="#payouts" className="hover:text-foreground transition-colors">Contests & Payouts</a>
             <a href="#reports" className="hover:text-foreground transition-colors">Audit & Reports</a>
           </nav>
@@ -1081,11 +1091,25 @@ export function LandingPage({
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-bold text-foreground">Compliance & Security</h4>
+                <h4 className="font-bold text-foreground">Compliance & Legal</h4>
                 <ul className="space-y-1.5 text-muted-foreground text-[11px]">
-                  <li>Private Isolated Workspaces</li>
+                  <li>
+                    <button
+                      onClick={() => setLegalModalState({ isOpen: true, tab: 'terms' })}
+                      className="hover:text-primary transition-colors text-left"
+                    >
+                      Terms of Service
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setLegalModalState({ isOpen: true, tab: 'privacy' })}
+                      className="hover:text-primary transition-colors text-left"
+                    >
+                      Privacy Policy
+                    </button>
+                  </li>
                   <li>Secret Anonymous Ballots</li>
-                  <li>Comprehensive Audit History</li>
                   <li>KDPA & GDPR Data Privacy</li>
                 </ul>
               </div>
@@ -1094,7 +1118,20 @@ export function LandingPage({
 
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted-foreground">
             <p>© 2026 Votexa Inc. All rights reserved. Secure Voting Platform.</p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => setLegalModalState({ isOpen: true, tab: 'terms' })}
+                className="hover:text-foreground transition-colors"
+              >
+                Terms of Service
+              </button>
+              <button
+                onClick={() => setLegalModalState({ isOpen: true, tab: 'privacy' })}
+                className="hover:text-foreground transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <span className="text-border">|</span>
               <button onClick={() => onNavigateToAuth('login')} className="hover:text-foreground transition-colors">Sign In</button>
               <button onClick={() => onNavigateToAuth('register')} className="hover:text-foreground transition-colors">Register</button>
               <button onClick={() => onLaunchApp('voting')} className="hover:text-foreground transition-colors">Cast Vote</button>
@@ -1102,6 +1139,13 @@ export function LandingPage({
           </div>
         </div>
       </footer>
+
+      {/* Interactive Legal Terms & Privacy Modal */}
+      <LegalModal
+        isOpen={legalModalState.isOpen}
+        onClose={() => setLegalModalState((prev) => ({ ...prev, isOpen: false }))}
+        initialTab={legalModalState.tab}
+      />
     </div>
   );
 }

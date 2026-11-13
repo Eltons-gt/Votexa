@@ -5,6 +5,7 @@ import { Card, CardContent } from '../../components/ui/card';
 import { User, Mail, Lock, Building2, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { supabase } from '../../lib/supabase';
+import { LegalModal } from '../../components/legal/LegalModal';
 
 import {
   UserProfile,
@@ -36,6 +37,10 @@ export function RegisterForm({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [legalModal, setLegalModal] = useState<{ isOpen: boolean; tab: 'terms' | 'privacy' }>({
+    isOpen: false,
+    tab: 'terms'
+  });
 
   const proceedFallback = (cleanName: string, cleanEmail: string, orgTitle: string) => {
     const isSuperAdminEmail =
@@ -298,6 +303,27 @@ export function RegisterForm({
             )}
           </Button>
 
+          {/* Terms & Privacy Notice */}
+          <p className="text-[11px] text-center text-muted-foreground leading-normal px-2 pt-1">
+            By creating an account, you agree to Votexa's{' '}
+            <button
+              type="button"
+              onClick={() => setLegalModal({ isOpen: true, tab: 'terms' })}
+              className="text-primary hover:underline font-semibold"
+            >
+              Terms of Service
+            </button>{' '}
+            and{' '}
+            <button
+              type="button"
+              onClick={() => setLegalModal({ isOpen: true, tab: 'privacy' })}
+              className="text-primary hover:underline font-semibold"
+            >
+              Privacy Policy
+            </button>
+            .
+          </p>
+
           {/* Footer switch */}
           <div className="pt-3 border-t border-border/60 text-center text-xs text-muted-foreground">
             <span>Already have an account? </span>
@@ -311,6 +337,12 @@ export function RegisterForm({
           </div>
         </CardContent>
       </form>
+
+      <LegalModal
+        isOpen={legalModal.isOpen}
+        onClose={() => setLegalModal((prev) => ({ ...prev, isOpen: false }))}
+        initialTab={legalModal.tab}
+      />
     </Card>
   );
 }
