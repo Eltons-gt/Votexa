@@ -12,7 +12,8 @@ import {
   Layers,
   ChevronRight,
   Calendar,
-  Sparkles
+  Sparkles,
+  Share2
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -25,6 +26,7 @@ import {
   ElectionStatus
 } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import { ShareElectionModal } from '../../components/modals/ShareElectionModal';
 
 interface WorkspaceDashboardOverviewProps {
   organization: Organization;
@@ -47,6 +49,7 @@ export function WorkspaceDashboardOverview({
   const [loading, setLoading] = useState<boolean>(true);
   const [enrolledVotersCount, setEnrolledVotersCount] = useState<number>(0);
   const [ballotsCastCount, setBallotsCastCount] = useState<number>(0);
+  const [sharingElection, setSharingElection] = useState<Election | null>(null);
 
   const formatKes = (cents: number = 0) => {
     return `KES ${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
@@ -342,14 +345,26 @@ export function WorkspaceDashboardOverview({
                       <Calendar className="h-3 w-3" />
                       {new Date(elec.startTime).toLocaleDateString()}
                     </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onNavigateTab('elections')}
-                      className="border-border bg-card text-foreground hover:bg-muted text-xs font-semibold h-7 px-2.5"
-                    >
-                      Manage
-                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSharingElection(elec)}
+                        className="text-primary hover:bg-primary/10 text-xs font-semibold h-7 px-2 gap-1"
+                        title="Share vote link & QR code"
+                      >
+                        <Share2 className="h-3 w-3" />
+                        Share
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onNavigateTab('elections')}
+                        className="border-border bg-card text-foreground hover:bg-muted text-xs font-semibold h-7 px-2.5"
+                      >
+                        Manage
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );
@@ -369,7 +384,7 @@ export function WorkspaceDashboardOverview({
               <Activity className="h-4 w-4 text-emerald-500" />
               <h3 className="font-bold text-sm text-foreground">Workspace Activity Stream</h3>
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">Connected to Supabase</span>
+            <span className="text-[11px] font-mono text-muted-foreground">System Online</span>
           </div>
 
           <div className="space-y-3">
@@ -383,7 +398,7 @@ export function WorkspaceDashboardOverview({
                   <span className="text-[10px] text-muted-foreground font-mono shrink-0">Live</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                  Tenant workspace authenticated. All actions are isolated to your organization.
+                  Workspace verified. All operations are securely isolated to your organization.
                 </p>
               </div>
             </div>
@@ -396,10 +411,10 @@ export function WorkspaceDashboardOverview({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-xs font-bold text-foreground truncate">{totalElections} Contests Configured</h4>
-                    <span className="text-[10px] text-muted-foreground font-mono shrink-0">Database Synchronized</span>
+                    <span className="text-[10px] text-muted-foreground font-mono shrink-0">Synchronized</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                    Elections retrieved directly from live PostgreSQL database for {organization.name}.
+                    All voting workspaces are live and ready for {organization.name}.
                   </p>
                 </div>
               </div>
@@ -471,10 +486,16 @@ export function WorkspaceDashboardOverview({
           </div>
 
           <div className="pt-4 border-t border-border text-[11px] text-muted-foreground">
-            Tenant Slug: <code className="text-foreground font-mono font-semibold">{organization.slug}</code>
+            Organization Slug: <code className="text-foreground font-mono font-semibold">{organization.slug}</code>
           </div>
         </div>
       </div>
+
+      <ShareElectionModal
+        election={sharingElection}
+        isOpen={!!sharingElection}
+        onClose={() => setSharingElection(null)}
+      />
     </div>
   );
 }

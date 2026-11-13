@@ -42,7 +42,7 @@ export function RevenueSplitDonutChart() {
       amountCents: 90000,
       color: '#F59E0B', // Amber
       glowColor: 'rgba(245, 158, 11, 0.4)',
-      description: 'Safaricom Daraja & Paystack interchange'
+      description: 'Payment Gateway Processing'
     }
   ];
 
@@ -76,10 +76,10 @@ export function RevenueSplitDonutChart() {
         <div>
           <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
             <PieChart className="h-4 w-4 text-emerald-400" />
-            40/60 Commercial Split Ledger
+            40/60 Commercial Split Overview
           </h3>
           <p className="text-[11px] text-slate-400">
-            Automated double-entry settlement architecture.
+            Automated commercial revenue distribution.
           </p>
         </div>
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -187,7 +187,7 @@ export function RevenueSplitDonutChart() {
       <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-          <span>Double-entry ledger audited</span>
+          <span>Financial accounts verified</span>
         </span>
         <span className="font-mono text-emerald-400 font-semibold">0.00 Discrepancy</span>
       </div>

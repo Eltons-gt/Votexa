@@ -77,7 +77,7 @@ export function MemberManagement({
               <Users className="h-5 w-5 text-primary" /> Workspace Members & Roles
             </CardTitle>
             <CardDescription className="text-xs">
-              Manage team access, RBAC permissions, and administrative delegates
+              Manage team access, roles, and administrative delegates
             </CardDescription>
           </div>
           {canManageMembers && (

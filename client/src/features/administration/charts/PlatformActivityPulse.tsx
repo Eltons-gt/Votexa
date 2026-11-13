@@ -20,15 +20,15 @@ export function PlatformActivityPulse() {
         <div>
           <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
             <Activity className="h-4 w-4 text-amber-400" />
-            Contest Distribution & Telemetry Radar
+            Contest Distribution & Live Activity
           </h3>
           <p className="text-[11px] text-slate-400">
-            Real-time multi-tenant workload and consensus engine throughput.
+            Real-time platform workload and voting throughput.
           </p>
         </div>
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping"></span>
-          Consensus Live
+          System Active
         </span>
       </div>
 
@@ -117,7 +117,7 @@ export function PlatformActivityPulse() {
             <ShieldCheck className="h-3 w-3 text-emerald-400" /> Latency
           </p>
           <p className="font-mono font-bold text-emerald-300 text-sm mt-0.5">62 ms</p>
-          <p className="text-[9px] text-slate-500">Hashing Consensus</p>
+          <p className="text-[9px] text-slate-500">Verification Time</p>
         </div>
 
         <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-800">
@@ -125,7 +125,7 @@ export function PlatformActivityPulse() {
             <Layers className="h-3 w-3 text-cyan-400" /> Integrity
           </p>
           <p className="font-mono font-bold text-cyan-300 text-sm mt-0.5">100.0%</p>
-          <p className="text-[9px] text-slate-500">Cryptographic Trail</p>
+          <p className="text-[9px] text-slate-500">Verified Trail</p>
         </div>
       </div>
     </div>

@@ -14,7 +14,8 @@ import {
   History,
   Play,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Share2
 } from 'lucide-react';
 import {
   Election,
@@ -29,6 +30,7 @@ import { VoterManagement } from './VoterManagement';
 import { EligibilityManagement } from './EligibilityManagement';
 import { ElectionSettingsView } from './ElectionSettingsView';
 import { apiClient } from '../../lib/api';
+import { ShareElectionModal } from '../../components/modals/ShareElectionModal';
 
 interface ElectionDetailsProps {
   electionId: string;
@@ -50,6 +52,7 @@ export function ElectionDetails({ electionId, userRole = OrganizationRole.OWNER,
   const [transitionReason, setTransitionReason] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const fetchElection = async () => {
     try {
@@ -198,11 +201,20 @@ export function ElectionDetails({ electionId, userRole = OrganizationRole.OWNER,
             </div>
           </div>
 
-          {/* Lifecycle Action Buttons */}
-          {!isReadOnly && (
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
-              {election.status === ElectionStatus.DRAFT && (
-                <>
+          {/* Lifecycle Action Buttons & Share */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              onClick={() => setShowShareModal(true)}
+              className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-sm"
+            >
+              <Share2 className="h-3.5 w-3.5" /> Share Vote & QR
+            </Button>
+
+            {!isReadOnly && (
+              <>
+                {election.status === ElectionStatus.DRAFT && (
+                  <>
                   <Button
                     size="sm"
                     variant="outline"
@@ -261,8 +273,9 @@ export function ElectionDetails({ electionId, userRole = OrganizationRole.OWNER,
                   Cancel
                 </Button>
               )}
-            </div>
+            </>
           )}
+          </div>
         </div>
       </div>
 
@@ -416,6 +429,15 @@ export function ElectionDetails({ electionId, userRole = OrganizationRole.OWNER,
             </div>
           </div>
         </div>
+      )}
+
+      {/* Share & QR Code Modal */}
+      {election && (
+        <ShareElectionModal
+          election={election}
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   );

@@ -33,8 +33,19 @@ import {
 } from '@votexa/shared';
 import { apiClient } from './lib/api';
 import { supabase } from './lib/supabase';
+import { Button } from './components/ui/button';
+import { Vote } from 'lucide-react';
 
 export function App() {
+  // Check for public voting link parameter (?vote=<electionId>)
+  const [publicVoteElectionId, setPublicVoteElectionId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('vote');
+    }
+    return null;
+  });
+
   // Top-Level View Router: Landing Page vs. Auth Page vs. Workspace App vs. Super Admin Portal
   const [viewMode, setViewMode] = useState<'landing' | 'auth' | 'app' | 'superadmin'>(() => {
     try {
@@ -377,6 +388,53 @@ export function App() {
         .catch(() => {});
     }
   }, [activeOrgId, viewMode, currentUser?.id]);
+
+  // =========================================================================
+  // VIEW MODE 0: DIRECT PUBLIC BALLOT (via ?vote=<electionId> or QR code)
+  // =========================================================================
+  if (publicVoteElectionId) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
+        <header className="border-b border-border bg-card/80 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+          <div
+            className="flex items-center gap-2.5 cursor-pointer"
+            onClick={() => {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('vote');
+              window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+              setPublicVoteElectionId(null);
+            }}
+          >
+            <div className="h-9 w-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <Vote className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="font-black text-lg tracking-tight text-foreground">VOTEXA</span>
+              <span className="text-[11px] block font-mono text-emerald-600 dark:text-emerald-400 font-semibold leading-none">
+                Verified Public Ballot
+              </span>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={() => {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('vote');
+              window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+              setPublicVoteElectionId(null);
+            }}
+          >
+            Exit Ballot
+          </Button>
+        </header>
+        <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8">
+          <VotingInterface electionId={publicVoteElectionId} />
+        </main>
+      </div>
+    );
+  }
 
   // =========================================================================
   // VIEW MODE 1: PUBLIC LANDING PAGE

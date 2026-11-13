@@ -121,6 +121,12 @@ export class VotingController {
       phase: 'ENGINE_ACTIVE'
     });
   }
+
+  async getPublicBallot(req: Request, res: Response): Promise<void> {
+    const electionId = (req.params.electionId || req.query.electionId) as string;
+    const ballot = await votingService.getPublicBallot(electionId);
+    sendSuccess(res, ballot, undefined, 200, req.requestId);
+  }
 }
 
 export const votingController = new VotingController();

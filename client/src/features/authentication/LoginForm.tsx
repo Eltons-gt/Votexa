@@ -73,7 +73,7 @@ export function LoginForm({
         .catch(() => {});
     }
 
-    setSuccessMessage('Welcome Super Admin! Opening Sovereign Command Center...');
+    setSuccessMessage('Welcome Super Admin! Opening Platform Command Center...');
     setTimeout(() => {
       if (onLoginSuccess) {
         onLoginSuccess(superAdminUser, undefined, []);

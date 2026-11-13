@@ -84,10 +84,11 @@ export class OrganizationsService {
       try {
         await client.query('BEGIN');
 
-        // Check if slug taken
-        const existing = await client.query('SELECT id FROM organizations WHERE slug = $1', [cleanSlug]);
+        // Check if slug taken, and append random suffix if collision
+        let finalSlug = cleanSlug;
+        const existing = await client.query('SELECT id FROM organizations WHERE slug = $1', [finalSlug]);
         if (existing.rows.length > 0) {
-          throw new AppError(`Organization slug '${cleanSlug}' is already taken`, 409, 'SLUG_ALREADY_TAKEN');
+          finalSlug = `${cleanSlug}-${Math.random().toString(36).substring(2, 6)}`;
         }
 
         // Create organization
@@ -95,7 +96,7 @@ export class OrganizationsService {
           `INSERT INTO organizations (name, slug, created_by, plan_id, created_at, updated_at)
            VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING *`,
-          [name.trim(), cleanSlug, userId, 'STANDARD', now, now]
+          [name.trim(), finalSlug, userId, 'STANDARD', now, now]
         );
         const orgRow = orgRes.rows[0];
 
@@ -139,9 +140,10 @@ export class OrganizationsService {
       if (err instanceof AppError) throw err;
 
       // 2. In-Memory Fallback
+      let fallbackSlug = cleanSlug;
       for (const org of OrganizationsService.localOrgs.values()) {
-        if (org.slug === cleanSlug) {
-          throw new AppError(`Organization slug '${cleanSlug}' is already taken`, 409, 'SLUG_ALREADY_TAKEN');
+        if (org.slug === fallbackSlug) {
+          fallbackSlug = `${cleanSlug}-${Math.random().toString(36).substring(2, 6)}`;
         }
       }
 
@@ -149,7 +151,7 @@ export class OrganizationsService {
       const newOrg: Organization = {
         id: orgId,
         name: name.trim(),
-        slug: cleanSlug,
+        slug: fallbackSlug,
         planId: 'STANDARD',
         settings: { timezone: 'UTC' },
         createdAt: now,

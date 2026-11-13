@@ -65,8 +65,8 @@ export function SuperAdminPortal({
       title: 'PLATFORM GOVERNANCE',
       items: [
         { id: 'overview' as const, label: 'Platform Overview', icon: Server, badge: 'Live' },
-        { id: 'organizations' as const, label: 'Organisations & Tenants', icon: Building2 },
-        { id: 'users' as const, label: 'Users & RBAC Roles', icon: Users },
+        { id: 'organizations' as const, label: 'Organizations & Workspaces', icon: Building2 },
+        { id: 'users' as const, label: 'Users & Permissions', icon: Users },
         { id: 'elections' as const, label: 'Election Moderation', icon: Vote }
       ]
     },
@@ -75,7 +75,7 @@ export function SuperAdminPortal({
       items: [
         { id: 'payments' as const, label: 'Payment Gateway Feeds', icon: CreditCard },
         { id: 'payouts' as const, label: 'Withdrawal Desk', icon: Landmark, badge: 'Queue' },
-        { id: 'financials' as const, label: '40/60 Ledger Engine', icon: DollarSign },
+        { id: 'financials' as const, label: 'Revenue Split Engine', icon: DollarSign },
         { id: 'commissions' as const, label: 'Commission Settings', icon: Percent }
       ]
     },
@@ -83,8 +83,8 @@ export function SuperAdminPortal({
       title: 'COMPLIANCE & SECURITY',
       items: [
         { id: 'reports' as const, label: 'Reporting Center', icon: FileText, badge: '9 Reports' },
-        { id: 'audit' as const, label: 'Immutable Audit Logs', icon: Lock },
-        { id: 'security' as const, label: 'Security & Threat Feed', icon: Radio }
+        { id: 'audit' as const, label: 'System Audit Logs', icon: Lock },
+        { id: 'security' as const, label: 'Security & Activity Feed', icon: Radio }
       ]
     }
   ];
@@ -92,31 +92,31 @@ export function SuperAdminPortal({
   const tabMeta: Record<SuperAdminNavTab, { title: string; subtitle: string }> = {
     overview: {
       title: 'Platform Command Center',
-      subtitle: 'Real-time telemetry, global election turnouts, revenue aggregates, and system health.'
+      subtitle: 'Real-time platform activity, global election turnouts, revenue aggregates, and system health.'
     },
     organizations: {
-      title: 'Tenant & Workspace Governance',
-      subtitle: 'Inspect and manage all organization tenants, plan subscriptions, and operational statuses.'
+      title: 'Workspaces & Governance',
+      subtitle: 'Inspect and manage all organization workspaces, plan subscriptions, and operational statuses.'
     },
     users: {
       title: 'Global Identity & Access Control',
-      subtitle: 'Platform user directory, privilege elevation, Super Admin authorizations, and security states.'
+      subtitle: 'Platform user directory, permissions, Super Admin authorizations, and security states.'
     },
     elections: {
       title: 'Global Election Moderation',
-      subtitle: 'Cross-tenant contest surveillance, ballot integrity inspection, and emergency freeze controls.'
+      subtitle: 'Cross-workspace contest surveillance, ballot integrity inspection, and emergency freeze controls.'
     },
     payments: {
       title: 'Payment Gateway Stream',
-      subtitle: 'Live ingestion of Safaricom Daraja M-Pesa STK pushes and Paystack card transactions.'
+      subtitle: 'Live processing of mobile money and card transactions.'
     },
     payouts: {
       title: 'Organiser Withdrawal Desk',
-      subtitle: 'Review organizer earnings withdrawals and execute automated M-Pesa B2C disbursements.'
+      subtitle: 'Review organizer earnings withdrawals and execute automated disbursements.'
     },
     financials: {
-      title: 'Commercial Ledger & Revenue Sharing',
-      subtitle: 'Double-entry platform ledger tracking the 40/60 commercial split and net platform reserves.'
+      title: 'Platform Revenue & Financial Engine',
+      subtitle: 'Platform financial system tracking revenue split and verified balances.'
     },
     commissions: {
       title: 'Platform Commission Settings',
@@ -127,12 +127,12 @@ export function SuperAdminPortal({
       subtitle: 'Generate and download 9 official audit reports in RFC 4180 CSV and JSON formats.'
     },
     audit: {
-      title: 'Cryptographic Audit Trail',
-      subtitle: 'SHA-256 hash-chained immutable audit records of all administrator and tally operations.'
+      title: 'Verified Audit Trail',
+      subtitle: 'Verified tamper-evident audit records of all administrator and tally operations.'
     },
     security: {
-      title: 'Security Events & Anomaly Telemetry',
-      subtitle: 'Real-time monitoring of authentication anomalies, rate limit violations, and security incidents.'
+      title: 'Security Events & Activity Monitor',
+      subtitle: 'Real-time monitoring of authentication, rate limit checks, and security incidents.'
     }
   };
 
@@ -185,10 +185,10 @@ export function SuperAdminPortal({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-[11px] font-semibold text-slate-200">Root Governance Mode</span>
+            <span className="text-[11px] font-semibold text-slate-200">Super Admin Access</span>
           </div>
           <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/30 font-bold px-1.5 py-0">
-            Sovereign
+            Active
           </Badge>
         </div>
 
@@ -286,7 +286,7 @@ export function SuperAdminPortal({
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-[11px] text-slate-300">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-              <span>PostgreSQL Pool: {serverStatus}</span>
+              <span>System Status: {serverStatus}</span>
             </div>
 
             <ThemeToggle />

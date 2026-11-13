@@ -208,7 +208,7 @@ export function OrganizationSettings({
             <div className="p-3 bg-muted/40 border rounded-lg flex items-center justify-between text-xs">
               <div className="space-y-0.5">
                 <div className="font-semibold text-foreground">Authentication Session</div>
-                <div className="text-muted-foreground text-[11px]">Protected with secure HMAC-SHA256 & Supabase Auth</div>
+                <div className="text-muted-foreground text-[11px]">Protected with enterprise-grade multi-layer security</div>
               </div>
               <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 bg-emerald-500/10">
                 Active Session

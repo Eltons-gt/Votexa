@@ -143,7 +143,7 @@ export function RevenueSplineChart() {
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time multi-series financial ledger trajectory and verified ballot submissions.
+            Real-time financial trends and verified ballot submissions.
           </p>
         </div>
 
@@ -429,7 +429,7 @@ export function RevenueSplineChart() {
         </div>
 
         <div className="text-[11px] text-slate-400 font-mono">
-          <span>Telemetry: </span>
+          <span>Status: </span>
           <span className="text-emerald-400 font-semibold">100% Real-Time Synchronized</span>
         </div>
       </div>

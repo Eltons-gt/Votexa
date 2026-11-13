@@ -11,7 +11,7 @@ import { AppError } from '../../utils/apiResponse.js';
 import { pool } from '../../database/db.js';
 import { voteAuthorizationService } from './vote-authorization.service.js';
 import { candidatesService } from '../candidates/candidates.service.js';
-import { electionsService } from '../elections/elections.service.js';
+import { electionsService, ElectionsService } from '../elections/elections.service.js';
 
 interface StoredVoteRecord {
   id: string;
@@ -381,6 +381,94 @@ export class VotingService {
       status: electionStatus,
       auditedAt: new Date().toISOString()
     };
+  }
+
+  /**
+   * Retrieve public ballot details (election details, questions/positions, candidates, packages)
+   * accessible to voters via link or QR code without requiring an organizer account.
+   */
+  async getPublicBallot(electionId: string): Promise<{
+    election: any;
+    positions: any[];
+    candidates: any[];
+    packages: any[];
+  }> {
+    if (!electionId) {
+      throw new AppError('Election ID is required', 400, 'ELECTION_REQUIRED');
+    }
+
+    try {
+      const client = await pool.connect();
+      try {
+        const elecRes = await client.query(
+          `SELECT e.id, e.organization_id as "organizationId", e.title, e.description,
+                  e.category, e.status, e.start_time as "startTime", e.end_time as "endTime",
+                  e.timezone, e.is_paid_voting as "isPaidVoting",
+                  row_to_json(s.*) as settings
+           FROM elections e
+           LEFT JOIN election_settings s ON s.election_id = e.id
+           WHERE e.id = $1`,
+          [electionId]
+        );
+
+        if (elecRes.rows.length === 0) {
+          throw new AppError('Election not found', 404, 'ELECTION_NOT_FOUND');
+        }
+
+        const election = elecRes.rows[0];
+
+        const posRes = await client.query(
+          `SELECT id, election_id as "electionId", organization_id as "organizationId",
+                  title, description, min_selections as "minSelections", max_selections as "maxSelections",
+                  order_index as "orderIndex", created_at as "createdAt"
+           FROM election_positions
+           WHERE election_id = $1
+           ORDER BY order_index ASC`,
+          [electionId]
+        );
+
+        const candRes = await client.query(
+          `SELECT id, election_id as "electionId", organization_id as "organizationId",
+                  position_id as "positionId", name, bio, avatar_url as "avatarUrl",
+                  ballot_order as "ballotOrder"
+           FROM candidates
+           WHERE election_id = $1
+           ORDER BY ballot_order ASC`,
+          [electionId]
+        );
+
+        const pkgRes = await client.query(
+          `SELECT id, election_id as "electionId", name, vote_count as "voteCount",
+                  price_cents as "priceCents", currency, is_active as "isActive"
+           FROM voting_packages
+           WHERE election_id = $1 AND is_active = true
+           ORDER BY vote_count ASC`,
+          [electionId]
+        );
+
+        return {
+          election,
+          positions: posRes.rows,
+          candidates: candRes.rows,
+          packages: pkgRes.rows
+        };
+      } finally {
+        client.release();
+      }
+    } catch (dbErr: any) {
+      if (dbErr instanceof AppError) throw dbErr;
+      // In-memory fallback
+      const local = ElectionsService.getLocalElection(electionId);
+      if (!local) {
+        throw new AppError('Election not found', 404, 'ELECTION_NOT_FOUND');
+      }
+      return {
+        election: local,
+        positions: [],
+        candidates: [],
+        packages: []
+      };
+    }
   }
 }
 

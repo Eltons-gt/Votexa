@@ -11,20 +11,11 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
   if (typeof require !== "undefined") return require.apply(this, arguments);
   throw Error('Dynamic require of "' + x + '" is not supported');
 });
-var __esm = (fn, res, err) => function __init() {
-  if (err) throw err[0];
-  try {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  } catch (e) {
-    throw err = [e], e;
-  }
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
 var __commonJS = (cb, mod) => function __require2() {
-  try {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  } catch (e) {
-    throw mod = 0, e;
-  }
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -15333,7 +15324,7 @@ var require_shams = __commonJS({
         return true;
       }
       var obj = {};
-      var sym = /* @__PURE__ */ Symbol("test");
+      var sym = Symbol("test");
       var symObj = Object(sym);
       if (typeof sym === "string") {
         return false;
@@ -15392,7 +15383,7 @@ var require_has_symbols = __commonJS({
       if (typeof origSymbol("foo") !== "symbol") {
         return false;
       }
-      if (typeof /* @__PURE__ */ Symbol("bar") !== "symbol") {
+      if (typeof Symbol("bar") !== "symbol") {
         return false;
       }
       return hasSymbolSham();
@@ -28478,8 +28469,8 @@ var require_split2 = __commonJS({
     "use strict";
     var { Transform } = __require("stream");
     var { StringDecoder } = __require("string_decoder");
-    var kLast = /* @__PURE__ */ Symbol("last");
-    var kDecoder = /* @__PURE__ */ Symbol("decoder");
+    var kLast = Symbol("last");
+    var kDecoder = Symbol("decoder");
     function transform(chunk, enc, cb) {
       let list;
       if (this.overflow) {
@@ -30575,15 +30566,16 @@ var init_organizations_service = __esm({
           const client = await pool.connect();
           try {
             await client.query("BEGIN");
-            const existing = await client.query("SELECT id FROM organizations WHERE slug = $1", [cleanSlug]);
+            let finalSlug = cleanSlug;
+            const existing = await client.query("SELECT id FROM organizations WHERE slug = $1", [finalSlug]);
             if (existing.rows.length > 0) {
-              throw new AppError(`Organization slug '${cleanSlug}' is already taken`, 409, "SLUG_ALREADY_TAKEN");
+              finalSlug = `${cleanSlug}-${Math.random().toString(36).substring(2, 6)}`;
             }
             const orgRes = await client.query(
               `INSERT INTO organizations (name, slug, created_by, plan_id, created_at, updated_at)
            VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING *`,
-              [name.trim(), cleanSlug, userId, "STANDARD", now, now]
+              [name.trim(), finalSlug, userId, "STANDARD", now, now]
             );
             const orgRow = orgRes.rows[0];
             await client.query(
@@ -30618,16 +30610,17 @@ var init_organizations_service = __esm({
           }
         } catch (err) {
           if (err instanceof AppError) throw err;
+          let fallbackSlug = cleanSlug;
           for (const org of _OrganizationsService.localOrgs.values()) {
-            if (org.slug === cleanSlug) {
-              throw new AppError(`Organization slug '${cleanSlug}' is already taken`, 409, "SLUG_ALREADY_TAKEN");
+            if (org.slug === fallbackSlug) {
+              fallbackSlug = `${cleanSlug}-${Math.random().toString(36).substring(2, 6)}`;
             }
           }
           const orgId = `org-${Date.now()}`;
           const newOrg = {
             id: orgId,
             name: name.trim(),
-            slug: cleanSlug,
+            slug: fallbackSlug,
             planId: "STANDARD",
             settings: { timezone: "UTC" },
             createdAt: now,
@@ -37950,7 +37943,7 @@ var require_helpers = __commonJS({
       return timeNow + expiresIn;
     }
     function generateCallbackId() {
-      return /* @__PURE__ */ Symbol("auth-callback");
+      return Symbol("auth-callback");
     }
     var isBrowser = () => typeof window !== "undefined" && typeof document !== "undefined";
     exports.isBrowser = isBrowser;
@@ -46176,7 +46169,7 @@ var isString = (value) => typeof value === "string";
 var throwErrorIfExists = (err) => {
   if (err) throw err;
 };
-var dangerouslyDisableDefaultSrc = /* @__PURE__ */ Symbol("dangerouslyDisableDefaultSrc");
+var dangerouslyDisableDefaultSrc = Symbol("dangerouslyDisableDefaultSrc");
 var SHOULD_BE_QUOTED = /* @__PURE__ */ new Set(["none", "self", "strict-dynamic", "report-sample", "inline-speculation-rules", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "wasm-unsafe-eval"]);
 var getDefaultDirectives = () => ({
   "default-src": ["'self'"],
@@ -46805,7 +46798,7 @@ __export(dist_exports, {
 });
 
 // node_modules/@supabase/supabase-js/dist/tracingRegistry.mjs
-var EXTRACTOR_KEY = /* @__PURE__ */ Symbol.for("@supabase/supabase-js.traceContextExtractor");
+var EXTRACTOR_KEY = Symbol.for("@supabase/supabase-js.traceContextExtractor");
 function getTraceContextExtractor() {
   return globalThis[EXTRACTOR_KEY];
 }
@@ -55600,6 +55593,12 @@ var ElectionsService = class _ElectionsService {
   static localElections = /* @__PURE__ */ new Map();
   static localSettings = /* @__PURE__ */ new Map();
   static localAuditLogs = /* @__PURE__ */ new Map();
+  static getLocalElection(id) {
+    return _ElectionsService.localElections.get(id);
+  }
+  static getLocalSettings(id) {
+    return _ElectionsService.localSettings.get(id);
+  }
   constructor() {
     this.seedDefaultElections();
   }
@@ -58680,6 +58679,80 @@ var VotingService = class _VotingService {
       auditedAt: (/* @__PURE__ */ new Date()).toISOString()
     };
   }
+  /**
+   * Retrieve public ballot details (election details, questions/positions, candidates, packages)
+   * accessible to voters via link or QR code without requiring an organizer account.
+   */
+  async getPublicBallot(electionId) {
+    if (!electionId) {
+      throw new AppError("Election ID is required", 400, "ELECTION_REQUIRED");
+    }
+    try {
+      const client = await pool.connect();
+      try {
+        const elecRes = await client.query(
+          `SELECT e.id, e.organization_id as "organizationId", e.title, e.description,
+                  e.category, e.status, e.start_time as "startTime", e.end_time as "endTime",
+                  e.timezone, e.is_paid_voting as "isPaidVoting",
+                  row_to_json(s.*) as settings
+           FROM elections e
+           LEFT JOIN election_settings s ON s.election_id = e.id
+           WHERE e.id = $1`,
+          [electionId]
+        );
+        if (elecRes.rows.length === 0) {
+          throw new AppError("Election not found", 404, "ELECTION_NOT_FOUND");
+        }
+        const election = elecRes.rows[0];
+        const posRes = await client.query(
+          `SELECT id, election_id as "electionId", organization_id as "organizationId",
+                  title, description, min_selections as "minSelections", max_selections as "maxSelections",
+                  order_index as "orderIndex", created_at as "createdAt"
+           FROM election_positions
+           WHERE election_id = $1
+           ORDER BY order_index ASC`,
+          [electionId]
+        );
+        const candRes = await client.query(
+          `SELECT id, election_id as "electionId", organization_id as "organizationId",
+                  position_id as "positionId", name, bio, avatar_url as "avatarUrl",
+                  ballot_order as "ballotOrder"
+           FROM candidates
+           WHERE election_id = $1
+           ORDER BY ballot_order ASC`,
+          [electionId]
+        );
+        const pkgRes = await client.query(
+          `SELECT id, election_id as "electionId", name, vote_count as "voteCount",
+                  price_cents as "priceCents", currency, is_active as "isActive"
+           FROM voting_packages
+           WHERE election_id = $1 AND is_active = true
+           ORDER BY vote_count ASC`,
+          [electionId]
+        );
+        return {
+          election,
+          positions: posRes.rows,
+          candidates: candRes.rows,
+          packages: pkgRes.rows
+        };
+      } finally {
+        client.release();
+      }
+    } catch (dbErr) {
+      if (dbErr instanceof AppError) throw dbErr;
+      const local = ElectionsService.getLocalElection(electionId);
+      if (!local) {
+        throw new AppError("Election not found", 404, "ELECTION_NOT_FOUND");
+      }
+      return {
+        election: local,
+        positions: [],
+        candidates: [],
+        packages: []
+      };
+    }
+  }
 };
 var votingService = new VotingService();
 
@@ -59060,6 +59133,11 @@ var VotingController = class {
       phase: "ENGINE_ACTIVE"
     });
   }
+  async getPublicBallot(req, res) {
+    const electionId = req.params.electionId || req.query.electionId;
+    const ballot = await votingService.getPublicBallot(electionId);
+    sendSuccess(res, ballot, void 0, 200, req.requestId);
+  }
 };
 var votingController = new VotingController();
 
@@ -59088,6 +59166,9 @@ router9.post("/authorize", (req, res, next) => {
 });
 router9.post("/cast-authorized", (req, res, next) => {
   votingController.castAuthorizedVote(req, res).catch(next);
+});
+router9.get("/ballot/:electionId", (req, res, next) => {
+  votingController.getPublicBallot(req, res).catch(next);
 });
 router9.get("/status/:electionId", (req, res, next) => {
   votingController.getVotingStatus(req, res).catch(next);

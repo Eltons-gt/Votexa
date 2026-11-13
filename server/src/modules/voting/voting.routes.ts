@@ -40,6 +40,11 @@ router.post('/cast-authorized', (req, res, next) => {
   votingController.castAuthorizedVote(req, res).catch(next);
 });
 
+// Public Ballot View for QR Codes and Shared Links
+router.get('/ballot/:electionId', (req, res, next) => {
+  votingController.getPublicBallot(req, res).catch(next);
+});
+
 // Status & Receipt Verification
 router.get('/status/:electionId', (req, res, next) => {
   votingController.getVotingStatus(req, res).catch(next);

@@ -787,10 +787,10 @@ export function LandingPage({
                       // Institutional Rule Enforcement
                     </div>
                     <div className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Max votes per voter = 1 (enforced)</div>
-                    <div className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ IsPaidVoting = false (immutable)</div>
+                    <div className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ 100% Free voting guaranteed</div>
                     <div className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Single-Use Authorization Token generated</div>
                     <div className="text-muted-foreground pt-2 text-[11px]">
-                      "Double voting attempt triggers HTTP 409 CONFLICT with audit trail timestamp."
+                      "Double voting attempts are instantly blocked and recorded in the audit trail."
                     </div>
                   </div>
                 </div>

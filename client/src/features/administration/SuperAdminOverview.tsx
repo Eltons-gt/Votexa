@@ -89,21 +89,21 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-amber-400" />
-            Live Sovereign Telemetry
+            Live Platform Activity
           </span>
           <span className="text-slate-600 hidden sm:inline">•</span>
           <span className="text-xs text-slate-400 hidden sm:inline">
-            Real-time multi-tenant ledger & consensus throughput
+            Real-time voting activity and platform financial totals
           </span>
         </div>
         <div className="flex items-center gap-2">
           {metrics?.isLedgerBalanced ? (
             <Badge variant="outline" className="gap-1.5 text-[11px] bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-semibold py-0.5">
-              <Scale className="h-3 w-3" /> Double-Entry Balanced
+              <Scale className="h-3 w-3" /> Financials Balanced
             </Badge>
           ) : (
             <Badge variant="destructive" className="gap-1 text-[11px] py-0.5">
-              Ledger Discrepancy Alert
+              Discrepancy Alert
             </Badge>
           )}
           <Button
@@ -114,7 +114,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
             className="text-xs h-7 gap-1.5 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white px-2.5"
           >
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh Telemetry</span>
+            <span>Refresh Data</span>
           </Button>
         </div>
       </div>
@@ -241,7 +241,7 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
           <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between gap-2">
             <div className="text-xs text-slate-400 flex items-center gap-1.5 whitespace-nowrap">
               <span className="text-amber-400 font-bold">100%</span>
-              <span className="text-slate-400 text-[11px]">Daraja B2C settlement</span>
+              <span className="text-slate-400 text-[11px]">Mobile transfers settled</span>
             </div>
             <MiniSparkline
               data={[10, 16, 20, 26, 34, 40, 48, 54, 62]}
@@ -366,10 +366,10 @@ export function SuperAdminOverview({ onNavigateTab }: SuperAdminOverviewProps) {
           <div className="font-semibold text-sm text-slate-200 flex items-center justify-between">
             <span className="flex items-center gap-2 group-hover:text-cyan-400 transition-colors">
               <Lock className="h-4 w-4 text-cyan-400" />
-              Immutable Audit Trail
+              Verified Audit Trail
             </span>
             <Badge variant="outline" className="text-[10px] bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
-              SHA-256 Chained
+              Tamper-Evident
             </Badge>
           </div>
           <p className="text-xs text-slate-400">

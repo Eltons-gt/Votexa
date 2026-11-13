@@ -13,7 +13,8 @@ import {
   DollarSign,
   BarChart2,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Share2
 } from 'lucide-react';
 import {
   Election,
@@ -22,6 +23,7 @@ import {
   OrganizationRole
 } from '@votexa/shared';
 import { apiClient } from '../../lib/api';
+import { ShareElectionModal } from '../../components/modals/ShareElectionModal';
 
 interface ElectionDashboardProps {
   organizationName: string;
@@ -41,6 +43,7 @@ export function ElectionDashboard({
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sharingElection, setSharingElection] = useState<Election | null>(null);
 
   const fetchElections = async () => {
     try {
@@ -318,18 +321,41 @@ export function ElectionDashboard({
                 <span className="text-[11px] text-muted-foreground font-mono">
                   ID: {elec.id.slice(0, 10)}...
                 </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onSelectElection(elec)}
-                  className="gap-1 text-xs h-7 hover:bg-primary hover:text-primary-foreground"
-                >
-                  Manage <ArrowRight className="h-3 w-3" />
-                </Button>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSharingElection(elec);
+                    }}
+                    className="gap-1 text-xs h-7 text-primary hover:bg-primary/10"
+                    title="Share Vote & QR Code"
+                  >
+                    <Share2 className="h-3 w-3" /> Share
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onSelectElection(elec)}
+                    className="gap-1 text-xs h-7 hover:bg-primary hover:text-primary-foreground"
+                  >
+                    Manage <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Share & QR Code Modal */}
+      {sharingElection && (
+        <ShareElectionModal
+          election={sharingElection}
+          isOpen={!!sharingElection}
+          onClose={() => setSharingElection(null)}
+        />
       )}
     </div>
   );

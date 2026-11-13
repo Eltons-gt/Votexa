@@ -21,6 +21,14 @@ export class ElectionsService {
   private static localSettings = new Map<string, ElectionSettings>();
   private static localAuditLogs = new Map<string, ElectionAuditLog[]>();
 
+  static getLocalElection(id: string): Election | undefined {
+    return ElectionsService.localElections.get(id);
+  }
+
+  static getLocalSettings(id: string): ElectionSettings | undefined {
+    return ElectionsService.localSettings.get(id);
+  }
+
   constructor() {
     this.seedDefaultElections();
   }

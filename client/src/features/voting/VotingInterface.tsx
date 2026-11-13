@@ -71,6 +71,15 @@ export function VotingInterface({
     const loadElectionData = async () => {
       try {
         setLoading(true);
+        // Try public ballot endpoint first so voters arriving via link or QR code can load data without login
+        const ballotRes = await apiClient.get<any>(`/voting/ballot/${electionId}`);
+        if (ballotRes.success && ballotRes.data?.election) {
+          setElection(ballotRes.data.election);
+          if (ballotRes.data.positions?.length > 0) setPositions(ballotRes.data.positions);
+          if (ballotRes.data.candidates?.length > 0) setCandidates(ballotRes.data.candidates);
+          return;
+        }
+
         const [elecRes, posRes, candRes] = await Promise.all([
           apiClient.get<Election>(`/elections/${electionId}`),
           apiClient.get<ElectionPosition[]>(`/elections/${electionId}/positions`),
